@@ -96,7 +96,7 @@ func main() {
 		rl.BeginMode3D(camera)
 		rl.DrawModel(model, mapPosition, 1.0, rl.White) // Draw maze map
 		rl.EndMode3D()
-		rl.DrawTextureEx(cubicmap, rl.NewVector2(float32(rl.GetScreenWidth())-float32(cubicmap.Width)*4.0-20, 20.0), 0.0, 4.0, rl.White)
+		rl.DrawTextureEx(&cubicmap, rl.NewVector2(float32(rl.GetScreenWidth())-float32(cubicmap.Width)*4.0-20, 20.0), 0.0, 4.0, rl.White)
 		rl.DrawRectangleLines(int32(rl.GetScreenWidth())-cubicmap.Width*4-20, 20, cubicmap.Width*4, cubicmap.Height*4, rl.Green)
 		// Draw player position radar
 		rl.DrawRectangle(int32(rl.GetScreenWidth()-int(cubicmap.Width*4)-20+(playerCellX*4)), int32(20+playerCellY*4), 4, 4, rl.Red)
@@ -109,9 +109,9 @@ func main() {
 
 	// De-Initialization
 	//--------------------------------------------------------------------------------------
-	rl.UnloadTexture(cubicmap) // Unload cubicmap texture
-	rl.UnloadTexture(texture)  // Unload map texture
-	rl.UnloadModel(model)      // Unload map model
-	rl.CloseWindow()           // Close window and OpenGL context
+	rl.UnloadTexture(&cubicmap) // Unload cubicmap texture
+	rl.UnloadTexture(&texture)  // Unload map texture
+	rl.UnloadModel(&model)      // Unload map model
+	rl.CloseWindow()            // Close window and OpenGL context
 	//--------------------------------------------------------------------------------------
 }

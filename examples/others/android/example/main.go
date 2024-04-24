@@ -4,7 +4,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 // Game states
@@ -61,21 +61,21 @@ func main() {
 		case Title:
 			// Press enter to change to GamePlay screen
 			if rl.IsGestureDetected(rl.GestureTap) {
-				rl.PlaySound(fx)
+				rl.PlaySound(&fx)
 				currentScreen = GamePlay
 			}
 			break
 		case GamePlay:
 			// Press enter to change to Ending screen
 			if rl.IsGestureDetected(rl.GestureTap) {
-				rl.PlaySound(fx)
+				rl.PlaySound(&fx)
 				currentScreen = Ending
 			}
 			break
 		case Ending:
 			// Press enter to return to Title screen
 			if rl.IsGestureDetected(rl.GestureTap) {
-				rl.PlaySound(fx)
+				rl.PlaySound(&fx)
 				currentScreen = Title
 			}
 			break
@@ -88,7 +88,7 @@ func main() {
 		switch currentScreen {
 		case Logo:
 			rl.DrawText("LOGO SCREEN", 20, 20, 40, rl.LightGray)
-			rl.DrawTexture(texture, screenWidth/2-texture.Width/2, screenHeight/2-texture.Height/2, rl.White)
+			rl.DrawTexture(&texture, screenWidth/2-texture.Width/2, screenHeight/2-texture.Height/2, rl.White)
 			rl.DrawText("WAIT for 4 SECONDS...", 290, 400, 20, rl.Gray)
 			break
 		case Title:
@@ -113,11 +113,11 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadSound(fx)            // Unload sound data
-	rl.UnloadMusicStream(ambient) // Unload music stream data
-	rl.CloseAudioDevice()         // Close audio device (music streaming is automatically stopped)
-	rl.UnloadTexture(texture)     // Unload texture data
-	rl.CloseWindow()              // Close window
+	rl.UnloadSound(&fx)            // Unload sound data
+	rl.UnloadMusicStream(&ambient) // Unload music stream data
+	rl.CloseAudioDevice()          // Close audio device (music streaming is automatically stopped)
+	rl.UnloadTexture(&texture)     // Unload texture data
+	rl.CloseWindow()               // Close window
 
 	os.Exit(0)
 }

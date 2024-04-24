@@ -35,7 +35,7 @@ func main() {
 		rl.ClearBackground(rl.RayWhite)
 
 		rl.BeginShaderMode(shader)
-		rl.DrawTexture(texture, 0, 0, rl.White)
+		rl.DrawTexture(&texture, 0, 0, rl.White)
 		rl.EndShaderMode()
 
 		rl.DrawText("BACKGROUND is PAINTED and ANIMATED on SHADER!", 10, 10, 20, rl.Maroon)
@@ -43,7 +43,7 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadShader(shader) // Unload shader
+	rl.UnloadShader(&shader) // Unload shader
 
 	rl.CloseWindow()
 }

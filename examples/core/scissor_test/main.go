@@ -24,15 +24,15 @@ func main() {
 			scissorMode = !scissorMode
 		}
 
-		scissorArea.X = float32(rl.GetMouseX())
-		scissorArea.Y = float32(rl.GetMouseY())
+		scissorArea.XY.X = float32(rl.GetMouseX())
+		scissorArea.XY.Y = float32(rl.GetMouseY())
 
 		rl.BeginDrawing()
 
 		rl.ClearBackground(rl.RayWhite)
 
 		if scissorMode {
-			rl.BeginScissorMode(scissorArea.ToInt32().X, scissorArea.ToInt32().Y, scissorArea.ToInt32().Width, scissorArea.ToInt32().Height)
+			rl.BeginScissorMode(scissorArea.ToInt32().XY.X, scissorArea.ToInt32().XY.Y, scissorArea.ToInt32().WH.X, scissorArea.ToInt32().WH.Y)
 		}
 
 		rl.DrawRectangle(0, 0, screenW, screenH, rl.Red)

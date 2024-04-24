@@ -95,9 +95,9 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadShader(shader) // Unload shader
-	rl.UnloadModel(cube)    // Unload model
-	rl.UnloadModel(ground)  // Unload model
+	rl.UnloadShader(&shader) // Unload shader
+	rl.UnloadModel(&cube)    // Unload model
+	rl.UnloadModel(&ground)  // Unload model
 
 	rl.CloseWindow()
 }

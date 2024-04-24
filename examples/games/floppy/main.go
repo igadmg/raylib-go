@@ -5,7 +5,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const (
@@ -177,16 +177,16 @@ func (g *Game) Init() {
 	// Pipes
 	g.Pipes = make([]Pipe, maxPipes*2)
 	for i := 0; i < maxPipes*2; i += 2 {
-		g.Pipes[i].Rec.X = g.PipesPos[i/2].X
-		g.Pipes[i].Rec.Y = g.PipesPos[i/2].Y
-		g.Pipes[i].Rec.Width = pipesWidth
-		g.Pipes[i].Rec.Height = 550
+		g.Pipes[i].Rec.XY.X = g.PipesPos[i/2].X
+		g.Pipes[i].Rec.XY.Y = g.PipesPos[i/2].Y
+		g.Pipes[i].Rec.WH.X = pipesWidth
+		g.Pipes[i].Rec.WH.Y = 550
 		g.Pipes[i].Color = colors[rl.GetRandomValue(0, int32(len(colors)-1))]
 
-		g.Pipes[i+1].Rec.X = g.PipesPos[i/2].X
-		g.Pipes[i+1].Rec.Y = 1200 + g.PipesPos[i/2].Y - 550
-		g.Pipes[i+1].Rec.Width = pipesWidth
-		g.Pipes[i+1].Rec.Height = 550
+		g.Pipes[i+1].Rec.XY.X = g.PipesPos[i/2].X
+		g.Pipes[i+1].Rec.XY.Y = 1200 + g.PipesPos[i/2].Y - 550
+		g.Pipes[i+1].Rec.WH.X = pipesWidth
+		g.Pipes[i+1].Rec.WH.Y = 550
 
 		g.Pipes[i/2].Active = true
 	}
@@ -214,13 +214,13 @@ func (g *Game) Load() {
 
 // Unload - Unload resources
 func (g *Game) Unload() {
-	rl.UnloadSound(g.FxFlap)
-	rl.UnloadSound(g.FxSlap)
-	rl.UnloadSound(g.FxPoint)
-	rl.UnloadSound(g.FxClick)
-	rl.UnloadTexture(g.TxSprites)
-	rl.UnloadTexture(g.TxSmoke)
-	rl.UnloadTexture(g.TxClouds)
+	rl.UnloadSound(&g.FxFlap)
+	rl.UnloadSound(&g.FxSlap)
+	rl.UnloadSound(&g.FxPoint)
+	rl.UnloadSound(&g.FxClick)
+	rl.UnloadTexture(&g.TxSprites)
+	rl.UnloadTexture(&g.TxSmoke)
+	rl.UnloadTexture(&g.TxClouds)
 }
 
 // Update - Update game
@@ -231,7 +231,7 @@ func (g *Game) Update() {
 
 	if !g.GameOver {
 		if rl.IsKeyPressed(rl.KeyP) || rl.IsKeyPressed(rl.KeyBack) {
-			rl.PlaySound(g.FxClick)
+			rl.PlaySound(&g.FxClick)
 
 			if runtime.GOOS == "android" && g.Pause {
 				g.WindowShouldClose = true
@@ -248,19 +248,19 @@ func (g *Game) Update() {
 				}
 
 				for i := 0; i < maxPipes*2; i += 2 {
-					g.Pipes[i].Rec.X = g.PipesPos[i/2].X
-					g.Pipes[i+1].Rec.X = g.PipesPos[i/2].X
+					g.Pipes[i].Rec.XY.X = g.PipesPos[i/2].X
+					g.Pipes[i+1].Rec.XY.X = g.PipesPos[i/2].X
 				}
 
 				// Scroll clouds
-				g.CloudRec.X += cloudsSpeedX
-				if g.CloudRec.X > float32(g.TxClouds.Width) {
-					g.CloudRec.X = 0
+				g.CloudRec.XY.X += cloudsSpeedX
+				if g.CloudRec.XY.X > float32(g.TxClouds.Width) {
+					g.CloudRec.XY.X = 0
 				}
 
 				// Movement/Controls
 				if rl.IsKeyDown(rl.KeySpace) || rl.IsMouseButtonDown(rl.MouseLeftButton) {
-					rl.PlaySound(g.FxFlap)
+					rl.PlaySound(&g.FxFlap)
 
 					// Activate one particle every frame
 					for i := 0; i < maxParticles; i++ {
@@ -278,9 +278,9 @@ func (g *Game) Update() {
 					g.FramesCounter++
 					if g.FramesCounter >= 8 {
 						g.FramesCounter = 0
-						g.FrameRec.X = spriteSize * 3
+						g.FrameRec.XY.X = spriteSize * 3
 					} else {
-						g.FrameRec.X = spriteSize * 2
+						g.FrameRec.XY.X = spriteSize * 2
 					}
 
 					// Floppy go up
@@ -290,9 +290,9 @@ func (g *Game) Update() {
 					g.FramesCounter++
 					if g.FramesCounter >= 8 {
 						g.FramesCounter = 0
-						g.FrameRec.X = spriteSize
+						g.FrameRec.XY.X = spriteSize
 					} else {
-						g.FrameRec.X = 0
+						g.FrameRec.XY.X = 0
 					}
 
 					// Floppy fall down
@@ -319,7 +319,7 @@ func (g *Game) Update() {
 						// OMG You killed Gopher you bastard!
 						g.Dead = true
 
-						rl.PlaySound(g.FxSlap)
+						rl.PlaySound(&g.FxSlap)
 					} else if (g.PipesPos[i/2].X < g.Floppy.Position.X-spriteSize) && g.Pipes[i/2].Active && !g.GameOver {
 						// Score point
 						g.Score += 1
@@ -333,7 +333,7 @@ func (g *Game) Update() {
 							g.HiScore = g.Score
 						}
 
-						rl.PlaySound(g.FxPoint)
+						rl.PlaySound(&g.FxPoint)
 					}
 				}
 			} else {
@@ -345,9 +345,9 @@ func (g *Game) Update() {
 
 				// Switch dead sprite
 				if g.FramesCounter >= 8 {
-					g.FrameRec.X = spriteSize * 5
+					g.FrameRec.XY.X = spriteSize * 5
 				} else {
-					g.FrameRec.X = spriteSize * 4
+					g.FrameRec.XY.X = spriteSize * 4
 				}
 			}
 		} else {
@@ -357,7 +357,7 @@ func (g *Game) Update() {
 		}
 	} else {
 		if rl.IsKeyPressed(rl.KeyEnter) || rl.IsMouseButtonDown(rl.MouseLeftButton) {
-			rl.PlaySound(g.FxClick)
+			rl.PlaySound(&g.FxClick)
 
 			// Return of the Gopher!
 			g.Init()
@@ -369,9 +369,9 @@ func (g *Game) Update() {
 		g.FramesCounter++
 		if g.FramesCounter >= 8 {
 			g.FramesCounter = 0
-			g.FrameRec.X = spriteSize
+			g.FrameRec.XY.X = spriteSize
 		} else {
-			g.FrameRec.X = 0
+			g.FrameRec.XY.X = 0
 		}
 
 	}
@@ -385,21 +385,21 @@ func (g *Game) Draw() {
 
 	if !g.GameOver {
 		// Draw clouds
-		rl.DrawTextureRec(g.TxClouds, g.CloudRec, rl.NewVector2(0, float32(screenHeight-g.TxClouds.Height)), rl.RayWhite)
+		rl.DrawTextureRec(&g.TxClouds, g.CloudRec, rl.NewVector2(0, float32(screenHeight-g.TxClouds.Height)), rl.RayWhite)
 
 		// Draw rotated clouds
-		rl.DrawTexturePro(g.TxClouds, rl.NewRectangle(-g.CloudRec.X, 0, float32(g.TxClouds.Width), float32(g.TxClouds.Height)),
+		rl.DrawTexturePro(&g.TxClouds, rl.NewRectangle(-g.CloudRec.XY.X, 0, float32(g.TxClouds.Width), float32(g.TxClouds.Height)),
 			rl.NewRectangle(0, 0, float32(g.TxClouds.Width), float32(g.TxClouds.Height)), rl.NewVector2(float32(g.TxClouds.Width), float32(g.TxClouds.Height)), 180, rl.White)
 
 		// Draw Gopher
-		rl.DrawTextureRec(g.TxSprites, g.FrameRec, g.Floppy.Position, rl.RayWhite)
+		rl.DrawTextureRec(&g.TxSprites, g.FrameRec, g.Floppy.Position, rl.RayWhite)
 
 		// Draw active particles
 		if !g.Dead {
 			for i := 0; i < maxParticles; i++ {
 				if g.Particles[i].Active {
 					rl.DrawTexturePro(
-						g.TxSmoke,
+						&g.TxSmoke,
 						rl.NewRectangle(0, 0, float32(g.TxSmoke.Width), float32(g.TxSmoke.Height)),
 						rl.NewRectangle(g.Particles[i].Position.X, g.Particles[i].Position.Y, float32(g.TxSmoke.Width)*g.Particles[i].Size, float32(g.TxSmoke.Height)*g.Particles[i].Size),
 						rl.NewVector2(float32(g.TxSmoke.Width)*g.Particles[i].Size/2, float32(g.TxSmoke.Height)*g.Particles[i].Size/2),
@@ -412,12 +412,12 @@ func (g *Game) Draw() {
 
 		// Draw pipes
 		for i := 0; i < maxPipes; i++ {
-			rl.DrawRectangle(int32(g.Pipes[i*2].Rec.X), int32(g.Pipes[i*2].Rec.Y), int32(g.Pipes[i*2].Rec.Width), int32(g.Pipes[i*2].Rec.Height), g.Pipes[i*2].Color)
-			rl.DrawRectangle(int32(g.Pipes[i*2+1].Rec.X), int32(g.Pipes[i*2+1].Rec.Y), int32(g.Pipes[i*2+1].Rec.Width), int32(g.Pipes[i*2+1].Rec.Height), g.Pipes[i*2].Color)
+			rl.DrawRectangle(int32(g.Pipes[i*2].Rec.XY.X), int32(g.Pipes[i*2].Rec.XY.Y), int32(g.Pipes[i*2].Rec.WH.X), int32(g.Pipes[i*2].Rec.WH.Y), g.Pipes[i*2].Color)
+			rl.DrawRectangle(int32(g.Pipes[i*2+1].Rec.XY.X), int32(g.Pipes[i*2+1].Rec.XY.Y), int32(g.Pipes[i*2+1].Rec.WH.X), int32(g.Pipes[i*2+1].Rec.WH.Y), g.Pipes[i*2].Color)
 
 			// Draw borders
-			rl.DrawRectangleLines(int32(g.Pipes[i*2].Rec.X), int32(g.Pipes[i*2].Rec.Y), int32(g.Pipes[i*2].Rec.Width), int32(g.Pipes[i*2].Rec.Height), rl.Black)
-			rl.DrawRectangleLines(int32(g.Pipes[i*2+1].Rec.X), int32(g.Pipes[i*2+1].Rec.Y), int32(g.Pipes[i*2+1].Rec.Width), int32(g.Pipes[i*2+1].Rec.Height), rl.Black)
+			rl.DrawRectangleLines(int32(g.Pipes[i*2].Rec.XY.X), int32(g.Pipes[i*2].Rec.XY.Y), int32(g.Pipes[i*2].Rec.WH.X), int32(g.Pipes[i*2].Rec.WH.Y), rl.Black)
+			rl.DrawRectangleLines(int32(g.Pipes[i*2+1].Rec.XY.X), int32(g.Pipes[i*2+1].Rec.XY.Y), int32(g.Pipes[i*2+1].Rec.WH.X), int32(g.Pipes[i*2+1].Rec.WH.Y), rl.Black)
 		}
 
 		// Draw Super Flashing FX (one frame only)
@@ -445,7 +445,7 @@ func (g *Game) Draw() {
 		}
 
 		// Draw Gopher
-		rl.DrawTextureRec(g.TxSprites, g.FrameRec, rl.NewVector2(float32(rl.GetScreenWidth()/2-spriteSize/2), float32(rl.GetScreenHeight()/2)), rl.RayWhite)
+		rl.DrawTextureRec(&g.TxSprites, g.FrameRec, rl.NewVector2(float32(rl.GetScreenWidth()/2-spriteSize/2), float32(rl.GetScreenHeight()/2)), rl.RayWhite)
 	}
 
 	rl.EndDrawing()

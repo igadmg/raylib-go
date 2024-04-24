@@ -64,7 +64,7 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadShader(shader) // Unload shader
+	rl.UnloadShader(&shader) // Unload shader
 
 	rl.CloseWindow()
 }

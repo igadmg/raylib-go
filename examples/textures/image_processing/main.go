@@ -114,22 +114,22 @@ func main() {
 		for i := 0; i < numProcesses; i++ {
 			if i == currentProcess {
 				rl.DrawRectangleRec(selectRecs[i], rl.SkyBlue)
-				rl.DrawRectangleLines(int32(selectRecs[i].X), int32(selectRecs[i].Y), int32(selectRecs[i].Width), int32(selectRecs[i].Height), rl.Blue)
-				rl.DrawText(processText[i], int32(selectRecs[i].X+selectRecs[i].Width/2)-rl.MeasureText(processText[i], 10)/2, int32(selectRecs[i].Y)+11, 10, rl.DarkBlue)
+				rl.DrawRectangleLines(int32(selectRecs[i].XY.X), int32(selectRecs[i].XY.Y), int32(selectRecs[i].WH.X), int32(selectRecs[i].WH.Y), rl.Blue)
+				rl.DrawText(processText[i], int32(selectRecs[i].XY.X+selectRecs[i].WH.X/2)-rl.MeasureText(processText[i], 10)/2, int32(selectRecs[i].XY.Y)+11, 10, rl.DarkBlue)
 			} else {
 				rl.DrawRectangleRec(selectRecs[i], rl.LightGray)
-				rl.DrawRectangleLines(int32(selectRecs[i].X), int32(selectRecs[i].Y), int32(selectRecs[i].Width), int32(selectRecs[i].Height), rl.Gray)
-				rl.DrawText(processText[i], int32(selectRecs[i].X+selectRecs[i].Width/2)-rl.MeasureText(processText[i], 10)/2, int32(selectRecs[i].Y)+11, 10, rl.DarkGray)
+				rl.DrawRectangleLines(int32(selectRecs[i].XY.X), int32(selectRecs[i].XY.Y), int32(selectRecs[i].WH.X), int32(selectRecs[i].WH.Y), rl.Gray)
+				rl.DrawText(processText[i], int32(selectRecs[i].XY.X+selectRecs[i].WH.X/2)-rl.MeasureText(processText[i], 10)/2, int32(selectRecs[i].XY.Y)+11, 10, rl.DarkGray)
 			}
 		}
 
-		rl.DrawTexture(texture, screenWidth-texture.Width-60, screenHeight/2-texture.Height/2, rl.White)
+		rl.DrawTexture(&texture, screenWidth-texture.Width-60, screenHeight/2-texture.Height/2, rl.White)
 		rl.DrawRectangleLines(screenWidth-texture.Width-60, screenHeight/2-texture.Height/2, texture.Width, texture.Height, rl.Black)
 
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(texture)
+	rl.UnloadTexture(&texture)
 
 	rl.CloseWindow()
 }

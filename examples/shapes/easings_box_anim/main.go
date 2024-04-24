@@ -33,7 +33,7 @@ func main() {
 		case 0:
 			frames++
 
-			rec.Y = ez.ElasticOut(float32(frames), -100, float32(screenHeight/2)+100, 120)
+			rec.XY.Y = ez.ElasticOut(float32(frames), -100, float32(screenHeight/2)+100, 120)
 
 			if frames >= 120 {
 				frames = 0
@@ -42,8 +42,8 @@ func main() {
 
 		case 1:
 			frames++
-			rec.Height = ez.BounceOut(float32(frames), 100, -90, 120)
-			rec.Width = ez.BounceOut(float32(frames), 100, float32(screenWidth), 120)
+			rec.WH.Y = ez.BounceOut(float32(frames), 100, -90, 120)
+			rec.WH.X = ez.BounceOut(float32(frames), 100, float32(screenWidth), 120)
 
 			if frames >= 120 {
 				frames++
@@ -58,7 +58,7 @@ func main() {
 			}
 		case 3:
 			frames++
-			rec.Height = ez.CircOut(float32(frames), 10, float32(screenWidth), 120)
+			rec.WH.Y = ez.CircOut(float32(frames), 10, float32(screenWidth), 120)
 			if frames >= 120 {
 				frames = 0
 				state = 4
@@ -86,7 +86,7 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawRectanglePro(rec, rl.NewVector2(rec.Width/2, rec.Height/2), rotation, rl.Fade(rl.Black, alpha))
+		rl.DrawRectanglePro(rec, rl.NewVector2(rec.WH.X/2, rec.WH.Y/2), rotation, rl.Fade(rl.Black, alpha))
 
 		if state == 5 {
 			txtlen := rl.MeasureText("SPACE to replay", 20)

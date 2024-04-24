@@ -40,7 +40,7 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(bill) // Unload texture
+	rl.UnloadTexture(&bill) // Unload texture
 
 	rl.CloseWindow()
 }

@@ -5,6 +5,8 @@ package easings
 
 import (
 	"math"
+
+	"github.com/EliCDavis/vector/mathex"
 )
 
 // Linear Easing functions
@@ -38,19 +40,19 @@ func LinearInOut(t, b, c, d float32) float32 {
 // SineIn easing
 // t: current time, b: begInnIng value, c: change In value, d: duration
 func SineIn(t, b, c, d float32) float32 {
-	return -c*float32(math.Cos(float64(t/d)*(math.Pi/2))) + c + b
+	return -c*mathex.Cos(t/d*math.Pi/2) + c + b
 }
 
 // SineOut easing
 // t: current time, b: begInnIng value, c: change In value, d: duration
 func SineOut(t, b, c, d float32) float32 {
-	return c*float32(math.Sin(float64(t/d)*(math.Pi/2))) + b
+	return c*mathex.Sin(t/d*math.Pi/2) + b
 }
 
 // SineInOut easing
 // t: current time, b: begInnIng value, c: change In value, d: duration
 func SineInOut(t, b, c, d float32) float32 {
-	return -c/2*(float32(math.Cos(math.Pi*float64(t/d)))-1) + b
+	return -c/2*(mathex.Cos(math.Pi*t/d)-1) + b
 }
 
 // Circular Easing functions
@@ -59,13 +61,13 @@ func SineInOut(t, b, c, d float32) float32 {
 // t: current time, b: begInnIng value, c: change In value, d: duration
 func CircIn(t, b, c, d float32) float32 {
 	t = t / d
-	return -c*(float32(math.Sqrt(float64(1-t*t)))-1) + b
+	return -c*(mathex.Sqrt(1-t*t)-1) + b
 }
 
 // CircOut easing
 // t: current time, b: begInnIng value, c: change In value, d: duration
 func CircOut(t, b, c, d float32) float32 {
-	return c*float32(math.Sqrt(1-float64((t/d-1)*t))) + b
+	return c*mathex.Sqrt(1-(t/d-1)*t) + b
 }
 
 // CircInOut easing
@@ -74,11 +76,11 @@ func CircInOut(t, b, c, d float32) float32 {
 	t = t / d * 2
 
 	if t < 1 {
-		return -c/2*(float32(math.Sqrt(float64(1-t*t)))-1) + b
+		return -c/2*(mathex.Sqrt(1-t*t)-1) + b
 	}
 
 	t = t - 2
-	return c/2*(float32(math.Sqrt(1-float64(t*t)))+1) + b
+	return c/2*(mathex.Sqrt(1-t*t)+1) + b
 }
 
 // Cubic Easing functions
@@ -267,7 +269,7 @@ func ElasticIn(t, b, c, d float32) float32 {
 	s := p / 4
 	postFix := a * float32(math.Pow(2, 10*float64(t-1)))
 
-	return -(postFix * float32(math.Sin(float64(t*d-s)*(2*math.Pi)/float64(p)))) + b
+	return -(postFix * mathex.Sin((t*d-s)*2*math.Pi/p)) + b
 }
 
 // ElasticOut easing
@@ -287,7 +289,7 @@ func ElasticOut(t, b, c, d float32) float32 {
 	a := c
 	s := p / 4
 
-	return a*float32(math.Pow(2, -10*float64(t)))*float32(math.Sin(float64(t*d-s)*(2*math.Pi)/float64(p))) + c + b
+	return a*float32(math.Pow(2, -10*float64(t)))*mathex.Sin((t*d-s)*2*math.Pi/p) + c + b
 }
 
 // ElasticInOut easing
@@ -310,10 +312,10 @@ func ElasticInOut(t, b, c, d float32) float32 {
 	if t < 1 {
 		t = t - 1
 		postFix := a * float32(math.Pow(2, 10*float64(t)))
-		return -0.5*(postFix*float32(math.Sin(float64(t*d-s)*(2*math.Pi)/float64(p)))) + b
+		return -0.5*(postFix*mathex.Sin((t*d-s)*2*math.Pi/p)) + b
 	}
 
 	t = t - 1
 	postFix := a * float32(math.Pow(2, -10*(float64(t))))
-	return postFix*float32(math.Sin(float64(t*d-s)*(2*math.Pi)/float64(p)))*0.5 + c + b
+	return postFix*mathex.Sin((t*d-s)*2*math.Pi/p)*0.5 + c + b
 }

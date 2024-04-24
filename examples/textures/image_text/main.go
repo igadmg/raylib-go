@@ -41,12 +41,12 @@ func main() {
 
 		if !showFont {
 			// Draw texture with text already drawn inside
-			rl.DrawTextureV(texture, position, rl.White)
+			rl.DrawTextureV(&texture, position, rl.White)
 
 			// Draw text directly using sprite font
-			rl.DrawTextEx(font, "[Parrots font drawing]", rl.NewVector2(position.X+20, position.Y+20+280), float32(font.BaseSize), 0, rl.White)
+			rl.DrawTextEx(&font, "[Parrots font drawing]", rl.NewVector2(position.X+20, position.Y+20+280), float32(font.BaseSize), 0, rl.White)
 		} else {
-			rl.DrawTexture(font.Texture, screenWidth/2-font.Texture.Width/2, 50, rl.Black)
+			rl.DrawTexture(&font.Texture, screenWidth/2-font.Texture.Width/2, 50, rl.Black)
 		}
 
 		rl.DrawText("PRESS SPACE to SEE USED SPRITEFONT ", 290, 420, 10, rl.DarkGray)
@@ -54,8 +54,8 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(texture)
-	rl.UnloadFont(font)
+	rl.UnloadTexture(&texture)
+	rl.UnloadFont(&font)
 
 	rl.CloseWindow()
 }

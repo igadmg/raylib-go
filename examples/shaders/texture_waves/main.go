@@ -53,15 +53,15 @@ func main() {
 		rl.ClearBackground(rl.RayWhite)
 
 		rl.BeginShaderMode(shader)
-		rl.DrawTexture(texture, 0, 0, rl.White)
-		rl.DrawTexture(texture, texture.Width, 0, rl.White)
+		rl.DrawTexture(&texture, 0, 0, rl.White)
+		rl.DrawTexture(&texture, texture.Width, 0, rl.White)
 		rl.EndShaderMode()
 
 		rl.EndDrawing()
 	}
 
-	rl.UnloadShader(shader)
-	rl.UnloadTexture(texture)
+	rl.UnloadShader(&shader)
+	rl.UnloadTexture(&texture)
 
 	rl.CloseWindow()
 }

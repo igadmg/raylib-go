@@ -50,9 +50,9 @@ func main() {
 	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
 	camera.Fovy = 45.0
 
-	obj := rl.LoadModel("church.obj")                            // Load OBJ model
-	texture := rl.LoadTexture("church_diffuse.png")              // Load model texture
-	rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, texture) // Set obj model diffuse texture
+	obj := rl.LoadModel("church.obj")                             // Load OBJ model
+	texture := rl.LoadTexture("church_diffuse.png")               // Load model texture
+	rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, &texture) // Set obj model diffuse texture
 
 	position := rl.NewVector3(0.0, 0.0, 0.0) // Set model position
 
@@ -98,7 +98,7 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.BeginTextureMode(target) // Enable drawing to texture
+		rl.BeginTextureMode(&target) // Enable drawing to texture
 
 		rl.ClearBackground(rl.RayWhite)
 
@@ -116,7 +116,7 @@ func main() {
 		rl.BeginShaderMode(shaders[currentShader])
 
 		// NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
-		rl.DrawTextureRec(target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)), rl.NewVector2(0, 0), rl.White)
+		rl.DrawTextureRec(&target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)), rl.NewVector2(0, 0), rl.White)
 
 		rl.EndShaderMode()
 
@@ -135,12 +135,12 @@ func main() {
 
 	// Unload all postpro shaders
 	for i := 0; i < MaxPostproShaders; i++ {
-		rl.UnloadShader(shaders[i])
+		rl.UnloadShader(&shaders[i])
 	}
 
-	rl.UnloadTexture(texture)      // Unload texture
-	rl.UnloadModel(obj)            // Unload model
-	rl.UnloadRenderTexture(target) // Unload render texture
+	rl.UnloadTexture(&texture)      // Unload texture
+	rl.UnloadModel(&obj)            // Unload model
+	rl.UnloadRenderTexture(&target) // Unload render texture
 
 	rl.CloseWindow()
 }

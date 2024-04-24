@@ -32,25 +32,25 @@ func main() {
 		mousePos := rl.GetMousePosition()
 
 		if !pause {
-			boxA.X += boxAspeedX
+			boxA.XY.X += boxAspeedX
 		}
-		if boxA.X+boxA.Width >= float32(rl.GetScreenWidth()) || boxA.X <= 0 {
+		if boxA.XY.X+boxA.WH.X >= float32(rl.GetScreenWidth()) || boxA.XY.X <= 0 {
 			boxAspeedX *= -1
 		}
 
-		boxB.X = mousePos.X - boxB.Width/2
-		boxB.Y = mousePos.Y - boxB.Height/2
+		boxB.XY.X = mousePos.X - boxB.WH.X/2
+		boxB.XY.Y = mousePos.Y - boxB.WH.Y/2
 
-		if boxB.X+boxB.Width >= float32(rl.GetScreenWidth()) {
-			boxB.X = float32(rl.GetScreenWidth()) - boxB.Width
-		} else if boxB.X <= 0 {
-			boxB.X = 0
+		if boxB.XY.X+boxB.WH.X >= float32(rl.GetScreenWidth()) {
+			boxB.XY.X = float32(rl.GetScreenWidth()) - boxB.WH.X
+		} else if boxB.XY.X <= 0 {
+			boxB.XY.X = 0
 		}
 
-		if boxB.Y+boxB.Height >= float32(rl.GetScreenHeight()) {
-			boxB.Y = float32(rl.GetScreenHeight()) - boxB.Height
-		} else if boxB.X <= screenUpperLimit {
-			boxB.Y = screenUpperLimit
+		if boxB.XY.Y+boxB.WH.Y >= float32(rl.GetScreenHeight()) {
+			boxB.XY.Y = float32(rl.GetScreenHeight()) - boxB.WH.Y
+		} else if boxB.XY.X <= screenUpperLimit {
+			boxB.XY.Y = screenUpperLimit
 		}
 
 		collision := rl.CheckCollisionRecs(boxA, boxB)
@@ -70,7 +70,7 @@ func main() {
 			rl.DrawRectangle(0, 0, screenWidth, int32(screenUpperLimit), rl.Red)
 			rl.DrawRectangleRec(boxCollision, rl.Lime)
 			rl.DrawText("COLLISION", int32(rl.GetScreenWidth()/2)-(rl.MeasureText("COLLISION", 20)/2), int32(screenUpperLimit/2)-10, 20, rl.Black)
-			rl.DrawText("Collision Area: "+fmt.Sprint(boxCollision.Width*boxCollision.Height), int32(rl.GetScreenWidth()/2)-100, int32(screenUpperLimit+10), 20, rl.Black)
+			rl.DrawText("Collision Area: "+fmt.Sprint(boxCollision.WH.X*boxCollision.WH.Y), int32(rl.GetScreenWidth()/2)-100, int32(screenUpperLimit+10), 20, rl.Black)
 		} else {
 			rl.DrawRectangle(0, 0, screenWidth, int32(screenUpperLimit), rl.Black)
 		}

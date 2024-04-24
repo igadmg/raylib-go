@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const (
@@ -40,7 +40,7 @@ func main() {
 				currentFrame = 0
 			}
 
-			frameRec.X = currentFrame * float32(scarfy.Width) / 6
+			frameRec.XY.X = currentFrame * float32(scarfy.Width) / 6
 		}
 
 		if rl.IsKeyPressed(rl.KeyRight) {
@@ -59,9 +59,9 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTexture(scarfy, 15, 40, rl.White)
+		rl.DrawTexture(&scarfy, 15, 40, rl.White)
 		rl.DrawRectangleLines(15, 40, scarfy.Width, scarfy.Height, rl.Lime)
-		rl.DrawRectangleLines(15+int32(frameRec.X), 40+int32(frameRec.Y), int32(frameRec.Width), int32(frameRec.Height), rl.Red)
+		rl.DrawRectangleLines(15+int32(frameRec.XY.X), 40+int32(frameRec.XY.Y), int32(frameRec.WH.X), int32(frameRec.WH.Y), rl.Red)
 
 		rl.DrawText("FRAME SPEED: ", 165, 210, 10, rl.DarkGray)
 		rl.DrawText(fmt.Sprintf("%02d FPS", framesSpeed), 575, 210, 10, rl.DarkGray)
@@ -74,14 +74,14 @@ func main() {
 			rl.DrawRectangleLines(int32(250+21*i), 205, 20, 20, rl.Maroon)
 		}
 
-		rl.DrawTextureRec(scarfy, frameRec, position, rl.White) // Draw part of the texture
+		rl.DrawTextureRec(&scarfy, frameRec, position, rl.White) // Draw part of the texture
 
 		rl.DrawText("(c) Scarfy sprite by Eiden Marsal", screenWidth-200, screenHeight-20, 10, rl.Gray)
 
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(scarfy)
+	rl.UnloadTexture(&scarfy)
 
 	rl.CloseWindow()
 }

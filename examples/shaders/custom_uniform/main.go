@@ -22,7 +22,7 @@ func main() {
 	obj := rl.LoadModel("barracks.obj")               // Load OBJ model
 	texture := rl.LoadTexture("barracks_diffuse.png") // Load model texture
 
-	rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, texture) // Set obj model diffuse texture
+	rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, &texture) // Set obj model diffuse texture
 
 	position := rl.NewVector3(0.0, 0.0, 0.0) // Set model position
 
@@ -61,7 +61,7 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.BeginTextureMode(target) // Enable drawing to texture
+		rl.BeginTextureMode(&target) // Enable drawing to texture
 
 		rl.ClearBackground(rl.RayWhite)
 
@@ -80,7 +80,7 @@ func main() {
 		rl.BeginShaderMode(shader)
 
 		// NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
-		rl.DrawTextureRec(target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)), rl.NewVector2(0, 0), rl.White)
+		rl.DrawTextureRec(&target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)), rl.NewVector2(0, 0), rl.White)
 
 		rl.EndShaderMode()
 
@@ -91,10 +91,10 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadShader(shader)        // Unload shader
-	rl.UnloadTexture(texture)      // Unload texture
-	rl.UnloadModel(obj)            // Unload model
-	rl.UnloadRenderTexture(target) // Unload render texture
+	rl.UnloadShader(&shader)        // Unload shader
+	rl.UnloadTexture(&texture)      // Unload texture
+	rl.UnloadModel(&obj)            // Unload model
+	rl.UnloadRenderTexture(&target) // Unload render texture
 
 	rl.CloseWindow()
 }

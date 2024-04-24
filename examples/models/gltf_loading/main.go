@@ -68,7 +68,7 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadModel(model)
+	rl.UnloadModel(&model)
 
 	rl.CloseWindow()
 }

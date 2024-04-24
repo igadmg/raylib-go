@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
@@ -30,12 +30,12 @@ func main() {
 		rl.DrawText(fmt.Sprintf("Font base size:           %d", font.BaseSize), 40, 80, 20, rl.Gray)
 		rl.DrawText(fmt.Sprintf("Font chars number:     %d", font.CharsCount), 40, 110, 20, rl.Gray)
 
-		rl.DrawTextEx(font, msg, rl.NewVector2(40, 180), float32(font.BaseSize), 0, rl.Maroon)
+		rl.DrawTextEx(&font, msg, rl.NewVector2(40, 180), float32(font.BaseSize), 0, rl.Maroon)
 
 		rl.EndDrawing()
 	}
 
-	rl.UnloadFont(font) // AngelCode Font unloading
+	rl.UnloadFont(&font) // AngelCode Font unloading
 
 	rl.CloseWindow()
 }

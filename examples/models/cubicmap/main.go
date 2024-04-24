@@ -23,8 +23,8 @@ func main() {
 	model := rl.LoadModelFromMesh(mesh)
 
 	// NOTE: By default each cube is mapped to one part of texture atlas
-	texture := rl.LoadTexture("cubicmap_atlas.png")                // Load map texture
-	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, texture) // Set map diffuse texture
+	texture := rl.LoadTexture("cubicmap_atlas.png")                 // Load map texture
+	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, &texture) // Set map diffuse texture
 
 	mapPosition := rl.NewVector3(-16.0, 0.0, -8.0) // Set model position
 
@@ -49,7 +49,7 @@ func main() {
 
 		rl.EndMode3D()
 
-		rl.DrawTextureEx(cubicmap, rl.NewVector2(float32(screenWidth-cubicmap.Width*4-20), 20), 0.0, 4.0, rl.White)
+		rl.DrawTextureEx(&cubicmap, rl.NewVector2(float32(screenWidth-cubicmap.Width*4-20), 20), 0.0, 4.0, rl.White)
 		rl.DrawRectangleLines(screenWidth-cubicmap.Width*4-20, 20, cubicmap.Width*4, cubicmap.Height*4, rl.Green)
 
 		rl.DrawText("cubicmap image used to", 658, 90, 10, rl.Gray)
@@ -60,9 +60,9 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(cubicmap) // Unload cubicmap texture
-	rl.UnloadTexture(texture)  // Unload map texture
-	rl.UnloadModel(model)      // Unload map model
+	rl.UnloadTexture(&cubicmap) // Unload cubicmap texture
+	rl.UnloadTexture(&texture)  // Unload map texture
+	rl.UnloadModel(&model)      // Unload map model
 
 	rl.CloseWindow()
 }

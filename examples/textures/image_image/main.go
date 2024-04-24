@@ -35,7 +35,7 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 		if rl.IsKeyPressed(rl.KeyS) {
-			rimg := rl.LoadImageFromTexture(texture)
+			rimg := rl.LoadImageFromTexture(&texture)
 
 			f, err := os.Create("image_saved.png")
 			if err != nil {
@@ -55,13 +55,13 @@ func main() {
 		rl.ClearBackground(rl.RayWhite)
 
 		rl.DrawText("PRESS S TO SAVE IMAGE FROM TEXTURE", 20, 20, 12, rl.LightGray)
-		rl.DrawTexture(texture, screenWidth/2-texture.Width/2, screenHeight/2-texture.Height/2, rl.White)
+		rl.DrawTexture(&texture, screenWidth/2-texture.Width/2, screenHeight/2-texture.Height/2, rl.White)
 		rl.DrawText("this IS a texture loaded from an image.Image!", 285, 370, 10, rl.Gray)
 
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(texture)
+	rl.UnloadTexture(&texture)
 
 	rl.CloseWindow()
 }

@@ -52,6 +52,41 @@ const (
 	ComputeShader  = 0x91B9 // GL_COMPUTE_SHADER
 )
 
+type BlendFactor int32
+type BlendFunc int32
+
+// GL blending factors
+const (
+	BlendZero BlendFactor = iota // 0: GL_ZERO
+	BlendOne                     // 1: GL_ONE
+)
+const (
+	BlendSrcColor         BlendFactor = iota + 0x0300 // 0x0300: GL_SRC_COLOR
+	BlendOneMinusSrcColor                             // 0x0301: GL_ONE_MINUS_SRC_COLOR
+	BlendSrcAlpha                                     // 0x0302: GL_SRC_ALPHA
+	BlendOneMinusSrcAlpha                             // 0x0303: GL_ONE_MINUS_SRC_ALPHA
+	BlendDstAlpha                                     // 0x0304: GL_DST_ALPHA
+	BlendOneMinusDstAlpha                             // 0x0305: GL_ONE_MINUS_DST_ALPHA
+	BlendDstColor                                     // 0x0306: GL_DST_COLOR
+	BlendOneMinusDstColor                             // 0x0307: GL_ONE_MINUS_DST_COLOR
+	BlendSrcAlphaSaturate                             // 0x0308: GL_SRC_ALPHA_SATURATE
+)
+const (
+	BlendConstantColor         BlendFactor = iota + 0x8001 // 0x8001: GL_CONSTANT_COLOR
+	BlendOneMinusConstantColor                             // 0x8002: GL_ONE_MINUS_CONSTANT_COLOR
+	BlendConstantAlpha                                     // 0x8003: GL_CONSTANT_ALPHA
+	BlendOneMinusConstantAlpha                             // 0x8004: GL_ONE_MINUS_CONSTANT_ALPHA
+)
+
+const (
+	// GL blending functions/equations
+	BlendFuncAdd             BlendFunc = 0x8006 // GL_FUNC_ADD
+	BlendMin                 BlendFunc = 0x8007 // GL_MIN
+	BlendMax                 BlendFunc = 0x8008 // GL_MAX
+	BlendFuncSubtract        BlendFunc = 0x800A // GL_FUNC_SUBTRACT
+	BlendFuncReverseSubtract BlendFunc = 0x800B // GL_FUNC_REVERSE_SUBTRACT
+)
+
 // VertexBuffer - Dynamic vertex buffers (position + texcoords + colors + indices arrays)
 type VertexBuffer struct {
 	ElementCount int32

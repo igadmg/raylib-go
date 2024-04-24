@@ -13,11 +13,36 @@ import (
 	"io"
 	"runtime"
 	"unsafe"
+
+	"github.com/EliCDavis/vector/rect2"
+	"github.com/EliCDavis/vector/vector2"
+	"github.com/EliCDavis/vector/vector3"
+	"github.com/EliCDavis/vector/vector4"
 )
 
 func init() {
 	// Make sure the main goroutine is bound to the main thread.
 	runtime.LockOSThread()
+}
+
+type IntegerT interface {
+	int | int8 | int16 | int32 | int64
+}
+
+type FloatT interface {
+	float32 | float64
+}
+
+type NumberT interface {
+	IntegerT | FloatT
+}
+
+type CoordinateT interface {
+	NumberT
+}
+
+type Vector2T interface {
+	Vector2 | Vector2Int
 }
 
 // Wave type, defines audio wave data
@@ -163,20 +188,6 @@ type AudioProcessor struct {
 	Process *[0]byte
 	Next    *AudioProcessor
 	Prev    *AudioProcessor
-}
-
-// AutomationEvent - Automation event
-type AutomationEvent struct {
-	Frame  uint32
-	Type   uint32
-	Params [4]int32
-}
-
-// AutomationEventList - Automation event list
-type AutomationEventList struct {
-	Capacity uint32
-	Count    uint32
-	Events   *AutomationEvent
 }
 
 // CameraMode type
@@ -484,39 +495,42 @@ var (
 )
 
 // Vector2 type
-type Vector2 struct {
-	X float32
-	Y float32
+type Vector2 = vector2.Float32
+type Vector2Int = vector2.Int
+
+var (
+	AnchorTopLeft     = NewVector2(0, 0)
+	AnchorTopRight    = NewVector2(1, 0)
+	AnchorCenter      = NewVector2(0.5, 0.5)
+	AnchorBottomLeft  = NewVector2(0, 1)
+	AnchorBottomRight = NewVector2(1, 1)
+)
+
+// NewVector2 - Returns new Vector2
+func NewVector2[XT, YT CoordinateT](x XT, y YT) Vector2 {
+	return vector2.New(float32(x), float32(y))
 }
 
 // NewVector2 - Returns new Vector2
-func NewVector2(x, y float32) Vector2 {
-	return Vector2{x, y}
+func NewVector2Int[XT, YT CoordinateT](x XT, y YT) Vector2Int {
+	return vector2.New(int(x), int(y))
 }
 
 // Vector3 type
-type Vector3 struct {
-	X float32
-	Y float32
-	Z float32
-}
+type Vector3 = vector3.Float32
+type Vector3Int = vector3.Int
 
 // NewVector3 - Returns new Vector3
-func NewVector3(x, y, z float32) Vector3 {
-	return Vector3{x, y, z}
+func NewVector3[XT, YT, ZT CoordinateT](x XT, y YT, z ZT) Vector3 {
+	return vector3.New(float32(x), float32(y), float32(z))
 }
 
 // Vector4 type
-type Vector4 struct {
-	X float32
-	Y float32
-	Z float32
-	W float32
-}
+type Vector4 = vector4.Float32
 
 // NewVector4 - Returns new Vector4
-func NewVector4(x, y, z, w float32) Vector4 {
-	return Vector4{x, y, z, w}
+func NewVector4[XT, YT, ZT, WT CoordinateT](x XT, y YT, z ZT, w WT) Vector4 {
+	return vector4.New(float32(x), float32(y), float32(z), float32(w))
 }
 
 // Matrix type (OpenGL style 4x4 - right handed, column major)
@@ -550,7 +564,7 @@ type Quaternion = Vector4
 
 // NewQuaternion - Returns new Quaternion
 func NewQuaternion(x, y, z, w float32) Quaternion {
-	return Quaternion{x, y, z, w}
+	return NewVector4(x, y, z, w)
 }
 
 // Color type, RGBA (32bit)
@@ -563,46 +577,27 @@ func NewColor(r, g, b, a uint8) color.RGBA {
 }
 
 // Rectangle type
-type Rectangle struct {
-	X      float32
-	Y      float32
-	Width  float32
-	Height float32
-}
+type Rectangle = rect2.Float32
+type RectangleInt32 = rect2.Int32
+
+//type Rectangle struct {
+//	X      float32
+//	Y      float32
+//	Width  float32
+//	Height float32
+//}
 
 // NewRectangle - Returns new Rectangle
-func NewRectangle(x, y, width, height float32) Rectangle {
-	return Rectangle{x, y, width, height}
+func NewRectangle[XT, YT, WT, HT CoordinateT](x XT, y YT, width WT, height HT) Rectangle {
+	return rect2.New(vector2.New(float32(x), float32(y)), vector2.New(float32(width), float32(height)))
 }
 
-// ToInt32 converts rectangle to int32 variant
-func (r *Rectangle) ToInt32() RectangleInt32 {
-	rect := RectangleInt32{}
-	rect.X = int32(r.X)
-	rect.Y = int32(r.Y)
-	rect.Width = int32(r.Width)
-	rect.Height = int32(r.Height)
-
-	return rect
+func NewRectangleV(xy, wh Vector2) Rectangle {
+	return rect2.New(vector2.New(xy.X, xy.Y), vector2.New(wh.X, wh.Y))
 }
 
-// RectangleInt32 type
-type RectangleInt32 struct {
-	X      int32
-	Y      int32
-	Width  int32
-	Height int32
-}
-
-// ToFloat32 converts rectangle to float32 variant
-func (r *RectangleInt32) ToFloat32() Rectangle {
-	rect := Rectangle{}
-	rect.X = float32(r.X)
-	rect.Y = float32(r.Y)
-	rect.Width = float32(r.Width)
-	rect.Height = float32(r.Height)
-
-	return rect
+func NewRectangleWHV(wh Vector2) Rectangle {
+	return rect2.New(vector2.Zero[float32](), vector2.New(wh.X, wh.Y))
 }
 
 // Camera3D type, defines a camera position/orientation in 3d space
@@ -944,12 +939,12 @@ func NewShader(id uint32, locs *int32) Shader {
 }
 
 // GetLocation - Get shader value's location
-func (sh Shader) GetLocation(index int32) int32 {
+func (sh *Shader) GetLocation(index int32) int32 {
 	return *(*int32)(unsafe.Pointer(uintptr(unsafe.Pointer(sh.Locs)) + uintptr(index*4)))
 }
 
 // UpdateLocation - Update shader value's location
-func (sh Shader) UpdateLocation(index int32, loc int32) {
+func (sh *Shader) UpdateLocation(index int32, loc int32) {
 	*(*int32)(unsafe.Pointer(uintptr(unsafe.Pointer(sh.Locs)) + uintptr(index*4))) = loc
 }
 
@@ -972,28 +967,50 @@ func NewGlyphInfo(value int32, offsetX, offsetY, advanceX int32, image Image) Gl
 	return GlyphInfo{value, offsetX, offsetY, advanceX, image}
 }
 
-// Font type, includes texture and charSet array data
-type Font struct {
-	// Base size (default chars height)
-	BaseSize int32
-	// Number of characters
-	CharsCount int32
-	// Padding around the chars
-	CharsPadding int32
-	// Characters texture atlas
-	Texture Texture2D
-	// Characters rectangles in texture
-	Recs *Rectangle
-	// Characters info data
-	Chars *GlyphInfo
-}
-
 // Font type, defines generation method
 const (
 	FontDefault = iota // Default font generation, anti-aliased
 	FontBitmap         // Bitmap font generation, no anti-aliasing
 	FontSdf            // SDF font generation, requires external shader
 )
+
+// Font type, includes texture and charSet array data
+type Font struct {
+	// Base size (default chars height)
+	BaseSize int32
+	// Number of characters
+	GlyphCount int32
+	// Padding around the chars
+	GlyphPadding int32
+	// Characters texture atlas
+	Texture Texture2D
+	// Characters rectangles in texture
+	Recs *Rectangle
+	// Characters info data
+	Glyphs *GlyphInfo
+}
+
+func (f *Font) IsReady() bool {
+	return f.Texture.IsReady() && // Validate OpenGL id fot font texture atlas
+		f.BaseSize != 0 && // Validate font size
+		f.GlyphCount != 0 && // Validate font contains some glyph
+		f.Recs != nil && // Validate font recs defining glyphs on texture atlas
+		f.Glyphs != nil // Validate glyph data is loaded
+}
+
+// DrawTextEx - Draw text using Font and additional parameters
+func (f *Font) DrawEx(text string, position Vector2, fontSize float32, spacing float32, tint color.RGBA) {
+	DrawTextEx(f, text, position, fontSize, spacing, tint)
+}
+
+func (f *Font) DrawLayout(text string, fontSize float32, spacing float32, tint color.RGBA, layoutFn func(wh Vector2) Rectangle) {
+	DrawTextLayout(f, text, fontSize, spacing, tint, layoutFn)
+}
+
+// MeasureTextEx - Measure string size for Font
+func (f *Font) MeasureEx(text string, fontSize float32, spacing float32) Vector2 {
+	return MeasureTextEx(f, text, fontSize, spacing)
+}
 
 // PixelFormat - Texture format
 type PixelFormat int32
@@ -1109,6 +1126,10 @@ func NewImage(data []byte, width, height, mipmaps int32, format PixelFormat) *Im
 	return &Image{d, width, height, mipmaps, format}
 }
 
+func (i *Image) Unload() {
+	UnloadImage(i)
+}
+
 // Texture2D type, bpp always RGBA (32bit)
 // NOTE: Data stored in GPU memory
 type Texture2D struct {
@@ -1125,8 +1146,82 @@ type Texture2D struct {
 }
 
 // NewTexture2D - Returns new Texture2D
-func NewTexture2D(id uint32, width, height, mipmaps int32, format PixelFormat) Texture2D {
-	return Texture2D{id, width, height, mipmaps, format}
+func NewTexture2D(id uint32, width, height, mipmaps int32, format PixelFormat) *Texture2D {
+	return &Texture2D{id, width, height, mipmaps, format}
+}
+
+func (t *Texture2D) Unload() {
+	UnloadTexture(t)
+}
+
+func (t *Texture2D) IsReady() bool {
+	return t.ID > 0 && // Validate OpenGL id
+		t.Width > 0 &&
+		t.Height > 0 && // Validate texture size
+		t.Format > 0 && // Validate texture pixel format
+		t.Mipmaps > 0
+}
+
+func (t *Texture2D) GetSize() Vector2 {
+	return NewVector2(t.Width, t.Height)
+}
+
+func (t *Texture2D) GetRect() Rectangle {
+	return NewRectangle(0, 0, t.Width, t.Height)
+}
+
+func (t *Texture2D) Draw(posX int, posY int, tint color.RGBA) {
+	DrawTexture(t, posX, posY, tint)
+}
+
+func (t *Texture2D) DrawDef(posX int, posY int) {
+	DrawTexture(t, posX, posY, White)
+}
+
+func (t *Texture2D) DrawV(position Vector2, tint color.RGBA) {
+	DrawTextureV(t, position, tint)
+}
+
+func (t *Texture2D) DrawVDef(position Vector2) {
+	DrawTextureV(t, position, White)
+}
+
+func (t *Texture2D) DrawEx(position Vector2, rotation, scale float32, tint color.RGBA) {
+	DrawTextureEx(t, position, rotation, scale, tint)
+}
+
+func (t *Texture2D) DrawExDef(position Vector2) {
+	DrawTextureEx(t, position, 0, 1, White)
+}
+
+func (t *Texture2D) DrawRec(sourceRec Rectangle, position Vector2, tint color.RGBA) {
+	DrawTextureRec(t, sourceRec, position, tint)
+}
+
+func (t *Texture2D) DrawPro(sourceRec, destRec Rectangle, origin Vector2, rotation float32, tint color.RGBA) {
+	DrawTexturePro(t, sourceRec, destRec, origin, rotation, tint)
+}
+
+func (t *Texture2D) DrawFlippedPro(sourceRec, destRec Rectangle, origin Vector2, rotation float32, tint color.RGBA) {
+	sourceRec = sourceRec.ScaleByVectorF(NewVector2(1, -1))
+	sourceRec.XY.Y = float32(t.Height) + sourceRec.WH.Y
+	DrawTexturePro(t, sourceRec, destRec, origin, rotation, tint)
+}
+
+func (t *Texture2D) DrawProDef(destRec Rectangle) {
+	DrawTexturePro(t, t.GetRect(), destRec, NewVector2(0, 0), 0, White)
+}
+
+func (t *Texture2D) DrawProFlippedDef(destRec Rectangle) {
+	DrawTexturePro(t, t.GetRect().ScaleByVectorF(NewVector2(1, -1)), destRec, NewVector2(0, 0), 0, White)
+}
+
+func (t *Texture2D) DrawTiled(source, dest Rectangle, origin Vector2, rotation, scale float32, tint color.RGBA) {
+	DrawTextureTiled(t, source, dest, origin, rotation, scale, tint)
+}
+
+func (t *Texture2D) DrawTiledDef(dest Rectangle) {
+	DrawTextureTiled(t, t.GetRect(), dest, vector2.Zero[float32](), 0, 1, White)
 }
 
 // RenderTexture2D type, for texture rendering
@@ -1140,8 +1235,12 @@ type RenderTexture2D struct {
 }
 
 // NewRenderTexture2D - Returns new RenderTexture2D
-func NewRenderTexture2D(id uint32, texture, depth Texture2D) RenderTexture2D {
-	return RenderTexture2D{id, texture, depth}
+func NewRenderTexture2D(id uint32, texture, depth Texture2D) *RenderTexture2D {
+	return &RenderTexture2D{id, texture, depth}
+}
+
+func (r *RenderTexture2D) Unload() {
+	UnloadRenderTexture(r)
 }
 
 // TraceLogCallbackFun - function that will recive the trace log messages

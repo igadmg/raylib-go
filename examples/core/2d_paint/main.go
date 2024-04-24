@@ -24,10 +24,10 @@ func main() {
 	var colorRecs = [colorCount]rl.Rectangle{}
 
 	for i := 0; i < colorCount; i++ {
-		colorRecs[i].X = float32(10 + 30*i + 2*i)
-		colorRecs[i].Y = 10
-		colorRecs[i].Width = 30
-		colorRecs[i].Height = 30
+		colorRecs[i].XY.X = float32(10 + 30*i + 2*i)
+		colorRecs[i].XY.Y = 10
+		colorRecs[i].WH.X = 30
+		colorRecs[i].WH.Y = 30
 	}
 
 	colorSelected := 0
@@ -35,7 +35,7 @@ func main() {
 	colorMouseHover := 0
 	brushSize := 20
 
-	var btnSaveRec = rl.Rectangle{750, 10, 40, 30}
+	var btnSaveRec = rl.NewRectangle(750, 10, 40, 30)
 	btnSaveMouseHover := false
 	showSaveMessage := false
 	saveMessageCounter := 0
@@ -48,10 +48,10 @@ func main() {
 	}
 
 	// Create a RenderTexture2D to use as a canvas
-	var target rl.RenderTexture2D = rl.LoadRenderTexture(screenWidth, screenHeight)
+	target := rl.LoadRenderTexture(screenWidth, screenHeight)
 
 	// Clear render texture before entering the game loop
-	rl.BeginTextureMode(target)
+	rl.BeginTextureMode(&target)
 	rl.ClearBackground(colors[0])
 	rl.EndTextureMode()
 
@@ -101,14 +101,14 @@ func main() {
 
 		if rl.IsKeyPressed(rl.KeyC) {
 			// Clear render texture to clear color
-			rl.BeginTextureMode(target)
+			rl.BeginTextureMode(&target)
 			rl.ClearBackground(colors[0])
 			rl.EndTextureMode()
 		}
 
 		if rl.IsMouseButtonDown(rl.MouseLeftButton) || rl.GetGestureDetected() == rl.GestureDrag {
 			// Clear render texture to clear color
-			rl.BeginTextureMode(target)
+			rl.BeginTextureMode(&target)
 
 			if mousePos.Y > 50 {
 				rl.DrawCircle(int32(mousePos.X), int32(mousePos.Y), float32(brushSize), colors[colorSelected])
@@ -121,7 +121,7 @@ func main() {
 			colorSelected = 0
 
 			// Erase circle from render texture
-			rl.BeginTextureMode(target)
+			rl.BeginTextureMode(&target)
 
 			if mousePos.Y > 50 {
 				rl.DrawCircle(int32(mousePos.X), int32(mousePos.Y), float32(brushSize), colors[0])
@@ -139,9 +139,9 @@ func main() {
 		}
 
 		if btnSaveMouseHover && rl.IsMouseButtonReleased(rl.MouseLeftButton) || rl.IsKeyPressed(rl.KeyS) {
-			image := rl.LoadImageFromTexture(target.Texture)
+			image := rl.LoadImageFromTexture(&target.Texture)
 			rl.ImageFlipVertical(*&image)
-			rl.ExportImage(*image, "export.png")
+			rl.ExportImage(image, "export.png")
 			rl.UnloadImage(image)
 			showSaveMessage = true
 		}
@@ -162,7 +162,7 @@ func main() {
 		rl.ClearBackground(rl.RayWhite)
 
 		// NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
-		rl.DrawTextureRec(target.Texture, rl.Rectangle{0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)}, rl.Vector2{0, 0}, rl.White)
+		rl.DrawTextureRec(&target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)), rl.NewVector2(0, 0), rl.White)
 
 		if mousePos.Y > 50 {
 			if rl.IsMouseButtonDown(rl.MouseRightButton) {
@@ -187,9 +187,9 @@ func main() {
 			rl.DrawRectangleRec(colorRecs[colorMouseHover], rl.Fade(rl.White, 0.0))
 		}
 
-		rl.DrawRectangleLinesEx(rl.Rectangle{
-			colorRecs[colorSelected].X - 2, colorRecs[colorSelected].Y - 2, colorRecs[colorSelected].Width + 4, colorRecs[colorSelected].Height + 4,
-		}, 2, rl.Black)
+		rl.DrawRectangleLinesEx(rl.NewRectangle(
+			colorRecs[colorSelected].XY.X-2, colorRecs[colorSelected].XY.Y-2, colorRecs[colorSelected].WH.X+4, colorRecs[colorSelected].WH.Y+4,
+		), 2, rl.Black)
 
 		// Draw save image button
 		rl.DrawRectangleLinesEx(btnSaveRec, 2, checkSaveHover())
@@ -207,7 +207,7 @@ func main() {
 
 	// De-Initialization
 	//--------------------------------------------------------------------------------------
-	rl.UnloadRenderTexture(target)
+	rl.UnloadRenderTexture(&target)
 
 	rl.CloseWindow()
 

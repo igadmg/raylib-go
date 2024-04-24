@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 // Bunny type
@@ -64,7 +64,7 @@ func main() {
 			// batching buffer starts being filled again; before launching the draw call,
 			// updated vertex data from internal buffer is send to GPU... it seems it generates
 			// a stall and consequently a frame drop, limiting number of bunnies drawn at 60 fps
-			rl.DrawTexture(texture, int32(b.Position.X), int32(b.Position.Y), rl.RayWhite)
+			rl.DrawTexture(&texture, int32(b.Position.X), int32(b.Position.Y), rl.RayWhite)
 		}
 
 		rl.DrawRectangle(0, 0, screenWidth, 40, rl.LightGray)
@@ -76,6 +76,6 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(texture)
+	rl.UnloadTexture(&texture)
 	rl.CloseWindow()
 }

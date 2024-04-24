@@ -39,6 +39,16 @@ func BeginBlendMode(mode BlendMode) {
 	C.BeginBlendMode(cmode)
 }
 
+func BeginBlendCustomMode(glSrcFactor, glDstFactor BlendFactor, glEquation BlendFunc) {
+	SetBlendFactors(glSrcFactor, glDstFactor, glEquation)
+	SetBlendMode(BlendCustom)
+}
+
+func BeginBlendCustomSeparateMode(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha BlendFactor, glEqRGB, glEqAlpha BlendFunc) {
+	SetBlendFactorsSeparate(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha, glEqRGB, glEqAlpha)
+	SetBlendMode(BlendCustomSeparate)
+}
+
 // EndBlendMode - End blending mode (reset to default: alpha blending)
 func EndBlendMode() {
 	C.EndBlendMode()
@@ -448,13 +458,13 @@ func CheckErrors() {
 }
 
 // SetBlendMode - Set blending mode
-func SetBlendMode(mode int32) {
+func SetBlendMode(mode BlendMode) {
 	cmode := C.int(mode)
 	C.rlSetBlendMode(cmode)
 }
 
 // SetBlendFactors - Set blending mode factor and equation (using OpenGL factors)
-func SetBlendFactors(glSrcFactor int32, glDstFactor int32, glEquation int32) {
+func SetBlendFactors(glSrcFactor, glDstFactor BlendFactor, glEquation BlendFunc) {
 	cglSrcFactor := C.int(glSrcFactor)
 	cglDstFactor := C.int(glDstFactor)
 	cglEquation := C.int(glEquation)
@@ -462,7 +472,7 @@ func SetBlendFactors(glSrcFactor int32, glDstFactor int32, glEquation int32) {
 }
 
 // SetBlendFactorsSeparate - Set blending mode factors and equations separately (using OpenGL factors)
-func SetBlendFactorsSeparate(glSrcRGB int32, glDstRGB int32, glSrcAlpha int32, glDstAlpha int32, glEqRGB int32, glEqAlpha int32) {
+func SetBlendFactorsSeparate(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha BlendFactor, glEqRGB, glEqAlpha BlendFunc) {
 	cglSrcRGB := C.int(glSrcRGB)
 	cglDstRGB := C.int(glDstRGB)
 	cglSrcAlpha := C.int(glSrcAlpha)
@@ -586,10 +596,8 @@ func LoadTextureDepth(width, height int32, useRenderBuffer bool) {
 }
 
 // LoadFramebuffer - Load an empty framebuffer
-func LoadFramebuffer(width int32, height int32) uint32 {
-	cwidth := C.int(width)
-	cheight := C.int(height)
-	return uint32(C.rlLoadFramebuffer(cwidth, cheight))
+func LoadFramebuffer() uint32 {
+	return uint32(C.rlLoadFramebuffer())
 }
 
 // FramebufferAttach - Attach texture/renderbuffer to a framebuffer
@@ -616,17 +624,27 @@ func UnloadFramebuffer(id uint32) {
 
 // LoadShaderCode - Load shader from code strings
 func LoadShaderCode(vsCode string, fsCode string) uint32 {
-	cvsCode := C.CString(vsCode)
-	defer C.free(unsafe.Pointer(cvsCode))
-	cfsCode := C.CString(fsCode)
-	defer C.free(unsafe.Pointer(cfsCode))
+	var cvsCode *C.char = nil
+	var cfsCode *C.char = nil
+
+	if vsCode != "" {
+		cvsCode = C.CString(vsCode)
+		defer C.free(unsafe.Pointer(cvsCode))
+	}
+	if fsCode != "" {
+		cfsCode = C.CString(fsCode)
+		defer C.free(unsafe.Pointer(cfsCode))
+	}
 	return uint32(C.rlLoadShaderCode(cvsCode, cfsCode))
 }
 
 // CompileShader - Compile custom shader and return shader id (type: VERTEX_SHADER, FRAGMENT_SHADER, COMPUTE_SHADER)
 func CompileShader(shaderCode string, type_ int32) uint32 {
-	cshaderCode := C.CString(shaderCode)
-	defer C.free(unsafe.Pointer(cshaderCode))
+	var cshaderCode *C.char = nil
+	if shaderCode != "" {
+		cshaderCode = C.CString(shaderCode)
+		defer C.free(unsafe.Pointer(cshaderCode))
+	}
 	ctype_ := C.int(type_)
 	return uint32(C.rlCompileShader(cshaderCode, ctype_))
 }
@@ -647,16 +665,14 @@ func UnloadShaderProgram(id uint32) {
 // GetLocationUniform - Get shader location uniform
 func GetLocationUniform(shaderId uint32, uniformName string) int32 {
 	cshaderId := C.uint(shaderId)
-	cuniformName := C.CString(uniformName)
-	defer C.free(unsafe.Pointer(cuniformName))
+	cuniformName := textAlloc(uniformName)
 	return int32(C.rlGetLocationUniform(cshaderId, cuniformName))
 }
 
 // GetLocationAttrib - Get shader location attribute
 func GetLocationAttrib(shaderId uint32, attribName string) int32 {
 	cshaderId := C.uint(shaderId)
-	cattribName := C.CString(attribName)
-	defer C.free(unsafe.Pointer(cattribName))
+	cattribName := textAlloc(attribName)
 	return int32(C.rlGetLocationAttrib(cshaderId, cattribName))
 }
 

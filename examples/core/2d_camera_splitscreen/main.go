@@ -20,13 +20,13 @@ func main() {
 	player1 := rl.NewRectangle(200, 200, playerSize, playerSize)
 	player2 := rl.NewRectangle(250, 200, playerSize, playerSize)
 
-	cam1.Target = rl.NewVector2(player1.X, player1.Y)
+	cam1.Target = rl.NewVector2(player1.XY.X, player1.XY.Y)
 	cam1.Offset = rl.NewVector2(200, 200)
 	cam1.Rotation = 0
 	cam1.Zoom = 1
 
 	cam2 = cam1
-	cam2.Target = rl.NewVector2(player2.X, player2.Y)
+	cam2.Target = rl.NewVector2(player2.XY.X, player2.XY.Y)
 
 	screenCam1 := rl.LoadRenderTexture(screenW/2, screenH)
 	screenCam2 := rl.LoadRenderTexture(screenW/2, screenH)
@@ -38,31 +38,31 @@ func main() {
 	for !rl.WindowShouldClose() {
 
 		if rl.IsKeyDown(rl.KeyS) {
-			player1.Y += 3
+			player1.XY.Y += 3
 		} else if rl.IsKeyDown(rl.KeyW) {
-			player1.Y -= 3
+			player1.XY.Y -= 3
 		}
 		if rl.IsKeyDown(rl.KeyD) {
-			player1.X += 3
+			player1.XY.X += 3
 		} else if rl.IsKeyDown(rl.KeyA) {
-			player1.X -= 3
+			player1.XY.X -= 3
 		}
 
 		if rl.IsKeyDown(rl.KeyUp) {
-			player2.Y -= 3
+			player2.XY.Y -= 3
 		} else if rl.IsKeyDown(rl.KeyDown) {
-			player2.Y += 3
+			player2.XY.Y += 3
 		}
 		if rl.IsKeyDown(rl.KeyRight) {
-			player2.X += 3
+			player2.XY.X += 3
 		} else if rl.IsKeyDown(rl.KeyLeft) {
-			player2.X -= 3
+			player2.XY.X -= 3
 		}
 
-		cam1.Target = rl.NewVector2(player1.X, player1.Y)
-		cam2.Target = rl.NewVector2(player2.X, player2.Y)
+		cam1.Target = rl.NewVector2(player1.XY.X, player1.XY.Y)
+		cam2.Target = rl.NewVector2(player2.XY.X, player2.XY.Y)
 
-		rl.BeginTextureMode(screenCam1)
+		rl.BeginTextureMode(&screenCam1)
 		rl.ClearBackground(rl.RayWhite)
 		rl.BeginMode2D(cam1)
 
@@ -86,7 +86,7 @@ func main() {
 		rl.DrawText("PLAYER 1 WASD KEYS", 10, 10, 10, rl.Maroon)
 		rl.EndTextureMode()
 
-		rl.BeginTextureMode(screenCam2)
+		rl.BeginTextureMode(&screenCam2)
 		rl.ClearBackground(rl.RayWhite)
 		rl.BeginMode2D(cam2)
 
@@ -113,16 +113,16 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
 
-		rl.DrawTextureRec(screenCam1.Texture, splitScreenRec, rl.NewVector2(0, 0), rl.White)
-		rl.DrawTextureRec(screenCam2.Texture, splitScreenRec, rl.NewVector2(float32(screenW/2), 0), rl.White)
+		rl.DrawTextureRec(&screenCam1.Texture, splitScreenRec, rl.NewVector2(0, 0), rl.White)
+		rl.DrawTextureRec(&screenCam2.Texture, splitScreenRec, rl.NewVector2(float32(screenW/2), 0), rl.White)
 		rl.DrawRectangle((screenW/2)-2, 0, 4, screenH, rl.LightGray)
 
 		rl.EndDrawing()
 
 	}
 
-	rl.UnloadRenderTexture(screenCam1)
-	rl.UnloadRenderTexture(screenCam2)
+	rl.UnloadRenderTexture(&screenCam1)
+	rl.UnloadRenderTexture(&screenCam2)
 
 	rl.CloseWindow()
 }

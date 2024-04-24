@@ -53,7 +53,7 @@ func main() {
 			currentFontFilter = 2
 		}
 
-		textSize = rl.MeasureTextEx(font, msg, float32(fontSize), 0)
+		textSize = rl.MeasureTextEx(&font, msg, float32(fontSize), 0)
 
 		if rl.IsKeyDown(rl.KeyLeft) {
 			fontPosition.X -= 10
@@ -67,7 +67,7 @@ func main() {
 			count = len(droppedFiles)
 
 			if count == 1 { // Only support one ttf file dropped
-				rl.UnloadFont(font)
+				rl.UnloadFont(&font)
 				font = rl.LoadFontEx(droppedFiles[0], fontSize, nil)
 				rl.UnloadDroppedFiles()
 			}
@@ -82,7 +82,7 @@ func main() {
 		rl.DrawText("Use 1, 2, 3 to change texture filter", 20, 60, 10, rl.Gray)
 		rl.DrawText("Drop a new TTF font for dynamic loading", 20, 80, 10, rl.DarkGray)
 
-		rl.DrawTextEx(font, msg, fontPosition, float32(fontSize), 0, rl.Black)
+		rl.DrawTextEx(&font, msg, fontPosition, float32(fontSize), 0, rl.Black)
 
 		// TODO: It seems texSize measurement is not accurate due to chars offsets...
 		//rl.DrawRectangleLines(int32(fontPosition.X), int32(fontPosition.Y), int32(textSize.X), int32(textSize.Y), rl.Red)
@@ -103,7 +103,7 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadFont(font) // Font unloading
+	rl.UnloadFont(&font) // Font unloading
 
 	rl.UnloadDroppedFiles() // Clear internal buffers
 

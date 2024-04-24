@@ -2,9 +2,11 @@ module github.com/gen2brain/raylib-go/rres
 
 go 1.21
 
-require github.com/gen2brain/raylib-go/raylib v0.0.0-20231118125650-a1c890e8cbfc
+replace github.com/gen2brain/raylib-go/raylib => github.com/igadmg/raylib-go/raylib
+
+require github.com/gen2brain/raylib-go/raylib v0.0.0-20240227114648-c3665eb9abf8
 
 require (
-	github.com/ebitengine/purego v0.5.0 // indirect
-	golang.org/x/sys v0.14.0 // indirect
+	github.com/ebitengine/purego v0.7.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
 )

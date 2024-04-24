@@ -40,23 +40,27 @@ type CStringArray struct {
 }
 
 // NewCStringArray returns an instance of CStringArray
-func NewCStringArray() *CStringArray {
-	return &CStringArray{}
+func NewCStringArray() CStringArray {
+	return CStringArray{}
 }
 
 // NewCStringArrayFromSlice makes an instance of CStringArray then copy the
 // input slice to it.
-func NewCStringArrayFromSlice(ss []string) *CStringArray {
+func NewCStringArrayFromSlice(ss []string) CStringArray {
 	var arr CStringArray
 	arr.Copy(ss)
-	return &arr
+	return arr
 }
 
-func NewCStringArrayFromPointer(p unsafe.Pointer) *CStringArray {
-	return &CStringArray{
+func NewCStringArrayFromPointer(p unsafe.Pointer) CStringArray {
+	return CStringArray{
 		Length:  int(C.len_str_array((**C.char)(p))),
 		Pointer: p,
 	}
+}
+
+func (arr *CStringArray) IsNil() bool {
+	return arr.Pointer == nil
 }
 
 // ToSlice converts CStringArray to Go slice of strings
@@ -99,4 +103,5 @@ func (arr *CStringArray) Copy(ss []string) {
 // then don't need to call Free()
 func (arr *CStringArray) Free() {
 	C.free_str_array((**C.char)(arr.Pointer), C.int(arr.Length))
+	arr.Pointer = nil
 }

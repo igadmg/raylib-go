@@ -28,12 +28,12 @@ func DrawScene() {
 	spacing := float32(4.0)
 
 	// Grid of cube trees on a plane to make a "world"
-	rl.DrawPlane(rl.Vector3{0, 0, 0}, rl.Vector2{50, 50}, rl.Beige) // Simple world plane
+	rl.DrawPlane(rl.NewVector3(0, 0, 0), rl.NewVector2(50, 50), rl.Beige) // Simple world plane
 
 	for x := -float32(count * spacing); x <= count*spacing; x += spacing {
 		for z := -float32(count * spacing); z <= count*spacing; z += spacing {
-			rl.DrawCube(rl.Vector3{x, 1.5, z}, 1, 1, 1, rl.Lime)
-			rl.DrawCube(rl.Vector3{x, 0.5, z}, 0.25, 1, 0.25, rl.Brown)
+			rl.DrawCube(rl.NewVector3(x, 1.5, z), 1, 1, 1, rl.Lime)
+			rl.DrawCube(rl.NewVector3(x, 0.5, z), 0.25, 1, 0.25, rl.Brown)
 		}
 	}
 
@@ -74,7 +74,7 @@ func main() {
 	screenPlayer2 := rl.LoadRenderTexture(screenWidth/2, screenHeight)
 
 	// Build a flipped rectangle the size of the split view to use for drawing later
-	splitScreenRect := rl.Rectangle{0.0, 0.0, float32(screenPlayer1.Texture.Width), float32(-screenPlayer1.Texture.Height)}
+	splitScreenRect := rl.NewRectangle(0.0, 0.0, screenPlayer1.Texture.Width, -screenPlayer1.Texture.Height)
 
 	rl.SetTargetFPS(60) // Set our game to run at 60 frames-per-second
 	//--------------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ func main() {
 		// Draw
 		//----------------------------------------------------------------------------------
 		// Draw Player1 view to the render texture
-		rl.BeginTextureMode(screenPlayer1)
+		rl.BeginTextureMode(&screenPlayer1)
 		rl.ClearBackground(rl.SkyBlue)
 		rl.BeginMode3D(cameraPlayer1)
 		DrawScene()
@@ -118,7 +118,7 @@ func main() {
 		rl.EndTextureMode()
 
 		// Draw Player2 view to the render texture
-		rl.BeginTextureMode(screenPlayer2)
+		rl.BeginTextureMode(&screenPlayer2)
 		rl.ClearBackground(rl.SkyBlue)
 		rl.BeginMode3D(cameraPlayer2)
 		DrawScene()
@@ -129,15 +129,15 @@ func main() {
 		// Draw both views render textures to the screen side by side
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
-		rl.DrawTextureRec(screenPlayer1.Texture, splitScreenRect, rl.Vector2{0, 0}, rl.White)
-		rl.DrawTextureRec(screenPlayer2.Texture, splitScreenRect, rl.Vector2{screenWidth / 2.0, 0}, rl.White)
+		rl.DrawTextureRec(&screenPlayer1.Texture, splitScreenRect, rl.NewVector2(0, 0), rl.White)
+		rl.DrawTextureRec(&screenPlayer2.Texture, splitScreenRect, rl.NewVector2(screenWidth/2.0, 0), rl.White)
 		rl.EndDrawing()
 	}
 
 	// De-Initialization
 	//--------------------------------------------------------------------------------------
-	rl.UnloadRenderTexture(screenPlayer1) // Unload render texture
-	rl.UnloadRenderTexture(screenPlayer2) // Unload render texture
+	rl.UnloadRenderTexture(&screenPlayer1) // Unload render texture
+	rl.UnloadRenderTexture(&screenPlayer2) // Unload render texture
 
 	rl.CloseWindow() // Close window and OpenGL context
 	//--------------------------------------------------------------------------------------

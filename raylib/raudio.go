@@ -37,40 +37,6 @@ func internalAudioStreamCallbackGo(data unsafe.Pointer, frames C.int) {
 	}
 }
 
-// newWaveFromPointer - Returns new Wave from pointer
-func newWaveFromPointer(ptr unsafe.Pointer) Wave {
-	return *(*Wave)(ptr)
-}
-
-// cptr returns C pointer
-func (w *Wave) cptr() *C.Wave {
-	return (*C.Wave)(unsafe.Pointer(w))
-}
-
-// newSoundFromPointer - Returns new Sound from pointer
-func newSoundFromPointer(ptr unsafe.Pointer) Sound {
-	return *(*Sound)(ptr)
-}
-
-func (s *Sound) cptr() *C.Sound {
-	return (*C.Sound)(unsafe.Pointer(s))
-}
-
-// newAudioStreamFromPointer - Returns new AudioStream from pointer
-func newAudioStreamFromPointer(ptr unsafe.Pointer) AudioStream {
-	return *(*AudioStream)(ptr)
-}
-
-// cptr returns C pointer
-func (a *AudioStream) cptr() *C.AudioStream {
-	return (*C.AudioStream)(unsafe.Pointer(a))
-}
-
-// newMusicFromPointer - Returns new Music from pointer
-func newMusicFromPointer(ptr unsafe.Pointer) Music {
-	return *(*Music)(ptr)
-}
-
 // InitAudioDevice - Initialize audio device and context
 func InitAudioDevice() {
 	C.InitAudioDevice()
@@ -103,61 +69,53 @@ func GetMasterVolume() float32 {
 
 // LoadWave - Load wave data from file into RAM
 func LoadWave(fileName string) Wave {
-	cfileName := C.CString(fileName)
-	defer C.free(unsafe.Pointer(cfileName))
+	cfileName := textAlloc(fileName)
 	ret := C.LoadWave(cfileName)
-	v := newWaveFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newWaveFromPointer(&ret)
 }
 
 // LoadWaveFromMemory - Load wave from memory buffer, fileType refers to extension: i.e. ".wav"
 func LoadWaveFromMemory(fileType string, fileData []byte, dataSize int32) Wave {
-	cfileType := C.CString(fileType)
-	defer C.free(unsafe.Pointer(cfileType))
+	cfileType := textAlloc(fileType)
 	cfileData := (*C.uchar)(unsafe.Pointer(&fileData[0]))
 	cdataSize := (C.int)(dataSize)
 	ret := C.LoadWaveFromMemory(cfileType, cfileData, cdataSize)
-	v := newWaveFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newWaveFromPointer(&ret)
 }
 
 // IsWaveReady - Checks if wave data is ready
-func IsWaveReady(wave Wave) bool {
+func IsWaveReady(wave *Wave) bool {
 	cwave := wave.cptr()
-	ret := C.IsWaveReady(*cwave)
+	ret := C.IsWaveReady(cwave)
 	v := bool(ret)
 	return v
 }
 
 // LoadSound - Load sound to memory
 func LoadSound(fileName string) Sound {
-	cfileName := C.CString(fileName)
-	defer C.free(unsafe.Pointer(cfileName))
+	cfileName := textAlloc(fileName)
 	ret := C.LoadSound(cfileName)
-	v := newSoundFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newSoundFromPointer(&ret)
 }
 
 // LoadSoundFromWave - Load sound to memory from wave data
 func LoadSoundFromWave(wave Wave) Sound {
 	cwave := wave.cptr()
 	ret := C.LoadSoundFromWave(*cwave)
-	v := newSoundFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newSoundFromPointer(&ret)
 }
 
 // LoadSoundAlias - Create a new sound that shares the same sample data as the source sound, does not own the sound data
 func LoadSoundAlias(source Sound) Sound {
 	csound := source.cptr()
 	ret := C.LoadSoundAlias(*csound)
-	v := newSoundFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newSoundFromPointer(&ret)
 }
 
 // IsSoundReady - Checks if a sound is ready
-func IsSoundReady(sound Sound) bool {
+func IsSoundReady(sound *Sound) bool {
 	csound := sound.cptr()
-	ret := C.IsSoundReady(*csound)
+	ret := C.IsSoundReady(csound)
 	v := bool(ret)
 	return v
 }
@@ -171,51 +129,50 @@ func UpdateSound(sound Sound, data []byte, samplesCount int32) {
 }
 
 // UnloadWave - Unload wave data
-func UnloadWave(wave Wave) {
+func UnloadWave(wave *Wave) {
 	cwave := wave.cptr()
-	C.UnloadWave(*cwave)
+	C.UnloadWave(cwave)
 }
 
 // UnloadSound - Unload sound
-func UnloadSound(sound Sound) {
+func UnloadSound(sound *Sound) {
 	csound := sound.cptr()
-	C.UnloadSound(*csound)
+	C.UnloadSound(csound)
 }
 
 // ExportWave - Export wave data to file
 func ExportWave(wave Wave, fileName string) {
 	cwave := wave.cptr()
-	cfileName := C.CString(fileName)
-	defer C.free(unsafe.Pointer(cfileName))
+	cfileName := textAlloc(fileName)
 	C.ExportWave(*cwave, cfileName)
 }
 
 // PlaySound - Play a sound
-func PlaySound(sound Sound) {
+func PlaySound(sound *Sound) {
 	csound := sound.cptr()
 	C.PlaySound(*csound)
 }
 
 // StopSound - Stop playing a sound
-func StopSound(sound Sound) {
+func StopSound(sound *Sound) {
 	csound := sound.cptr()
 	C.StopSound(*csound)
 }
 
 // PauseSound - Pause a sound
-func PauseSound(sound Sound) {
+func PauseSound(sound *Sound) {
 	csound := sound.cptr()
 	C.PauseSound(*csound)
 }
 
 // ResumeSound - Resume a paused sound
-func ResumeSound(sound Sound) {
+func ResumeSound(sound *Sound) {
 	csound := sound.cptr()
 	C.ResumeSound(*csound)
 }
 
 // IsSoundPlaying - Check if a sound is currently playing
-func IsSoundPlaying(sound Sound) bool {
+func IsSoundPlaying(sound *Sound) bool {
 	csound := sound.cptr()
 	ret := C.IsSoundPlaying(*csound)
 	v := bool(ret)
@@ -256,8 +213,7 @@ func WaveFormat(wave Wave, sampleRate int32, sampleSize int32, channels int32) {
 func WaveCopy(wave Wave) Wave {
 	cwave := wave.cptr()
 	ret := C.WaveCopy(*cwave)
-	v := newWaveFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newWaveFromPointer(&ret)
 }
 
 // WaveCrop - Crop a wave to defined samples range
@@ -283,116 +239,112 @@ func UnloadWaveSamples(samples []float32) {
 
 // LoadMusicStream - Load music stream from file
 func LoadMusicStream(fileName string) Music {
-	cfileName := C.CString(fileName)
-	defer C.free(unsafe.Pointer(cfileName))
+	cfileName := textAlloc(fileName)
 	ret := C.LoadMusicStream(cfileName)
-	v := newMusicFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newMusicFromPointer(&ret)
 }
 
 // LoadMusicStreamFromMemory - Load music stream from data
 func LoadMusicStreamFromMemory(fileType string, fileData []byte, dataSize int32) Music {
-	cfileType := C.CString(fileType)
-	defer C.free(unsafe.Pointer(cfileType))
+	cfileType := textAlloc(fileType)
 	cfileData := (*C.uchar)(unsafe.Pointer(&fileData[0]))
 	cdataSize := (C.int)(dataSize)
 	ret := C.LoadMusicStreamFromMemory(cfileType, cfileData, cdataSize)
-	v := newMusicFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newMusicFromPointer(&ret)
 }
 
 // IsMusicReady - Checks if a music stream is ready
-func IsMusicReady(music Music) bool {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
+func IsMusicReady(music *Music) bool {
+	cmusic := music.cptr()
 	ret := C.IsMusicReady(cmusic)
 	v := bool(ret)
 	return v
 }
 
 // UnloadMusicStream - Unload music stream
-func UnloadMusicStream(music Music) {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
+func UnloadMusicStream(music *Music) {
+	cmusic := music.cptr()
 	C.UnloadMusicStream(cmusic)
 }
 
 // PlayMusicStream - Start music playing
 func PlayMusicStream(music Music) {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
-	C.PlayMusicStream(cmusic)
+	cmusic := music.cptr()
+	C.PlayMusicStream(*cmusic)
 }
 
 // IsMusicStreamPlaying - Check if music is playing
 func IsMusicStreamPlaying(music Music) bool {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
-	ret := C.IsMusicStreamPlaying(cmusic)
+	cmusic := music.cptr()
+	ret := C.IsMusicStreamPlaying(*cmusic)
 	v := bool(ret)
 	return v
 }
 
 // UpdateMusicStream - Updates buffers for music streaming
 func UpdateMusicStream(music Music) {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
-	C.UpdateMusicStream(cmusic)
+	cmusic := music.cptr()
+	C.UpdateMusicStream(*cmusic)
 }
 
 // StopMusicStream - Stop music playing
 func StopMusicStream(music Music) {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
-	C.StopMusicStream(cmusic)
+	cmusic := music.cptr()
+	C.StopMusicStream(*cmusic)
 }
 
 // PauseMusicStream - Pause music playing
 func PauseMusicStream(music Music) {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
-	C.PauseMusicStream(cmusic)
+	cmusic := music.cptr()
+	C.PauseMusicStream(*cmusic)
 }
 
 // ResumeMusicStream - Resume playing paused music
 func ResumeMusicStream(music Music) {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
-	C.ResumeMusicStream(cmusic)
+	cmusic := music.cptr()
+	C.ResumeMusicStream(*cmusic)
 }
 
 // SeekMusicStream - Seek music to a position (in seconds)
 func SeekMusicStream(music Music, position float32) {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
+	cmusic := music.cptr()
 	cposition := (C.float)(position)
-	C.SeekMusicStream(cmusic, cposition)
+	C.SeekMusicStream(*cmusic, cposition)
 }
 
 // SetMusicVolume - Set volume for music (1.0 is max level)
 func SetMusicVolume(music Music, volume float32) {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
+	cmusic := music.cptr()
 	cvolume := (C.float)(volume)
-	C.SetMusicVolume(cmusic, cvolume)
+	C.SetMusicVolume(*cmusic, cvolume)
 }
 
 // SetMusicPitch - Set pitch for a music (1.0 is base level)
 func SetMusicPitch(music Music, pitch float32) {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
+	cmusic := music.cptr()
 	cpitch := (C.float)(pitch)
-	C.SetMusicPitch(cmusic, cpitch)
+	C.SetMusicPitch(*cmusic, cpitch)
 }
 
 // SetMusicPan - Set pan for a music (0.5 is center)
 func SetMusicPan(music Music, pan float32) {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
+	cmusic := music.cptr()
 	cpan := (C.float)(pan)
-	C.SetMusicPan(cmusic, cpan)
+	C.SetMusicPan(*cmusic, cpan)
 }
 
 // GetMusicTimeLength - Get music time length (in seconds)
 func GetMusicTimeLength(music Music) float32 {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
-	ret := C.GetMusicTimeLength(cmusic)
+	cmusic := music.cptr()
+	ret := C.GetMusicTimeLength(*cmusic)
 	v := (float32)(ret)
 	return v
 }
 
 // GetMusicTimePlayed - Get current music time played (in seconds)
 func GetMusicTimePlayed(music Music) float32 {
-	cmusic := *(*C.Music)(unsafe.Pointer(&music))
-	ret := C.GetMusicTimePlayed(cmusic)
+	cmusic := music.cptr()
+	ret := C.GetMusicTimePlayed(*cmusic)
 	v := (float32)(ret)
 	return v
 }
@@ -403,22 +355,21 @@ func LoadAudioStream(sampleRate uint32, sampleSize uint32, channels uint32) Audi
 	csampleSize := (C.uint)(sampleSize)
 	cchannels := (C.uint)(channels)
 	ret := C.LoadAudioStream(csampleRate, csampleSize, cchannels)
-	v := newAudioStreamFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newAudioStreamFromPointer(&ret)
 }
 
 // IsAudioStreamReady - Checks if an audio stream is ready
-func IsAudioStreamReady(stream AudioStream) bool {
+func IsAudioStreamReady(stream *AudioStream) bool {
 	cstream := stream.cptr()
-	ret := C.IsAudioStreamReady(*cstream)
+	ret := C.IsAudioStreamReady(cstream)
 	v := bool(ret)
 	return v
 }
 
 // UnloadAudioStream - Unload audio stream and free memory
-func UnloadAudioStream(stream AudioStream) {
+func UnloadAudioStream(stream *AudioStream) {
 	cstream := stream.cptr()
-	C.UnloadAudioStream(*cstream)
+	C.UnloadAudioStream(cstream)
 }
 
 // UpdateAudioStream - Update audio stream buffers with data

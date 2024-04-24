@@ -1,6 +1,7 @@
 package rl
 
 /*
+#cgo CFLAGS: -I${SRCDIR}/../external/raylib/src -I${SRCDIR}/../external/raylib/src/external/glfw/include -std=gnu99 -Wno-missing-braces -Wno-unused-result -Wno-implicit-function-declaration
 #include "raylib.h"
 #include <stdlib.h>
 */
@@ -11,125 +12,9 @@ import (
 	"unsafe"
 )
 
-// newVector2FromPointer - Returns new Vector2 from pointer
-func newVector2FromPointer(ptr unsafe.Pointer) Vector2 {
-	return *(*Vector2)(ptr)
-}
-
-// cptr returns C pointer
-func (v *Vector2) cptr() *C.Vector2 {
-	return (*C.Vector2)(unsafe.Pointer(v))
-}
-
-// newVector3FromPointer - Returns new Vector3 from pointer
-func newVector3FromPointer(ptr unsafe.Pointer) Vector3 {
-	return *(*Vector3)(ptr)
-}
-
-// cptr returns C pointer
-func (v *Vector3) cptr() *C.Vector3 {
-	return (*C.Vector3)(unsafe.Pointer(v))
-}
-
-// newVector4FromPointer - Returns new Vector4 from pointer
-func newVector4FromPointer(ptr unsafe.Pointer) Vector4 {
-	return *(*Vector4)(ptr)
-}
-
-// cptr returns C pointer
-func (v *Vector4) cptr() *C.Vector4 {
-	return (*C.Vector4)(unsafe.Pointer(v))
-}
-
-// newMatrixFromPointer - Returns new Matrix from pointer
-func newMatrixFromPointer(ptr unsafe.Pointer) Matrix {
-	return *(*Matrix)(ptr)
-}
-
-// cptr returns C pointer
-func (m *Matrix) cptr() *C.Matrix {
-	return (*C.Matrix)(unsafe.Pointer(m))
-}
-
-// newColorFromPointer - Returns new Color from pointer
-func newColorFromPointer(ptr unsafe.Pointer) color.RGBA {
-	return *(*color.RGBA)(ptr)
-}
-
-// colorCptr returns color C pointer
-func colorCptr(col color.RGBA) *C.Color {
-	return (*C.Color)(unsafe.Pointer(&col))
-}
-
-// newRectangleFromPointer - Returns new Rectangle from pointer
-func newRectangleFromPointer(ptr unsafe.Pointer) Rectangle {
-	return *(*Rectangle)(ptr)
-}
-
-// cptr returns C pointer
-func (r *Rectangle) cptr() *C.Rectangle {
-	return (*C.Rectangle)(unsafe.Pointer(r))
-}
-
-// newCamera3DFromPointer - Returns new Camera3D from pointer
-func newCamera3DFromPointer(ptr unsafe.Pointer) Camera3D {
-	return *(*Camera3D)(ptr)
-}
-
-// cptr returns C pointer
-func (c *Camera) cptr() *C.Camera {
-	return (*C.Camera)(unsafe.Pointer(c))
-}
-
-// newCamera2DFromPointer - Returns new Camera2D from pointer
-func newCamera2DFromPointer(ptr unsafe.Pointer) Camera2D {
-	return *(*Camera2D)(ptr)
-}
-
-// cptr returns C pointer
-func (c *Camera2D) cptr() *C.Camera2D {
-	return (*C.Camera2D)(unsafe.Pointer(c))
-}
-
-// newBoundingBoxFromPointer - Returns new BoundingBox from pointer
-func newBoundingBoxFromPointer(ptr unsafe.Pointer) BoundingBox {
-	return *(*BoundingBox)(ptr)
-}
-
-// cptr returns C pointer
-func (b *BoundingBox) cptr() *C.BoundingBox {
-	return (*C.BoundingBox)(unsafe.Pointer(b))
-}
-
-// newShaderFromPointer - Returns new Shader from pointer
-func newShaderFromPointer(ptr unsafe.Pointer) Shader {
-	return *(*Shader)(ptr)
-}
-
-// cptr returns C pointer
-func (s *Shader) cptr() *C.Shader {
-	return (*C.Shader)(unsafe.Pointer(s))
-}
-
-// newAutomationEventFromPointer - Returns new AutomationEvent from pointer
-func newAutomationEventFromPointer(ptr unsafe.Pointer) AutomationEvent {
-	return *(*AutomationEvent)(ptr)
-}
-
-// cptr returns C pointer
-func (a *AutomationEvent) cptr() *C.AutomationEvent {
-	return (*C.AutomationEvent)(unsafe.Pointer(a))
-}
-
-// newAutomationEventListFromPointer - Returns new AutomationEventList from pointer
-func newAutomationEventListFromPointer(ptr unsafe.Pointer) AutomationEventList {
-	return *(*AutomationEventList)(ptr)
-}
-
-// cptr returns C pointer
-func (a *AutomationEventList) cptr() *C.AutomationEventList {
-	return (*C.AutomationEventList)(unsafe.Pointer(a))
-}
+// AutomationEvent - Automation event
+type AutomationEvent = C.AutomationEvent
+type AutomationEventList = C.AutomationEventList
 
 // WindowShouldClose - Check if KeyEscape pressed or Close icon pressed
 func WindowShouldClose() bool {
@@ -247,8 +132,7 @@ func SetWindowIcons(images []Image, count int32) {
 
 // SetWindowTitle - Set title for window (only PLATFORM_DESKTOP)
 func SetWindowTitle(title string) {
-	ctitle := C.CString(title)
-	defer C.free(unsafe.Pointer(ctitle))
+	ctitle := textAlloc(title)
 	C.SetWindowTitle(ctitle)
 }
 
@@ -344,8 +228,7 @@ func GetCurrentMonitor() int {
 func GetMonitorPosition(monitor int) Vector2 {
 	cmonitor := (C.int)(monitor)
 	ret := C.GetMonitorPosition(cmonitor)
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // GetMonitorWidth - Get primary monitor width
@@ -391,15 +274,13 @@ func GetMonitorRefreshRate(monitor int) int {
 // GetWindowPosition - Get window position XY on monitor
 func GetWindowPosition() Vector2 {
 	ret := C.GetWindowPosition()
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // GetWindowScaleDPI - Get window scale DPI factor
 func GetWindowScaleDPI() Vector2 {
 	ret := C.GetWindowScaleDPI()
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // GetMonitorName - Get the human-readable, UTF-8 encoded name of the primary monitor
@@ -412,8 +293,7 @@ func GetMonitorName(monitor int) string {
 
 // SetClipboardText - Set clipboard text content
 func SetClipboardText(data string) {
-	cdata := C.CString(data)
-	defer C.free(unsafe.Pointer(cdata))
+	cdata := textAlloc(data)
 	C.SetClipboardText(cdata)
 }
 
@@ -436,7 +316,7 @@ func DisableEventWaiting() {
 
 // ClearBackground - Sets Background Color
 func ClearBackground(col color.RGBA) {
-	ccolor := colorCptr(col)
+	ccolor := ccolorptr(&col)
 	C.ClearBackground(*ccolor)
 }
 
@@ -473,7 +353,7 @@ func EndMode3D() {
 }
 
 // BeginTextureMode - Initializes render texture for drawing
-func BeginTextureMode(target RenderTexture2D) {
+func BeginTextureMode(target *RenderTexture2D) {
 	ctarget := target.cptr()
 	C.BeginTextureMode(*ctarget)
 }
@@ -492,6 +372,14 @@ func BeginScissorMode(x, y, width, height int32) {
 	C.BeginScissorMode(cx, cy, cwidth, cheight)
 }
 
+func BeginScissorModeRec(r RectangleInt32) {
+	cx := (C.int)(r.XY.X)
+	cy := (C.int)(r.XY.Y)
+	cwidth := (C.int)(r.WH.X)
+	cheight := (C.int)(r.WH.Y)
+	C.BeginScissorMode(cx, cy, cwidth, cheight)
+}
+
 // EndScissorMode - Ends scissor mode
 func EndScissorMode() {
 	C.EndScissorMode()
@@ -499,11 +387,8 @@ func EndScissorMode() {
 
 // LoadShader - Load a custom shader and bind default locations
 func LoadShader(vsFileName string, fsFileName string) Shader {
-	cvsFileName := C.CString(vsFileName)
-	defer C.free(unsafe.Pointer(cvsFileName))
-
-	cfsFileName := C.CString(fsFileName)
-	defer C.free(unsafe.Pointer(cfsFileName))
+	cvsFileName := textAlloc(vsFileName)
+	cfsFileName := textAlloc(fsFileName)
 
 	if vsFileName == "" {
 		cvsFileName = nil
@@ -514,37 +399,32 @@ func LoadShader(vsFileName string, fsFileName string) Shader {
 	}
 
 	ret := C.LoadShader(cvsFileName, cfsFileName)
-	v := newShaderFromPointer(unsafe.Pointer(&ret))
-
-	return v
+	return *newShaderFromPointer(&ret)
 }
 
 // LoadShaderFromMemory - Load shader from code strings and bind default locations
 func LoadShaderFromMemory(vsCode string, fsCode string) Shader {
-	cvsCode := C.CString(vsCode)
-	defer C.free(unsafe.Pointer(cvsCode))
+	var cvsCode *C.char = nil
+	var cfsCode *C.char = nil
 
-	cfsCode := C.CString(fsCode)
-	defer C.free(unsafe.Pointer(cfsCode))
-
-	if vsCode == "" {
-		cvsCode = nil
+	if vsCode != "" {
+		cvsCode = C.CString(vsCode)
+		defer C.free(unsafe.Pointer(cvsCode))
 	}
 
-	if fsCode == "" {
-		cfsCode = nil
+	if fsCode != "" {
+		cfsCode = C.CString(fsCode)
+		defer C.free(unsafe.Pointer(cfsCode))
 	}
 
 	ret := C.LoadShaderFromMemory(cvsCode, cfsCode)
-	v := newShaderFromPointer(unsafe.Pointer(&ret))
-
-	return v
+	return *newShaderFromPointer(&ret)
 }
 
 // IsShaderReady - Check if a shader is ready
-func IsShaderReady(shader Shader) bool {
+func IsShaderReady(shader *Shader) bool {
 	cshader := shader.cptr()
-	ret := C.IsShaderReady(*cshader)
+	ret := C.IsShaderReady(cshader)
 	v := bool(ret)
 	return v
 }
@@ -552,8 +432,7 @@ func IsShaderReady(shader Shader) bool {
 // GetShaderLocation - Get shader uniform location
 func GetShaderLocation(shader Shader, uniformName string) int32 {
 	cshader := shader.cptr()
-	cuniformName := C.CString(uniformName)
-	defer C.free(unsafe.Pointer(cuniformName))
+	cuniformName := textAlloc(uniformName)
 
 	ret := C.GetShaderLocation(*cshader, cuniformName)
 	v := (int32)(ret)
@@ -563,8 +442,7 @@ func GetShaderLocation(shader Shader, uniformName string) int32 {
 // GetShaderLocationAttrib - Get shader attribute location
 func GetShaderLocationAttrib(shader Shader, attribName string) int32 {
 	cshader := shader.cptr()
-	cuniformName := C.CString(attribName)
-	defer C.free(unsafe.Pointer(cuniformName))
+	cuniformName := textAlloc(attribName)
 
 	ret := C.GetShaderLocationAttrib(*cshader, cuniformName)
 	v := (int32)(ret)
@@ -599,7 +477,7 @@ func SetShaderValueMatrix(shader Shader, locIndex int32, mat Matrix) {
 }
 
 // SetShaderValueTexture - Set shader uniform value for texture (sampler2d)
-func SetShaderValueTexture(shader Shader, locIndex int32, texture Texture2D) {
+func SetShaderValueTexture(shader Shader, locIndex int32, texture *Texture2D) {
 	cshader := shader.cptr()
 	clocIndex := (C.int)(locIndex)
 	ctexture := texture.cptr()
@@ -607,76 +485,69 @@ func SetShaderValueTexture(shader Shader, locIndex int32, texture Texture2D) {
 }
 
 // UnloadShader - Unload a custom shader from memory
-func UnloadShader(shader Shader) {
+func UnloadShader(shader *Shader) {
 	cshader := shader.cptr()
-	C.UnloadShader(*cshader)
+	C.UnloadShader(cshader)
 }
 
 // GetMouseRay - Returns a ray trace from mouse position
 func GetMouseRay(mousePosition Vector2, camera Camera) Ray {
-	cmousePosition := mousePosition.cptr()
+	cmousePosition := cvec2ptr(&mousePosition)
 	ccamera := camera.cptr()
 	ret := C.GetMouseRay(*cmousePosition, *ccamera)
-	v := newRayFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newRayFromPointer(&ret)
 }
 
 // GetCameraMatrix - Returns camera transform matrix (view matrix)
 func GetCameraMatrix(camera Camera) Matrix {
 	ccamera := camera.cptr()
 	ret := C.GetCameraMatrix(*ccamera)
-	v := newMatrixFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newMatrixFromPointer(&ret)
 }
 
 // GetCameraMatrix2D - Returns camera 2d transform matrix
 func GetCameraMatrix2D(camera Camera2D) Matrix {
 	ccamera := camera.cptr()
 	ret := C.GetCameraMatrix2D(*ccamera)
-	v := newMatrixFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newMatrixFromPointer(&ret)
 }
 
 // GetWorldToScreen - Returns the screen space position from a 3d world space position
 func GetWorldToScreen(position Vector3, camera Camera) Vector2 {
-	cposition := position.cptr()
+	cposition := cvec3ptr(&position)
 	ccamera := camera.cptr()
 	ret := C.GetWorldToScreen(*cposition, *ccamera)
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // GetScreenToWorld2D - Returns the world space position for a 2d camera screen space position
 func GetScreenToWorld2D(position Vector2, camera Camera2D) Vector2 {
-	cposition := position.cptr()
+	cposition := cvec2ptr(&position)
 	ccamera := camera.cptr()
 	ret := C.GetScreenToWorld2D(*cposition, *ccamera)
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // GetWorldToScreenEx - Get size position for a 3d world space position
 func GetWorldToScreenEx(position Vector3, camera Camera, width int32, height int32) Vector2 {
-	cposition := position.cptr()
+	cposition := cvec3ptr(&position)
 	ccamera := camera.cptr()
 	cwidth := (C.int)(width)
 	cheight := (C.int)(height)
 	ret := C.GetWorldToScreenEx(*cposition, *ccamera, cwidth, cheight)
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // GetWorldToScreen2D - Returns the screen space position for a 2d camera world space position
 func GetWorldToScreen2D(position Vector2, camera Camera2D) Vector2 {
-	cposition := position.cptr()
+	cposition := cvec2ptr(&position)
 	ccamera := camera.cptr()
 	ret := C.GetWorldToScreen2D(*cposition, *ccamera)
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // SetTargetFPS - Set target FPS (maximum)
-func SetTargetFPS(fps int32) {
+func SetTargetFPS[T IntegerT](fps T) {
 	cfps := (C.int)(fps)
 	C.SetTargetFPS(cfps)
 }
@@ -704,16 +575,15 @@ func GetTime() float64 {
 
 // Fade - Returns color with alpha applied, alpha goes from 0.0f to 1.0f
 func Fade(col color.RGBA, alpha float32) color.RGBA {
-	ccolor := colorCptr(col)
+	ccolor := ccolorptr(&col)
 	calpha := (C.float)(alpha)
 	ret := C.Fade(*ccolor, calpha)
-	v := newColorFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *gocolorptr(&ret)
 }
 
 // ColorToInt - Returns hexadecimal value for a Color
 func ColorToInt(col color.RGBA) int32 {
-	ccolor := colorCptr(col)
+	ccolor := ccolorptr(&col)
 	ret := C.ColorToInt(*ccolor)
 	v := (int32)(ret)
 	return v
@@ -733,18 +603,16 @@ func ColorNormalize(col color.RGBA) Vector4 {
 
 // ColorFromNormalized - Returns Color from normalized values [0..1]
 func ColorFromNormalized(normalized Vector4) color.RGBA {
-	cnormalized := normalized.cptr()
+	cnormalized := cvec4ptr(&normalized)
 	ret := C.ColorFromNormalized(*cnormalized)
-	v := newColorFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *gocolorptr(&ret)
 }
 
 // ColorToHSV - Returns HSV values for a Color, hue [0..360], saturation/value [0..1]
 func ColorToHSV(col color.RGBA) Vector3 {
-	ccolor := colorCptr(col)
+	ccolor := ccolorptr(&col)
 	ret := C.ColorToHSV(*ccolor)
-	v := newVector3FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec3ptr(&ret)
 }
 
 // ColorFromHSV - Returns a Color from HSV values, hue [0..360], saturation/value [0..1]
@@ -753,35 +621,31 @@ func ColorFromHSV(hue, saturation, value float32) color.RGBA {
 	csaturation := (C.float)(saturation)
 	cvalue := (C.float)(value)
 	ret := C.ColorFromHSV(chue, csaturation, cvalue)
-	v := newColorFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *gocolorptr(&ret)
 }
 
 // ColorTint - Get color multiplied with another color
 func ColorTint(col color.RGBA, tint color.RGBA) color.RGBA {
-	ccolor := colorCptr(col)
-	ctint := colorCptr(tint)
+	ccolor := ccolorptr(&col)
+	ctint := ccolorptr(&tint)
 	ret := C.ColorTint(*ccolor, *ctint)
-	v := newColorFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *gocolorptr(&ret)
 }
 
 // ColorBrightness - Get color with brightness correction, brightness factor goes from -1.0f to 1.0f
 func ColorBrightness(col color.RGBA, factor float32) color.RGBA {
-	ccolor := colorCptr(col)
+	ccolor := ccolorptr(&col)
 	cfactor := C.float(factor)
 	ret := C.ColorBrightness(*ccolor, cfactor)
-	v := newColorFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *gocolorptr(&ret)
 }
 
 // ColorContrast - Get color with contrast correction, contrast values between -1.0f and 1.0f
 func ColorContrast(col color.RGBA, contrast float32) color.RGBA {
-	ccolor := colorCptr(col)
+	ccolor := ccolorptr(&col)
 	ccontrast := C.float(contrast)
 	ret := C.ColorContrast(*ccolor, ccontrast)
-	v := newColorFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *gocolorptr(&ret)
 }
 
 // ColorAlpha - Returns color with alpha applied, alpha goes from 0.0f to 1.0f
@@ -791,20 +655,18 @@ func ColorAlpha(col color.RGBA, alpha float32) color.RGBA {
 
 // ColorAlphaBlend - Returns src alpha-blended into dst color with tint
 func ColorAlphaBlend(src, dst, tint color.RGBA) color.RGBA {
-	csrc := colorCptr(src)
-	cdst := colorCptr(dst)
-	ctint := colorCptr(tint)
+	csrc := ccolorptr(&src)
+	cdst := ccolorptr(&dst)
+	ctint := ccolorptr(&tint)
 	ret := C.ColorAlphaBlend(*csrc, *cdst, *ctint)
-	v := newColorFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *gocolorptr(&ret)
 }
 
 // GetColor - Returns a Color struct from hexadecimal value
 func GetColor(hexValue uint) color.RGBA {
 	chexValue := (C.uint)(hexValue)
 	ret := C.GetColor(chexValue)
-	v := newColorFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *gocolorptr(&ret)
 }
 
 // GetPixelDataSize - Get pixel data size in bytes for certain format
@@ -862,8 +724,7 @@ func GetRandomValue(min, max int32) int32 {
 
 // OpenURL - Open URL with default system browser (if available)
 func OpenURL(url string) {
-	curl := C.CString(url)
-	defer C.free(unsafe.Pointer(curl))
+	curl := textAlloc(url)
 	C.OpenURL(curl)
 }
 
@@ -875,31 +736,26 @@ func SetConfigFlags(flags uint32) {
 
 // TakeScreenshot - Takes a screenshot of current screen (saved a .png)
 func TakeScreenshot(name string) {
-	cname := C.CString(name)
-	defer C.free(unsafe.Pointer(cname))
+	cname := textAlloc(name)
 	C.TakeScreenshot(cname)
 }
 
 // LoadAutomationEventList - Load automation events list from file, NULL for empty list, capacity = MAX_AUTOMATION_EVENTS
 func LoadAutomationEventList(fileName string) AutomationEventList {
-	cfileName := C.CString(fileName)
-	defer C.free(unsafe.Pointer(cfileName))
+	cfileName := textAlloc(fileName)
 
 	ret := C.LoadAutomationEventList(cfileName)
-	v := newAutomationEventListFromPointer(unsafe.Pointer(&ret))
-
-	return v
+	return *newAutomationEventListFromPointer(&ret)
 }
 
 // UnloadAutomationEventList - Unload automation events list from file
 func UnloadAutomationEventList(list *AutomationEventList) {
-	C.UnloadAutomationEventList(list.cptr())
+	C.UnloadAutomationEventList(list)
 }
 
 // ExportAutomationEventList - Export automation events list as text file
 func ExportAutomationEventList(list AutomationEventList, fileName string) bool {
-	cfileName := C.CString(fileName)
-	defer C.free(unsafe.Pointer(cfileName))
+	cfileName := textAlloc(fileName)
 
 	ret := C.ExportAutomationEventList(*list.cptr(), cfileName)
 	v := bool(ret)
@@ -934,7 +790,7 @@ func PlayAutomationEvent(event AutomationEvent) {
 }
 
 // IsKeyPressed - Detect if a key has been pressed once
-func IsKeyPressed(key int32) bool {
+func IsKeyPressed[KT IntegerT](key KT) bool {
 	ckey := (C.int)(key)
 	ret := C.IsKeyPressed(ckey)
 	v := bool(ret)
@@ -942,7 +798,7 @@ func IsKeyPressed(key int32) bool {
 }
 
 // IsKeyPressedRepeat - Detect if a key has been pressed again (Only PLATFORM_DESKTOP)
-func IsKeyPressedRepeat(key int32) bool {
+func IsKeyPressedRepeat[KT IntegerT](key KT) bool {
 	ckey := (C.int)(key)
 	ret := C.IsKeyPressedRepeat(ckey)
 	v := bool(ret)
@@ -950,7 +806,7 @@ func IsKeyPressedRepeat(key int32) bool {
 }
 
 // IsKeyDown - Detect if a key is being pressed
-func IsKeyDown(key int32) bool {
+func IsKeyDown[KT IntegerT](key KT) bool {
 	ckey := (C.int)(key)
 	ret := C.IsKeyDown(ckey)
 	v := bool(ret)
@@ -958,7 +814,7 @@ func IsKeyDown(key int32) bool {
 }
 
 // IsKeyReleased - Detect if a key has been released once
-func IsKeyReleased(key int32) bool {
+func IsKeyReleased[KT IntegerT](key KT) bool {
 	ckey := (C.int)(key)
 	ret := C.IsKeyReleased(ckey)
 	v := bool(ret)
@@ -966,10 +822,16 @@ func IsKeyReleased(key int32) bool {
 }
 
 // IsKeyUp - Detect if a key is NOT being pressed
-func IsKeyUp(key int32) bool {
+func IsKeyUp[KT IntegerT](key KT) bool {
 	ckey := (C.int)(key)
 	ret := C.IsKeyUp(ckey)
 	v := bool(ret)
+	return v
+}
+
+func GetKeyDownCount() int {
+	ret := C.GetKeyDownCount()
+	v := (int)(ret)
 	return v
 }
 
@@ -988,13 +850,13 @@ func GetCharPressed() int32 {
 }
 
 // SetExitKey - Set a custom key to exit program (default is ESC)
-func SetExitKey(key int32) {
+func SetExitKey[KT IntegerT](key KT) {
 	ckey := (C.int)(key)
 	C.SetExitKey(ckey)
 }
 
 // IsGamepadAvailable - Detect if a gamepad is available
-func IsGamepadAvailable(gamepad int32) bool {
+func IsGamepadAvailable[GT IntegerT](gamepad GT) bool {
 	cgamepad := (C.int)(gamepad)
 	ret := C.IsGamepadAvailable(cgamepad)
 	v := bool(ret)
@@ -1002,7 +864,7 @@ func IsGamepadAvailable(gamepad int32) bool {
 }
 
 // GetGamepadName - Return gamepad internal name id
-func GetGamepadName(gamepad int32) string {
+func GetGamepadName[GT IntegerT](gamepad GT) string {
 	cgamepad := (C.int)(gamepad)
 	ret := C.GetGamepadName(cgamepad)
 	v := C.GoString(ret)
@@ -1010,7 +872,7 @@ func GetGamepadName(gamepad int32) string {
 }
 
 // IsGamepadButtonPressed - Detect if a gamepad button has been pressed once
-func IsGamepadButtonPressed(gamepad, button int32) bool {
+func IsGamepadButtonPressed[GT, BT IntegerT](gamepad GT, button BT) bool {
 	cgamepad := (C.int)(gamepad)
 	cbutton := (C.int)(button)
 	ret := C.IsGamepadButtonPressed(cgamepad, cbutton)
@@ -1019,7 +881,7 @@ func IsGamepadButtonPressed(gamepad, button int32) bool {
 }
 
 // IsGamepadButtonDown - Detect if a gamepad button is being pressed
-func IsGamepadButtonDown(gamepad, button int32) bool {
+func IsGamepadButtonDown[GT, BT IntegerT](gamepad GT, button BT) bool {
 	cgamepad := (C.int)(gamepad)
 	cbutton := (C.int)(button)
 	ret := C.IsGamepadButtonDown(cgamepad, cbutton)
@@ -1028,7 +890,7 @@ func IsGamepadButtonDown(gamepad, button int32) bool {
 }
 
 // IsGamepadButtonReleased - Detect if a gamepad button has been released once
-func IsGamepadButtonReleased(gamepad, button int32) bool {
+func IsGamepadButtonReleased[GT, BT IntegerT](gamepad GT, button BT) bool {
 	cgamepad := (C.int)(gamepad)
 	cbutton := (C.int)(button)
 	ret := C.IsGamepadButtonReleased(cgamepad, cbutton)
@@ -1037,7 +899,7 @@ func IsGamepadButtonReleased(gamepad, button int32) bool {
 }
 
 // IsGamepadButtonUp - Detect if a gamepad button is NOT being pressed
-func IsGamepadButtonUp(gamepad, button int32) bool {
+func IsGamepadButtonUp[GT, BT IntegerT](gamepad GT, button BT) bool {
 	cgamepad := (C.int)(gamepad)
 	cbutton := (C.int)(button)
 	ret := C.IsGamepadButtonUp(cgamepad, cbutton)
@@ -1053,7 +915,7 @@ func GetGamepadButtonPressed() int32 {
 }
 
 // GetGamepadAxisCount - Return gamepad axis count for a gamepad
-func GetGamepadAxisCount(gamepad int32) int32 {
+func GetGamepadAxisCount[GT IntegerT](gamepad GT) int32 {
 	cgamepad := (C.int)(gamepad)
 	ret := C.GetGamepadAxisCount(cgamepad)
 	v := (int32)(ret)
@@ -1061,7 +923,7 @@ func GetGamepadAxisCount(gamepad int32) int32 {
 }
 
 // GetGamepadAxisMovement - Return axis movement value for a gamepad axis
-func GetGamepadAxisMovement(gamepad, axis int32) float32 {
+func GetGamepadAxisMovement[GT, AT IntegerT](gamepad GT, axis AT) float32 {
 	cgamepad := (C.int)(gamepad)
 	caxis := (C.int)(axis)
 	ret := C.GetGamepadAxisMovement(cgamepad, caxis)
@@ -1071,15 +933,15 @@ func GetGamepadAxisMovement(gamepad, axis int32) float32 {
 
 // SetGamepadMappings - Set internal gamepad mappings (SDL_GameControllerDB)
 func SetGamepadMappings(mappings string) int32 {
-	cmappings := C.CString(mappings)
-	defer C.free(unsafe.Pointer(cmappings))
+	cmappings := textAlloc(mappings)
+	//defer C.free(unsafe.Pointer(cmappings))  TODO: possible mappings truncation
 	ret := C.SetGamepadMappings(cmappings)
 	v := (int32)(ret)
 	return v
 }
 
 // IsMouseButtonPressed - Detect if a mouse button has been pressed once
-func IsMouseButtonPressed(button int32) bool {
+func IsMouseButtonPressed[BT IntegerT](button BT) bool {
 	cbutton := (C.int)(button)
 	ret := C.IsMouseButtonPressed(cbutton)
 	v := bool(ret)
@@ -1087,7 +949,7 @@ func IsMouseButtonPressed(button int32) bool {
 }
 
 // IsMouseButtonDown - Detect if a mouse button is being pressed
-func IsMouseButtonDown(button int32) bool {
+func IsMouseButtonDown[BT IntegerT](button BT) bool {
 	cbutton := (C.int)(button)
 	ret := C.IsMouseButtonDown(cbutton)
 	v := bool(ret)
@@ -1095,7 +957,7 @@ func IsMouseButtonDown(button int32) bool {
 }
 
 // IsMouseButtonReleased - Detect if a mouse button has been released once
-func IsMouseButtonReleased(button int32) bool {
+func IsMouseButtonReleased[BT IntegerT](button BT) bool {
 	cbutton := (C.int)(button)
 	ret := C.IsMouseButtonReleased(cbutton)
 	v := bool(ret)
@@ -1103,7 +965,7 @@ func IsMouseButtonReleased(button int32) bool {
 }
 
 // IsMouseButtonUp - Detect if a mouse button is NOT being pressed
-func IsMouseButtonUp(button int32) bool {
+func IsMouseButtonUp[BT IntegerT](button BT) bool {
 	cbutton := (C.int)(button)
 	ret := C.IsMouseButtonUp(cbutton)
 	v := bool(ret)
@@ -1127,15 +989,13 @@ func GetMouseY() int32 {
 // GetMousePosition - Returns mouse position XY
 func GetMousePosition() Vector2 {
 	ret := C.GetMousePosition()
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // GetMouseDelta - Get mouse delta between frames
 func GetMouseDelta() Vector2 {
 	ret := C.GetMouseDelta()
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // SetMousePosition - Set mouse position XY
@@ -1169,8 +1029,7 @@ func GetMouseWheelMove() float32 {
 // GetMouseWheelMoveV - Get mouse wheel movement for both X and Y
 func GetMouseWheelMoveV() Vector2 {
 	ret := C.GetMouseWheelMoveV()
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // SetMouseCursor - Set mouse cursor
@@ -1194,15 +1053,14 @@ func GetTouchY() int32 {
 }
 
 // GetTouchPosition - Returns touch position XY for a touch point index (relative to screen size)
-func GetTouchPosition(index int32) Vector2 {
+func GetTouchPosition[IT IntegerT](index IT) Vector2 {
 	cindex := (C.int)(index)
 	ret := C.GetTouchPosition(cindex)
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // GetTouchPointId - Get touch point identifier for given index
-func GetTouchPointId(index int32) int32 {
+func GetTouchPointId[IT IntegerT](index IT) int32 {
 	cindex := (C.int)(index)
 	ret := C.GetTouchPointId(cindex)
 	v := (int32)(ret)

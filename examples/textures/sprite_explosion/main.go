@@ -38,7 +38,7 @@ func main() {
 			active = true
 			position.X -= frameW / 2
 			position.Y -= frameH / 2
-			rl.PlaySound(fxBoom)
+			rl.PlaySound(&fxBoom)
 		}
 
 		if active {
@@ -58,8 +58,8 @@ func main() {
 			}
 		}
 
-		frameRec.X = frameW * float32(currentFrame)
-		frameRec.Y = frameH * float32(currentLine)
+		frameRec.XY.X = frameW * float32(currentFrame)
+		frameRec.XY.Y = frameH * float32(currentLine)
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
@@ -68,14 +68,14 @@ func main() {
 		rl.DrawText("click left mouse on screen to explode", 20, 20, 20, rl.Black)
 
 		if active {
-			rl.DrawTextureRec(explosion, frameRec, position, rl.White)
+			rl.DrawTextureRec(&explosion, frameRec, position, rl.White)
 		}
 
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(explosion)
-	rl.UnloadSound(fxBoom)
+	rl.UnloadTexture(&explosion)
+	rl.UnloadSound(&fxBoom)
 	rl.CloseAudioDevice()
 
 	rl.CloseWindow()

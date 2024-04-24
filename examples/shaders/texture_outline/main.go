@@ -49,7 +49,7 @@ func main() {
 
 		rl.BeginShaderMode(shader)
 
-		rl.DrawTexture(texture, int32(cnt.X)-texture.Width/2, int32(cnt.Y)-texture.Height/2, rl.White)
+		rl.DrawTexture(&texture, int32(cnt.X)-texture.Width/2, int32(cnt.Y)-texture.Height/2, rl.White)
 
 		rl.EndShaderMode()
 
@@ -58,8 +58,8 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadShader(shader)
-	rl.UnloadTexture(texture)
+	rl.UnloadShader(&shader)
+	rl.UnloadTexture(&texture)
 
 	rl.CloseWindow()
 }

@@ -73,7 +73,7 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadAudioStream(stream) // Close raw audio stream and delete buffers from RAM
+	rl.UnloadAudioStream(&stream) // Close raw audio stream and delete buffers from RAM
 
 	rl.CloseAudioDevice() // Close audio device (music streaming is automatically stopped)
 

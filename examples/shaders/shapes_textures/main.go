@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
@@ -57,7 +57,7 @@ func main() {
 		// Activate our custom shader to be applied on next shapes/textures drawings
 		rl.BeginShaderMode(shader)
 
-		rl.DrawTexture(fudesumi, 500, -30, rl.White) // Using custom shader
+		rl.DrawTexture(&fudesumi, 500, -30, rl.White) // Using custom shader
 
 		// Activate our default shader for next drawings
 		rl.EndShaderMode()
@@ -67,8 +67,8 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadShader(shader)    // Unload shader
-	rl.UnloadTexture(fudesumi) // Unload texture
+	rl.UnloadShader(&shader)    // Unload shader
+	rl.UnloadTexture(&fudesumi) // Unload texture
 
 	rl.CloseWindow() // Close window and OpenGL context
 }

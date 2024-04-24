@@ -19,7 +19,7 @@ func main() {
 
 	model := rl.LoadModel("guy.iqm")
 	texture := rl.LoadTexture("guytex.png")
-	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, texture)
+	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, &texture)
 
 	position := rl.NewVector3(0, 0, 0)
 
@@ -64,8 +64,8 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadModel(model)
-	rl.UnloadTexture(texture)
+	rl.UnloadModel(&model)
+	rl.UnloadTexture(&texture)
 
 	rl.CloseWindow()
 }

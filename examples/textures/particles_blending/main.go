@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const (
@@ -94,7 +94,7 @@ func main() {
 		for i := 0; i < maxParticles; i++ {
 			if mouseTail[i].Active {
 				rl.DrawTexturePro(
-					smoke,
+					&smoke,
 					rl.NewRectangle(0, 0, float32(smoke.Width), float32(smoke.Height)),
 					rl.NewRectangle(mouseTail[i].Position.X, mouseTail[i].Position.Y, float32(smoke.Width)*mouseTail[i].Size, float32(smoke.Height)*mouseTail[i].Size),
 					rl.NewVector2(float32(smoke.Width)*mouseTail[i].Size/2, float32(smoke.Height)*mouseTail[i].Size/2),
@@ -117,7 +117,7 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(smoke)
+	rl.UnloadTexture(&smoke)
 
 	rl.CloseWindow()
 }

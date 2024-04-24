@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const maxCircles = 64
@@ -113,7 +113,7 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadMusicStream(xm)
+	rl.UnloadMusicStream(&xm)
 
 	rl.CloseAudioDevice()
 

@@ -24,7 +24,7 @@ func main() {
 	mesh := rl.GenMeshHeightmap(*image, rl.NewVector3(16, 8, 16)) // Generate heightmap mesh (RAM and VRAM)
 	model := rl.LoadModelFromMesh(mesh)                           // Load model from generated mesh
 
-	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, texture) // Set map diffuse texture
+	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, &texture) // Set map diffuse texture
 
 	mapPosition := rl.NewVector3(-8.0, 0.0, -8.0) // Set model position
 
@@ -51,7 +51,7 @@ func main() {
 
 		rl.EndMode3D()
 
-		rl.DrawTexture(texture, screenWidth-texture.Width-20, 20, rl.White)
+		rl.DrawTexture(&texture, screenWidth-texture.Width-20, 20, rl.White)
 		rl.DrawRectangleLines(screenWidth-texture.Width-20, 20, texture.Width, texture.Height, rl.Green)
 
 		rl.DrawFPS(10, 10)
@@ -59,8 +59,8 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(texture) // Unload map texture
-	rl.UnloadModel(model)     // Unload map model
+	rl.UnloadTexture(&texture) // Unload map texture
+	rl.UnloadModel(&model)     // Unload map model
 
 	rl.CloseWindow()
 }

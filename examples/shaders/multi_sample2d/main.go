@@ -50,8 +50,8 @@ func main() {
 
 		rl.BeginShaderMode(shader)
 
-		rl.SetShaderValueTexture(shader, texBlueLoc, texBlue)
-		rl.DrawTexture(texRed, 0, 0, rl.White)
+		rl.SetShaderValueTexture(shader, texBlueLoc, &texBlue)
+		rl.DrawTexture(&texRed, 0, 0, rl.White)
 
 		rl.EndShaderMode()
 
@@ -61,9 +61,9 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadShader(shader)   // Unload shader
-	rl.UnloadTexture(texRed)  // Unload texture
-	rl.UnloadTexture(texBlue) // Unload texture
+	rl.UnloadShader(&shader)   // Unload shader
+	rl.UnloadTexture(&texRed)  // Unload texture
+	rl.UnloadTexture(&texBlue) // Unload texture
 
 	rl.CloseWindow()
 }

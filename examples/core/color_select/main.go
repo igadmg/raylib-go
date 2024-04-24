@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
@@ -18,10 +18,10 @@ func main() {
 	// Fills colorsRecs data (for every rectangle)
 	for i := 0; i < 21; i++ {
 		r := rl.Rectangle{}
-		r.X = float32(20 + 100*(i%7) + 10*(i%7))
-		r.Y = float32(60 + 100*(i/7) + 10*(i/7))
-		r.Width = 100
-		r.Height = 100
+		r.XY.X = float32(20 + 100*(i%7) + 10*(i%7))
+		r.XY.Y = float32(60 + 100*(i/7) + 10*(i/7))
+		r.WH.X = 100
+		r.WH.Y = 100
 
 		colorsRecs[i] = r
 	}
@@ -56,10 +56,10 @@ func main() {
 
 			// Draw four rectangles around selected rectangle
 			if selected[i] {
-				rl.DrawRectangle(int32(colorsRecs[i].X), int32(colorsRecs[i].Y), 100, 10, rl.RayWhite)    // Square top rectangle
-				rl.DrawRectangle(int32(colorsRecs[i].X), int32(colorsRecs[i].Y), 10, 100, rl.RayWhite)    // Square left rectangle
-				rl.DrawRectangle(int32(colorsRecs[i].X+90), int32(colorsRecs[i].Y), 10, 100, rl.RayWhite) // Square right rectangle
-				rl.DrawRectangle(int32(colorsRecs[i].X), int32(colorsRecs[i].Y)+90, 100, 10, rl.RayWhite) // Square bottom rectangle
+				rl.DrawRectangle(int32(colorsRecs[i].XY.X), int32(colorsRecs[i].XY.Y), 100, 10, rl.RayWhite)    // Square top rectangle
+				rl.DrawRectangle(int32(colorsRecs[i].XY.X), int32(colorsRecs[i].XY.Y), 10, 100, rl.RayWhite)    // Square left rectangle
+				rl.DrawRectangle(int32(colorsRecs[i].XY.X+90), int32(colorsRecs[i].XY.Y), 10, 100, rl.RayWhite) // Square right rectangle
+				rl.DrawRectangle(int32(colorsRecs[i].XY.X), int32(colorsRecs[i].XY.Y)+90, 100, 10, rl.RayWhite) // Square bottom rectangle
 			}
 		}
 

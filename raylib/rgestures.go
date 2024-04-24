@@ -4,7 +4,6 @@ package rl
 #include "raylib.h"
 */
 import "C"
-import "unsafe"
 
 // SetGesturesEnabled - Enable a set of gestures using flags
 func SetGesturesEnabled(gestureFlags uint32) {
@@ -37,8 +36,7 @@ func GetGestureHoldDuration() float32 {
 // GetGestureDragVector - Get gesture drag vector
 func GetGestureDragVector() Vector2 {
 	ret := C.GetGestureDragVector()
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // GetGestureDragAngle - Get gesture drag angle
@@ -51,8 +49,7 @@ func GetGestureDragAngle() float32 {
 // GetGesturePinchVector - Get gesture pinch delta
 func GetGesturePinchVector() Vector2 {
 	ret := C.GetGesturePinchVector()
-	v := newVector2FromPointer(unsafe.Pointer(&ret))
-	return v
+	return *govec2ptr(&ret)
 }
 
 // GetGesturePinchAngle - Get gesture pinch angle

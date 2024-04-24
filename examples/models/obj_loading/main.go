@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	obj := rl.LoadModel("castle.obj")               // Load OBJ model
 	texture := rl.LoadTexture("castle_diffuse.png") // Load model texture
 
-	rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, texture) // Set map diffuse texture
+	rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, &texture) // Set map diffuse texture
 
 	position := rl.NewVector3(0.0, 0.0, 0.0) // Set model position
 
@@ -44,8 +44,8 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(texture) // Unload texture
-	rl.UnloadModel(obj)       // Unload model
+	rl.UnloadTexture(&texture) // Unload texture
+	rl.UnloadModel(&obj)       // Unload model
 
 	rl.CloseWindow()
 }

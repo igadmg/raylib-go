@@ -16,8 +16,12 @@ import "C"
 import (
 	"fmt"
 	"os"
-	"unsafe"
 )
+
+// SetTraceLogLevel - Set the current threshold (minimum) log level
+func GetTraceLogLevel() TraceLogLevel {
+	return (TraceLogLevel)(C.GetTraceLogLevel())
+}
 
 // SetTraceLogLevel - Set the current threshold (minimum) log level
 func SetTraceLogLevel(logLevel TraceLogLevel) {
@@ -27,8 +31,7 @@ func SetTraceLogLevel(logLevel TraceLogLevel) {
 
 // TraceLog - Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
 func TraceLog(logLevel TraceLogLevel, text string, v ...interface{}) {
-	ctext := C.CString(fmt.Sprintf(text, v...))
-	defer C.free(unsafe.Pointer(ctext))
+	ctext := textAlloc(fmt.Sprintf(text, v...))
 	clogLevel := (C.int)(logLevel)
 	C.TraceLogWrapper(clogLevel, ctext)
 }

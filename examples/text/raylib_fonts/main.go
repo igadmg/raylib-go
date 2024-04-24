@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const maxFonts = 8
@@ -38,7 +38,7 @@ func main() {
 
 	var i int32
 	for i = 0; i < maxFonts; i++ {
-		x := screenWidth/2 - int32(rl.MeasureTextEx(fonts[i], messages[i], float32(fonts[i].BaseSize*2), spacings[i]).X/2)
+		x := screenWidth/2 - int32(rl.MeasureTextEx(&fonts[i], messages[i], float32(fonts[i].BaseSize*2), spacings[i]).X/2)
 		y := 60 + fonts[i].BaseSize + 45*i
 		positions[i] = rl.NewVector2(float32(x), float32(y))
 	}
@@ -60,14 +60,14 @@ func main() {
 		rl.DrawLine(220, 50, 590, 50, rl.DarkGray)
 
 		for i = 0; i < maxFonts; i++ {
-			rl.DrawTextEx(fonts[i], messages[i], positions[i], float32(fonts[i].BaseSize*2), spacings[i], colors[i])
+			rl.DrawTextEx(&fonts[i], messages[i], positions[i], float32(fonts[i].BaseSize*2), spacings[i], colors[i])
 		}
 
 		rl.EndDrawing()
 	}
 
 	for i = 0; i < maxFonts; i++ {
-		rl.UnloadFont(fonts[i])
+		rl.UnloadFont(&fonts[i])
 	}
 
 	rl.CloseWindow()

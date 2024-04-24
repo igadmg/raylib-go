@@ -138,15 +138,19 @@
 // Some lines-based shapes could still use lines
 #define SUPPORT_QUADS_DRAW_MODE         1
 
+// rshapes: Configuration values
+//------------------------------------------------------------------------------------
+#define SPLINE_SEGMENT_DIVISIONS       24       // Spline segments subdivisions
+
 
 //------------------------------------------------------------------------------------
 // Module: rtextures - Configuration Flags
 //------------------------------------------------------------------------------------
 // Selecte desired fileformats to be supported for image data loading
 #define SUPPORT_FILEFORMAT_PNG      1
-#define SUPPORT_FILEFORMAT_BMP      1
+//#define SUPPORT_FILEFORMAT_BMP      1
 //#define SUPPORT_FILEFORMAT_TGA      1
-#define SUPPORT_FILEFORMAT_JPG      1
+//#define SUPPORT_FILEFORMAT_JPG      1
 #define SUPPORT_FILEFORMAT_GIF      1
 #define SUPPORT_FILEFORMAT_QOI      1
 //#define SUPPORT_FILEFORMAT_PSD      1

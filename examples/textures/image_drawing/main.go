@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTexture(texture, screenWidth/2-texture.Width/2, screenHeight/2-texture.Height/2-40, rl.White)
+		rl.DrawTexture(&texture, screenWidth/2-texture.Width/2, screenHeight/2-texture.Height/2-40, rl.White)
 		rl.DrawRectangleLines(screenWidth/2-texture.Width/2, screenHeight/2-texture.Height/2-40, texture.Width, texture.Height, rl.DarkGray)
 
 		rl.DrawText("We are drawing only one texture from various images composed!", 240, 350, 10, rl.DarkGray)
@@ -43,7 +43,7 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(texture)
+	rl.UnloadTexture(&texture)
 
 	rl.CloseWindow()
 }

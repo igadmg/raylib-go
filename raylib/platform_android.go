@@ -25,12 +25,11 @@ import (
 var callbackHolder func()
 
 // InitWindow - Initialize Window and OpenGL Graphics
-func InitWindow(width int32, height int32, title string) {
+func InitWindow[WT, HT IntegerT](width WT, height HT, title string) {
 	cwidth := (C.int)(width)
 	cheight := (C.int)(height)
 
-	ctitle := C.CString(title)
-	defer C.free(unsafe.Pointer(ctitle))
+	ctitle := TextAlloc(title)
 
 	C.InitWindow(cwidth, cheight, ctitle)
 	C.android_init()
@@ -95,8 +94,7 @@ func UnloadDroppedFiles() {
 
 // OpenAsset - Open asset
 func OpenAsset(name string) (Asset, error) {
-	cname := C.CString(name)
-	defer C.free(unsafe.Pointer(cname))
+	cname := TextAlloc(name)
 
 	a := &asset{C.AAssetManager_open(C.asset_manager, cname, C.AASSET_MODE_UNKNOWN)}
 

@@ -21,7 +21,7 @@ func main() {
 	model := rl.LoadModelFromMesh(cube)
 
 	texture := rl.LoadTexture("cubicmap_atlas.png")
-	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, texture)
+	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, &texture)
 
 	tiling := []float32{3, 3}
 	shader := rl.LoadShader("", "tiling.fs")
@@ -57,9 +57,9 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadShader(shader)
-	rl.UnloadModel(model)
-	rl.UnloadTexture(texture)
+	rl.UnloadShader(&shader)
+	rl.UnloadModel(&model)
+	rl.UnloadTexture(&texture)
 
 	rl.CloseWindow()
 }

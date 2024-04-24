@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
@@ -24,14 +24,14 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTexture(texture, screenWidth/2-texture.Width/2, screenHeight/2-texture.Height/2, rl.White)
+		rl.DrawTexture(&texture, screenWidth/2-texture.Width/2, screenHeight/2-texture.Height/2, rl.White)
 
 		rl.DrawText("this IS a texture loaded from an image!", 300, 370, 10, rl.Gray)
 
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(texture)
+	rl.UnloadTexture(&texture)
 
 	rl.CloseWindow()
 }

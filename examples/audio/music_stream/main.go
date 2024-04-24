@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
@@ -53,8 +53,8 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadMusicStream(music) // Unload music stream buffers from RAM
-	rl.CloseAudioDevice()       // Close audio device (music streaming is automatically stopped)
+	rl.UnloadMusicStream(&music) // Unload music stream buffers from RAM
+	rl.CloseAudioDevice()        // Close audio device (music streaming is automatically stopped)
 
 	rl.CloseWindow()
 }

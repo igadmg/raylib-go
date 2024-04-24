@@ -75,7 +75,7 @@ func main() {
 	}
 
 	for i := 0; i < len(models); i++ {
-		rl.UnloadModel(models[i])
+		rl.UnloadModel(&models[i])
 	}
 
 	rl.CloseWindow()

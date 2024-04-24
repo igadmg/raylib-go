@@ -35,7 +35,7 @@ func main() {
 	models[7] = rl.LoadModelFromMesh(rl.GenMeshPoly(5, 2))
 
 	for i := 0; i < numModels; i++ {
-		rl.SetMaterialTexture(models[i].Materials, rl.MapDiffuse, texture)
+		rl.SetMaterialTexture(models[i].Materials, rl.MapDiffuse, &texture)
 	}
 
 	position := rl.Vector3Zero()
@@ -93,9 +93,9 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(texture)
+	rl.UnloadTexture(&texture)
 	for i := 0; i < numModels; i++ {
-		rl.UnloadModel(models[i])
+		rl.UnloadModel(&models[i])
 	}
 
 	rl.CloseWindow()

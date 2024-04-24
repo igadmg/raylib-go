@@ -48,7 +48,7 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTexture(textures[currentTexture], 0, 0, rl.White)
+		rl.DrawTexture(&textures[currentTexture], 0, 0, rl.White)
 
 		rl.DrawRectangle(30, 400, 325, 30, rl.Fade(rl.SkyBlue, 0.5))
 		rl.DrawRectangleLines(30, 400, 325, 30, rl.Fade(rl.White, 0.5))
@@ -81,7 +81,7 @@ func main() {
 	}
 
 	for _, t := range textures {
-		rl.UnloadTexture(t)
+		rl.UnloadTexture(&t)
 	}
 
 	rl.CloseWindow()

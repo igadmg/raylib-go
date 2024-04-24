@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 var (
@@ -23,12 +23,12 @@ func main() {
 
 	for i := 0; i < maxBuildings; i++ {
 		r := rl.Rectangle{}
-		r.Width = float32(rl.GetRandomValue(50, 200))
-		r.Height = float32(rl.GetRandomValue(100, 800))
-		r.Y = float32(screenHeight) - 130 - r.Height
-		r.X = -6000 + spacing
+		r.WH.X = float32(rl.GetRandomValue(50, 200))
+		r.WH.Y = float32(rl.GetRandomValue(100, 800))
+		r.XY.Y = float32(screenHeight) - 130 - r.WH.Y
+		r.XY.X = -6000 + spacing
 
-		spacing += r.Width
+		spacing += r.WH.X
 
 		c := rl.NewColor(byte(rl.GetRandomValue(200, 240)), byte(rl.GetRandomValue(200, 240)), byte(rl.GetRandomValue(200, 250)), byte(255))
 
@@ -37,7 +37,7 @@ func main() {
 	}
 
 	camera := rl.Camera2D{}
-	camera.Target = rl.NewVector2(float32(player.X+20), float32(player.Y+20))
+	camera.Target = rl.NewVector2(float32(player.XY.X+20), float32(player.XY.Y+20))
 	camera.Offset = rl.NewVector2(float32(screenWidth/2), float32(screenHeight/2))
 	camera.Rotation = 0.0
 	camera.Zoom = 1.0
@@ -46,13 +46,13 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 		if rl.IsKeyDown(rl.KeyRight) {
-			player.X += 2 // Player movement
+			player.XY.X += 2 // Player movement
 		} else if rl.IsKeyDown(rl.KeyLeft) {
-			player.X -= 2 // Player movement
+			player.XY.X -= 2 // Player movement
 		}
 
 		// Camera target follows player
-		camera.Target = rl.NewVector2(float32(player.X+20), float32(player.Y+20))
+		camera.Target = rl.NewVector2(float32(player.XY.X+20), float32(player.XY.Y+20))
 
 		// Camera rotation controls
 		if rl.IsKeyDown(rl.KeyA) {

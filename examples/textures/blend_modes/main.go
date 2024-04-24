@@ -40,9 +40,9 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTexture(bgTex, screenW/2-bgTex.Width/2, screenH/2-bgTex.Height/2, rl.White)
+		rl.DrawTexture(&bgTex, screenW/2-bgTex.Width/2, screenH/2-bgTex.Height/2, rl.White)
 		rl.BeginBlendMode(rl.BlendMode(blendMode))
-		rl.DrawTexture(fgTex, screenW/2-fgTex.Width/2, screenH/2-fgTex.Height/2, rl.White)
+		rl.DrawTexture(&fgTex, screenW/2-fgTex.Width/2, screenH/2-fgTex.Height/2, rl.White)
 		rl.EndBlendMode()
 
 		txt := "Press SPACE to change blend modes"
@@ -74,8 +74,8 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(fgTex)
-	rl.UnloadTexture(bgTex)
+	rl.UnloadTexture(&fgTex)
+	rl.UnloadTexture(&bgTex)
 
 	rl.CloseWindow()
 }

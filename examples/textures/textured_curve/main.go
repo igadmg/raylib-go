@@ -56,7 +56,7 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadTexture(texRoad)
+	rl.UnloadTexture(&texRoad)
 
 	rl.CloseWindow()
 }

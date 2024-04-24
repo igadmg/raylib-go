@@ -85,7 +85,6 @@ func UnpackResourceChunk(chunk *ResourceChunk) ErrorType {
 //
 // If not provided, the application path is prepended to link by default
 func SetBaseDirectory(baseDir string) {
-	cbaseDir := C.CString(baseDir)
-	defer C.free(unsafe.Pointer(cbaseDir))
+	cbaseDir := TextAlloc(baseDir)
 	C.SetBaseDirectory(cbaseDir)
 }
