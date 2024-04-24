@@ -164,7 +164,7 @@ func LoadRenderTexture[WT, HT IntegerT](width WT, height HT) RenderTexture2D {
 }
 
 func LoadRenderTextureV[T IntegerT](wh vector2.Vector[T]) RenderTexture2D {
-	return LoadRenderTexture(wh.X, wh.Y)
+	return LoadRenderTexture(wh.X(), wh.Y())
 }
 
 // LoadTextureCubemap - Loads a texture for a cubemap using given layout

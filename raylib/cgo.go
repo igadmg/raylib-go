@@ -2,6 +2,7 @@ package rl
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../external/raylib/src -I${SRCDIR}/../external/raylib/src/external/glfw/include -std=gnu99 -Wno-missing-braces -Wno-unused-result -Wno-implicit-function-declaration
+#cgo android CFLAGS: -DPLATFORM_ANDROID -DPLATFORM_ANDROID_NOMAIN -DGRAPHICS_API_OPENGL_ES2
 
 #include "raylib.h"
 #include <stdlib.h>

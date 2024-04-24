@@ -6,7 +6,7 @@
 *
 *   LICENSE: zlib/libpng
 *
-*   Copyright (c) 2018-2023 Ahmad Fatoum & Ramon Santamaria (@raysan5)
+*   Copyright (c) 2018-2024 Ahmad Fatoum & Ramon Santamaria (@raysan5)
 *
 *   This software is provided "as-is", without any express or implied warranty. In no event
 *   will the authors be held liable for any damages arising from the use of this software.
@@ -69,7 +69,9 @@
 // Support custom frame control, only for advance users
 // By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timing + PollInputEvents()
 // Enabling this flag allows manual control of the frame processes, use at your own risk
-//#define SUPPORT_CUSTOM_FRAME_CONTROL    1
+#if defined(PLATFORM_ANDROID_GOLANG)
+#define SUPPORT_CUSTOM_FRAME_CONTROL    1
+#endif
 
 // rcore: Configuration values
 //------------------------------------------------------------------------------------
@@ -81,6 +83,7 @@
 #define MAX_GAMEPADS                    4       // Maximum number of gamepads supported
 #define MAX_GAMEPAD_AXIS                8       // Maximum number of axis supported (per gamepad)
 #define MAX_GAMEPAD_BUTTONS            32       // Maximum number of buttons supported (per gamepad)
+#define MAX_GAMEPAD_VIBRATION_TIME      2.0f    // Maximum vibration time in seconds
 #define MAX_TOUCH_POINTS                8       // Maximum number of touch points supported
 #define MAX_KEY_PRESSED_QUEUE          16       // Maximum number of keys in the key input queue
 #define MAX_CHAR_PRESSED_QUEUE         16       // Maximum number of characters in the char input queue
@@ -179,8 +182,9 @@
 // NOTE: If enabled, uses external module functions to load default raylib font
 #define SUPPORT_DEFAULT_FONT            1
 // Selected desired font fileformats to be supported for loading
-#define SUPPORT_FILEFORMAT_FNT          1
 #define SUPPORT_FILEFORMAT_TTF          1
+#define SUPPORT_FILEFORMAT_FNT          1
+//#define SUPPORT_FILEFORMAT_BDF          1
 
 // Support text management functions
 // If not defined, still some functions are supported: TextLength(), TextFormat()
@@ -194,8 +198,10 @@
 // rtext: Configuration values
 //------------------------------------------------------------------------------------
 #define MAX_TEXT_BUFFER_LENGTH       1024       // Size of internal static buffers used on some functions:
-                                                // TextFormat(), TextSubtext(), TextToUpper(), TextToLower(), TextToPascal(), TextSplit()
+                                                // TextAllocate(), TextFormat(), TextSubtext(), TextToUpper(), TextToLower(), TextToPascal(), TextSplit()
 #define MAX_TEXTSPLIT_COUNT           128       // Maximum number of substrings to split: TextSplit()
+#define MAX_TEXTFORMAT_BUFFERS          8       // Maximum number of buffers for TextFormat() and TextFormatEx()
+#define MAX_TEXTALLOC_BUFFER_LENGTH     8 * MAX_TEXT_BUFFER_LENGTH     // Buffers for TextAllocate()
 
 
 //------------------------------------------------------------------------------------

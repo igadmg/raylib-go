@@ -1,14 +1,15 @@
+//go:build RAY_MATH
 package rl
 
 // GetCameraForward - Returns the cameras forward vector (normalized)
 func GetCameraForward(camera *Camera) Vector3 {
-	return Vector3Normalize(Vector3Subtract(camera.Target, camera.Position))
+	return camera.Target.Sub(camera.Position).Normalized()
 }
 
 // GetCameraUp - Returns the cameras up vector (normalized)
 // Note: The up vector might not be perpendicular to the forward vector
 func GetCameraUp(camera *Camera) Vector3 {
-	return Vector3Normalize(camera.Up)
+	return camera.Up.Normalized()
 }
 
 // GetCameraRight - Returns the cameras right vector (normalized)
@@ -16,7 +17,7 @@ func GetCameraRight(camera *Camera) Vector3 {
 	forward := GetCameraForward(camera)
 	up := GetCameraUp(camera)
 
-	return Vector3CrossProduct(forward, up)
+	return forward.Cross(up)
 }
 
 // CameraMoveForward - Moves the camera in its forward direction
@@ -25,16 +26,15 @@ func CameraMoveForward(camera *Camera, distance float32, moveInWorldPlane uint8)
 
 	if moveInWorldPlane != 0 {
 		// Project vector onto world plane
-		forward.Y = float32(0)
-		forward = Vector3Normalize(forward)
+		forward = forward.SetY(0).Normalized()
 	}
 
 	// Scale by distance
-	forward = Vector3Scale(forward, distance)
+	forward = forward.ScaleF(distance)
 
 	// Move position and target
-	camera.Position = Vector3Add(camera.Position, forward)
-	camera.Target = Vector3Add(camera.Target, forward)
+	camera.Position = camera.Position.Add(forward)
+	camera.Target = camera.Target.Add(forward)
 }
 
 // CameraMoveUp - Moves the camera in its up direction
@@ -42,11 +42,11 @@ func CameraMoveUp(camera *Camera, distance float32) {
 	up := GetCameraUp(camera)
 
 	// Scale by distance
-	up = Vector3Scale(up, distance)
+	up = up.ScaleF(distance)
 
 	// Move position and target
-	camera.Position = Vector3Add(camera.Position, up)
-	camera.Target = Vector3Add(camera.Target, up)
+	camera.Position = camera.Position.Add(up)
+	camera.Target = camera.Target.Add(up)
 }
 
 // CameraMoveRight - Moves the camera target in its current right direction
@@ -55,21 +55,20 @@ func CameraMoveRight(camera *Camera, distance float32, moveInWorldPlane uint8) {
 
 	if moveInWorldPlane != 0 {
 		// Project vector onto world plane
-		right.Y = float32(0)
-		right = Vector3Normalize(right)
+		right = right.SetY(0).Normalized()
 	}
 
 	// Scale by distance
-	right = Vector3Scale(right, distance)
+	right = right.ScaleF(distance)
 
 	// Move position and target
-	camera.Position = Vector3Add(camera.Position, right)
-	camera.Target = Vector3Add(camera.Target, right)
+	camera.Position = camera.Position.Add(right)
+	camera.Target = camera.Target.Add(right)
 }
 
 // CameraMoveToTarget - Moves the camera position closer/farther to/from the camera target
 func CameraMoveToTarget(camera *Camera, delta float32) {
-	distance := Vector3Distance(camera.Position, camera.Target)
+	distance := camera.Position.Distance(camera.Target)
 
 	// Apply delta
 	distance = distance + delta
@@ -81,7 +80,7 @@ func CameraMoveToTarget(camera *Camera, delta float32) {
 
 	// Set new distance by moving the position along the forward vector
 	forward := GetCameraForward(camera)
-	camera.Position = Vector3Add(camera.Target, Vector3Scale(forward, -distance))
+	camera.Position = camera.Target.Add(forward.ScaleF(-distance))
 }
 
 // CameraYaw - Rotates the camera around its up vector
@@ -93,17 +92,17 @@ func CameraYaw(camera *Camera, angle float32, rotateAroundTarget uint8) {
 	var up = GetCameraUp(camera)
 
 	// View vector
-	var targetPosition = Vector3Subtract(camera.Target, camera.Position)
+	var targetPosition = camera.Target.Sub(camera.Position)
 
 	// Rotate view vector around up axis
 	targetPosition = Vector3RotateByAxisAngle(targetPosition, up, angle)
 
 	if rotateAroundTarget != 0 {
 		// Move position relative to target
-		camera.Position = Vector3Subtract(camera.Target, targetPosition)
+		camera.Position = camera.Target.Sub(targetPosition)
 	} else {
 		// Move target relative to position
-		camera.Target = Vector3Add(camera.Position, targetPosition)
+		camera.Target = camera.Position.Add(targetPosition)
 	}
 }
 
@@ -118,21 +117,21 @@ func CameraPitch(camera *Camera, angle float32, lockView uint8, rotateAroundTarg
 	var up = GetCameraUp(camera)
 
 	// View vector
-	var targetPosition = Vector3Subtract(camera.Target, camera.Position)
+	var targetPosition = camera.Target.Sub(camera.Position)
 
 	if lockView != 0 {
 		// In these camera modes we clamp the Pitch angle
 		// to allow only viewing straight up or down.
 
 		// Clamp view up
-		maxAngleUp := Vector3Angle(up, targetPosition)
+		maxAngleUp := up.Angle(targetPosition)
 		maxAngleUp = maxAngleUp - 0.001 // avoid numerical errors
 		if angle > maxAngleUp {
 			angle = maxAngleUp
 		}
 
 		// Clamp view down
-		maxAngleDown := Vector3Angle(Vector3Negate(up), targetPosition)
+		maxAngleDown := up.ScaleF(-1).Angle(targetPosition)
 		maxAngleDown = maxAngleDown * -1.0  // downwards angle is negative
 		maxAngleDown = maxAngleDown + 0.001 // avoid numerical errors
 		if angle < maxAngleDown {
@@ -148,10 +147,10 @@ func CameraPitch(camera *Camera, angle float32, lockView uint8, rotateAroundTarg
 
 	if rotateAroundTarget != 0 {
 		// Move position relative to target
-		camera.Position = Vector3Subtract(camera.Target, targetPosition)
+		camera.Position = camera.Target.Sub(targetPosition)
 	} else {
 		// Move target relative to position
-		camera.Target = Vector3Add(camera.Position, targetPosition)
+		camera.Target = camera.Position.Add(targetPosition)
 	}
 
 	if rotateUp != 0 {
@@ -218,9 +217,9 @@ func UpdateCamera(camera *Camera, mode CameraMode) {
 	if mode == CameraOrbital {
 		// Orbital can just orbit
 		var rotation = MatrixRotate(GetCameraUp(camera), 0.5*GetFrameTime())
-		var view = Vector3Subtract(camera.Position, camera.Target)
+		var view = camera.Position.Sub(camera.Target)
 		view = Vector3Transform(view, rotation)
-		camera.Position = Vector3Add(camera.Target, view)
+		camera.Position = camera.Target.Add(view)
 	} else {
 		// Camera rotation
 		if IsKeyDown(KeyDown) {
@@ -336,14 +335,14 @@ func UpdateCameraPro(camera *Camera, movement Vector3, rotation Vector3, zoom fl
 	moveInWorldPlane := uint8(1)
 
 	// Camera rotation
-	CameraPitch(camera, -rotation.Y*(Pi/180.0), lockView, rotateAroundTarget, rotateUp)
-	CameraYaw(camera, -rotation.X*(Pi/180.0), rotateAroundTarget)
-	CameraRoll(camera, rotation.Z*(Pi/180.0))
+	CameraPitch(camera, -rotation.Y()*(Pi/180.0), lockView, rotateAroundTarget, rotateUp)
+	CameraYaw(camera, -rotation.X()*(Pi/180.0), rotateAroundTarget)
+	CameraRoll(camera, rotation.Z()*(Pi/180.0))
 
 	// Camera movement
-	CameraMoveForward(camera, movement.X, moveInWorldPlane)
-	CameraMoveRight(camera, movement.Y, moveInWorldPlane)
-	CameraMoveUp(camera, movement.Z)
+	CameraMoveForward(camera, movement.X(), moveInWorldPlane)
+	CameraMoveRight(camera, movement.Y(), moveInWorldPlane)
+	CameraMoveUp(camera, movement.Z())
 
 	// Zoom target distance
 	CameraMoveToTarget(camera, zoom)

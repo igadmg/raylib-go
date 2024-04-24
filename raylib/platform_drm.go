@@ -18,7 +18,7 @@ func InitWindow[WT, HT IntegerT](width WT, height HT, title string) {
 	cwidth := (C.int)(width)
 	cheight := (C.int)(height)
 
-	ctitle := TextAlloc(title)
+	ctitle := textAlloc(title)
 
 	C.InitWindow(cwidth, cheight, ctitle)
 }

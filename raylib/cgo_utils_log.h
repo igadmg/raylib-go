@@ -4,6 +4,7 @@ extern "C" {            // Prevents name mangling of functions
 
 
 void setLogCallbackWrapper(void);                 // enable the call-back
+void TraceLogWrapper(int logLevel, const char *text);
 
 #if defined(__cplusplus)
 }

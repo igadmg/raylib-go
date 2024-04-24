@@ -2,8 +2,6 @@ module github.com/gen2brain/raylib-go/rres
 
 go 1.21
 
-replace github.com/gen2brain/raylib-go/raylib => github.com/igadmg/raylib-go/raylib
-
 require github.com/gen2brain/raylib-go/raylib v0.0.0-20240227114648-c3665eb9abf8
 
 require (

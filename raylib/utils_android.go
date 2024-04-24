@@ -3,33 +3,6 @@
 
 package rl
 
-/*
-#include "stdlib.h"
-#include "raylib.h"
-void TraceLogWrapper(int logLevel, const char *text)
-{
-	TraceLog(logLevel, text);
-}
-*/
-import "C"
-
-import (
-	"fmt"
-)
-
-// SetTraceLogLevel - Set the current threshold (minimum) log level
-func SetTraceLogLevel(logLevel TraceLogLevel) {
-	clogLevel := (C.int)(logLevel)
-	C.SetTraceLogLevel(clogLevel)
-}
-
-// TraceLog - Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
-func TraceLog(logLevel TraceLogLevel, text string, v ...interface{}) {
-	ctext := TextAlloc(fmt.Sprintf(text, v...))
-	clogLevel := (C.int)(logLevel)
-	C.TraceLogWrapper(clogLevel, ctext)
-}
-
 // HomeDir - Returns user home directory
 // NOTE: On Android this returns internal data path and must be called after InitWindow
 func HomeDir() string {

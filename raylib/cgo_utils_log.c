@@ -16,3 +16,8 @@ void rayLogWrapperCallback(int logType, const char *text, va_list args) {
 void setLogCallbackWrapper(void) {
 	SetTraceLogCallback(rayLogWrapperCallback);
 }
+
+void TraceLogWrapper(int logLevel, const char *text)
+{
+	TraceLog(logLevel, text);
+}

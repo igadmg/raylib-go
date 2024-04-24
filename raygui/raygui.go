@@ -598,39 +598,19 @@ func ColorBarHue(bounds rl.Rectangle, text string, value float32) float32 {
 // ColorPickerHSV - Color Picker control that avoids conversion to RGB on each call (multiple color controls)
 func ColorPickerHSV(bounds rl.Rectangle, text string, colorHSV *rl.Vector3) int32 {
 	cbounds := crect2ptr(&bounds)
-
 	ctext := textAlloc(text)
+	ccolorHSV := cvec3ptr(colorHSV)
 
-	var ccolorHSV C.struct_Vector3
-	ccolorHSV.x = C.float(colorHSV.X)
-	ccolorHSV.y = C.float(colorHSV.Y)
-	ccolorHSV.z = C.float(colorHSV.Z)
-	defer func() {
-		colorHSV.X = float32(ccolorHSV.x)
-		colorHSV.Y = float32(ccolorHSV.y)
-		colorHSV.Z = float32(ccolorHSV.z)
-	}()
-
-	return int32(C.GuiColorPickerHSV(*cbounds, ctext, &ccolorHSV))
+	return int32(C.GuiColorPickerHSV(*cbounds, ctext, ccolorHSV))
 }
 
 // ColorPanelHSV - Color Panel control that returns HSV color value, used by GuiColorPickerHSV()
 func ColorPanelHSV(bounds rl.Rectangle, text string, colorHSV *rl.Vector3) int32 {
 	cbounds := crect2ptr(&bounds)
-
 	ctext := textAlloc(text)
+	ccolorHSV := cvec3ptr(colorHSV)
 
-	var ccolorHSV C.struct_Vector3
-	ccolorHSV.x = C.float(colorHSV.X)
-	ccolorHSV.y = C.float(colorHSV.Y)
-	ccolorHSV.z = C.float(colorHSV.Z)
-	defer func() {
-		colorHSV.X = float32(ccolorHSV.x)
-		colorHSV.Y = float32(ccolorHSV.y)
-		colorHSV.Z = float32(ccolorHSV.z)
-	}()
-
-	return int32(C.GuiColorPanelHSV(*cbounds, ctext, &ccolorHSV))
+	return int32(C.GuiColorPanelHSV(*cbounds, ctext, ccolorHSV))
 }
 
 // DropdownBox control

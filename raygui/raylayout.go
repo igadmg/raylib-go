@@ -47,9 +47,9 @@ func CanvasLayout(bounds rl.Rectangle) canvasLayout {
 }
 
 func (cl *canvasLayout) Layout(anchor rl.Vector2, pivot rl.Vector2, rect rl.Rectangle) rl.Rectangle {
-	anchorp := rl.NewVector2(anchor.X*cl.Bounds.WH.X, anchor.Y*cl.Bounds.WH.Y)
-	pivotp := rl.NewVector2(pivot.X*rect.WH.X, pivot.Y*rect.WH.Y)
-	return rl.NewRectangle(cl.Bounds.XY.X+anchorp.X-pivotp.X+rect.XY.X, cl.Bounds.XY.Y+anchorp.Y-pivotp.Y+rect.XY.Y, rect.WH.X, rect.WH.Y)
+	anchorp := anchor.MultByVector(cl.Bounds.WH())
+	pivotp := pivot.MultByVector(rect.WH())
+	return rl.NewRectangleV(cl.Bounds.XY().Add(anchorp).Add(rect.XY()).Sub(pivotp), rect.WH())
 }
 
 type horizontalLayout struct {
@@ -67,16 +67,16 @@ func HorizontalLayout(bounds rl.Rectangle, spacing int) horizontalLayout {
 }
 
 func (hl *horizontalLayout) Layout(wh rl.Vector2, justify Justyfy) rl.Rectangle {
-	whY, dy := justify.Justyfy(wh.Y, hl.Bounds.WH.Y)
-	r := rl.NewRectangle(hl.Bounds.XY.X+float32(hl.position), hl.Bounds.XY.Y+dy, wh.X, whY)
-	hl.position += int(wh.X) + hl.spacing
+	whY, dy := justify.Justyfy(wh.Y(), hl.Bounds.Height())
+	r := rl.NewRectangle(hl.Bounds.X()+float32(hl.position), hl.Bounds.Y()+dy, wh.X(), whY)
+	hl.position += int(wh.X()) + hl.spacing
 	return r
 }
 
 func (hl *horizontalLayout) Fill(wh rl.Vector2, justify Justyfy) rl.Rectangle {
-	whY, dy := justify.Justyfy(wh.Y, hl.Bounds.WH.Y)
-	r := rl.NewRectangle(hl.Bounds.XY.X+float32(hl.position), hl.Bounds.XY.Y+dy, hl.Bounds.WH.X-float32(hl.position), whY)
-	hl.position = int(hl.Bounds.WH.X)
+	whY, dy := justify.Justyfy(wh.Y(), hl.Bounds.Height())
+	r := rl.NewRectangle(hl.Bounds.X()+float32(hl.position), hl.Bounds.Y()+dy, hl.Bounds.Width()-float32(hl.position), whY)
+	hl.position = int(hl.Bounds.Width())
 	return r
 }
 
@@ -95,15 +95,15 @@ func VerticalLayout(bounds rl.Rectangle, spacing int) verticalLayout {
 }
 
 func (vl *verticalLayout) Layout(wh rl.Vector2, justify Justyfy) rl.Rectangle {
-	whX, dx := justify.Justyfy(wh.X, vl.Bounds.WH.X)
-	r := rl.NewRectangle(vl.Bounds.XY.X+dx, vl.Bounds.XY.Y+float32(vl.position), whX, wh.Y)
-	vl.position += int(wh.Y) + vl.spacing
+	whX, dx := justify.Justyfy(wh.X(), vl.Bounds.Width())
+	r := rl.NewRectangle(vl.Bounds.X()+dx, vl.Bounds.Y()+float32(vl.position), whX, wh.Y())
+	vl.position += int(wh.Y()) + vl.spacing
 	return r
 }
 
 func (vl *verticalLayout) Fill(wh rl.Vector2, justify Justyfy) rl.Rectangle {
-	whX, dx := justify.Justyfy(wh.X, vl.Bounds.WH.X)
-	r := rl.NewRectangle(vl.Bounds.XY.X+dx, vl.Bounds.XY.Y+float32(vl.position), whX, vl.Bounds.WH.Y-float32(vl.position))
-	vl.position = int(vl.Bounds.WH.Y)
+	whX, dx := justify.Justyfy(wh.X(), vl.Bounds.Width())
+	r := rl.NewRectangle(vl.Bounds.X()+dx, vl.Bounds.Y()+float32(vl.position), whX, vl.Bounds.Height()-float32(vl.position))
+	vl.position = int(vl.Bounds.Height())
 	return r
 }

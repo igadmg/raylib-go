@@ -1,3 +1,4 @@
+//go:build RAY_MATH
 package rl
 
 import (
@@ -6,156 +7,46 @@ import (
 	"github.com/EliCDavis/vector/mathex"
 )
 
-// Vector2Zero - Vector with components value 0.0
-func Vector2Zero() Vector2 {
-	return NewVector2(0.0, 0.0)
-}
-
-// Vector2One - Vector with components value 1.0
-func Vector2One() Vector2 {
-	return NewVector2(1.0, 1.0)
-}
-
-func Vector2Less(v1, v2 Vector2) bool {
-	return v1.X < v2.X && v1.Y < v2.Y
-}
-
-// Vector2Add - Add two vectors (v1 + v2)
-func Vector2Add(v1, v2 Vector2) Vector2 {
-	return NewVector2(v1.X+v2.X, v1.Y+v2.Y)
-}
-
-// Vector2AddValue - Add vector and float value
-func Vector2AddValue(v Vector2, add float32) Vector2 {
-	return NewVector2(v.X+add, v.Y+add)
-}
-
-// Vector2Subtract - Subtract two vectors (v1 - v2)
-func Vector2Subtract(v1, v2 Vector2) Vector2 {
-	return NewVector2(v1.X-v2.X, v1.Y-v2.Y)
-}
-
-// Vector2SubtractValue - Subtract vector by float value
-func Vector2SubtractValue(v Vector2, sub float32) Vector2 {
-	return NewVector2(v.X-sub, v.Y-sub)
-}
-
-// Vector2Length - Calculate vector length
-func Vector2Length(v Vector2) float32 {
-	return float32(math.Sqrt(float64((v.X * v.X) + (v.Y * v.Y))))
-}
-
-// Vector2LengthSqr - Calculate vector square length
-func Vector2LengthSqr(v Vector2) float32 {
-	return v.X*v.X + v.Y*v.Y
-}
-
-// Vector2DotProduct - Calculate two vectors dot product
-func Vector2DotProduct(v1, v2 Vector2) float32 {
-	return v1.X*v2.X + v1.Y*v2.Y
-}
-
-// Vector2Distance - Calculate distance between two vectors
-func Vector2Distance(v1, v2 Vector2) float32 {
-	return float32(math.Sqrt(float64((v1.X-v2.X)*(v1.X-v2.X) + (v1.Y-v2.Y)*(v1.Y-v2.Y))))
-}
-
-// Vector2DistanceSqr - Calculate square distance between two vectors
-func Vector2DistanceSqr(v1 Vector2, v2 Vector2) float32 {
-	return (v1.X-v2.X)*(v1.X-v2.X) + (v1.Y-v2.Y)*(v1.Y-v2.Y)
-}
-
-// Vector2Angle - Calculate angle from two vectors in radians
-func Vector2Angle(v1, v2 Vector2) float32 {
-	result := math.Atan2(float64(v2.Y), float64(v2.X)) - math.Atan2(float64(v1.Y), float64(v1.X))
-
-	return float32(result)
-}
-
 // Vector2LineAngle - Calculate angle defined by a two vectors line
 // NOTE: Parameters need to be normalized. Current implementation should be aligned with glm::angle
 func Vector2LineAngle(start Vector2, end Vector2) float32 {
-	return float32(-math.Atan2(float64(end.Y-start.Y), float64(end.X-start.X)))
-}
-
-// Vector2Scale - Scale vector (multiply by value)
-func Vector2Scale(v Vector2, scale float32) Vector2 {
-	return NewVector2(v.X*scale, v.Y*scale)
-}
-
-// Vector2Multiply - Multiply vector by vector
-func Vector2Multiply(v1, v2 Vector2) Vector2 {
-	return NewVector2(v1.X*v2.X, v1.Y*v2.Y)
-}
-
-// Vector2Negate - Negate vector
-func Vector2Negate(v Vector2) Vector2 {
-	return NewVector2(-v.X, -v.Y)
-}
-
-// Vector2Divide - Divide vector by vector
-func Vector2Divide(v1, v2 Vector2) Vector2 {
-	return NewVector2(v1.X/v2.X, v1.Y/v2.Y)
-}
-
-// Vector2Normalize - Normalize provided vector
-func Vector2Normalize(v Vector2) Vector2 {
-	if l := Vector2Length(v); l > 0 {
-		return Vector2Scale(v, 1/l)
-	}
-	return v
+	return float32(-math.Atan2(float64(end.Y()-start.Y()), float64(end.X()-start.X())))
 }
 
 // Vector2Transform - Transforms a Vector2 by a given Matrix
 func Vector2Transform(v Vector2, mat Matrix) Vector2 {
-	var result = Vector2{}
-
-	var x = v.X
-	var y = v.Y
+	var x = v.X()
+	var y = v.Y()
 	var z float32
 
-	result.X = mat.M0*x + mat.M4*y + mat.M8*z + mat.M12
-	result.Y = mat.M1*x + mat.M5*y + mat.M9*z + mat.M13
-
-	return result
-}
-
-// Vector2Lerp - Calculate linear interpolation between two vectors
-func Vector2Lerp(v1, v2 Vector2, amount float32) Vector2 {
-	return NewVector2(v1.X+amount*(v2.X-v1.X), v1.Y+amount*(v2.Y-v1.Y))
+	return NewVector2(
+		mat.M0*x+mat.M4*y+mat.M8*z+mat.M12,
+		mat.M1*x+mat.M5*y+mat.M9*z+mat.M13)
 }
 
 // Vector2Reflect - Calculate reflected vector to normal
 func Vector2Reflect(v Vector2, normal Vector2) Vector2 {
-	var result = Vector2{}
+	dotProduct := v.X()*normal.X() + v.Y()*normal.Y() // Dot product
 
-	dotProduct := v.X*normal.X + v.Y*normal.Y // Dot product
-
-	result.X = v.X - 2.0*normal.X*dotProduct
-	result.Y = v.Y - 2.0*normal.Y*dotProduct
-
-	return result
+	return NewVector2(
+		v.X()-2.0*normal.X()*dotProduct,
+		v.Y()-2.0*normal.Y()*dotProduct)
 }
 
 // Vector2Rotate - Rotate vector by angle
 func Vector2Rotate(v Vector2, angle float32) Vector2 {
-	var result = Vector2{}
-
 	cosres := float32(math.Cos(float64(angle)))
 	sinres := float32(math.Sin(float64(angle)))
 
-	result.X = v.X*cosres - v.Y*sinres
-	result.Y = v.X*sinres + v.Y*cosres
-
-	return result
+	return NewVector2(
+		v.X()*cosres-v.Y()*sinres,
+		v.X()*sinres+v.Y()*cosres)
 }
 
 // Vector2MoveTowards - Move Vector towards target
 func Vector2MoveTowards(v Vector2, target Vector2, maxDistance float32) Vector2 {
-	var result = Vector2{}
-
-	dx := target.X - v.X
-	dy := target.Y - v.Y
+	dx := target.X() - v.X()
+	dy := target.Y() - v.Y()
 	value := dx*dx + dy*dy
 
 	if value == 0 || maxDistance >= 0 && value <= maxDistance*maxDistance {
@@ -164,215 +55,26 @@ func Vector2MoveTowards(v Vector2, target Vector2, maxDistance float32) Vector2 
 
 	dist := mathex.Sqrt(value)
 
-	result.X = v.X + dx/dist*maxDistance
-	result.Y = v.Y + dy/dist*maxDistance
-
-	return result
-}
-
-// Vector2Invert - Invert the given vector
-func Vector2Invert(v Vector2) Vector2 {
-	return NewVector2(1.0/v.X, 1.0/v.Y)
-}
-
-// Vector2CrossProduct - Calculate two vectors cross product
-func Vector2CrossProduct(v1, v2 Vector2) float32 {
-	return v1.X*v2.Y - v1.Y*v2.X
-}
-
-// Vector2Cross - Calculate the cross product of a vector and a value
-func Vector2Cross(value float32, vector Vector2) Vector2 {
-	return NewVector2(-value*vector.Y, value*vector.X)
-}
-
-// Vector2LenSqr - Returns the len square root of a vector
-func Vector2LenSqr(vector Vector2) float32 {
-	return vector.X*vector.X + vector.Y*vector.Y
-}
-
-// Vector3Zero - Vector with components value 0.0
-func Vector3Zero() Vector3 {
-	return NewVector3(0.0, 0.0, 0.0)
-}
-
-// Vector3One - Vector with components value 1.0
-func Vector3One() Vector3 {
-	return NewVector3(1.0, 1.0, 1.0)
-}
-
-// Vector3Add - Add two vectors
-func Vector3Add(v1, v2 Vector3) Vector3 {
-	return NewVector3(v1.X+v2.X, v1.Y+v2.Y, v1.Z+v2.Z)
-}
-
-// Vector3AddValue - Add vector and float value
-func Vector3AddValue(v Vector3, add float32) Vector3 {
-	return NewVector3(v.X+add, v.Y+add, v.Z+add)
-}
-
-// Vector3Subtract - Subtract two vectors
-func Vector3Subtract(v1, v2 Vector3) Vector3 {
-	return NewVector3(v1.X-v2.X, v1.Y-v2.Y, v1.Z-v2.Z)
-}
-
-// Vector3SubtractValue - Subtract vector by float value
-func Vector3SubtractValue(v Vector3, sub float32) Vector3 {
-	return NewVector3(v.X-sub, v.Y-sub, v.Z-sub)
-}
-
-// Vector3Scale - Scale provided vector
-func Vector3Scale(v Vector3, scale float32) Vector3 {
-	return NewVector3(v.X*scale, v.Y*scale, v.Z*scale)
-}
-
-// Vector3Multiply - Multiply vector by vector
-func Vector3Multiply(v1, v2 Vector3) Vector3 {
-	result := Vector3{}
-
-	result.X = v1.X * v2.X
-	result.Y = v1.Y * v2.Y
-	result.Z = v1.Z * v2.Z
-
-	return result
-}
-
-// Vector3CrossProduct - Calculate two vectors cross product
-func Vector3CrossProduct(v1, v2 Vector3) Vector3 {
-	result := Vector3{}
-
-	result.X = v1.Y*v2.Z - v1.Z*v2.Y
-	result.Y = v1.Z*v2.X - v1.X*v2.Z
-	result.Z = v1.X*v2.Y - v1.Y*v2.X
-
-	return result
+	return NewVector2(
+		v.X()+dx/dist*maxDistance,
+		v.Y()+dy/dist*maxDistance)
 }
 
 // Vector3Perpendicular - Calculate one vector perpendicular vector
 func Vector3Perpendicular(v Vector3) Vector3 {
-	min := mathex.Abs(v.X)
+	min := mathex.Abs(v.X())
 	cardinalAxis := NewVector3(1.0, 0.0, 0.0)
 
-	if mathex.Abs(v.Y) < min {
-		min = mathex.Abs(v.Y)
+	if mathex.Abs(v.Y()) < min {
+		min = mathex.Abs(v.Y())
 		cardinalAxis = NewVector3(0.0, 1.0, 0.0)
 	}
 
-	if mathex.Abs(v.Z) < min {
+	if mathex.Abs(v.Z()) < min {
 		cardinalAxis = NewVector3(0.0, 0.0, 1.0)
 	}
 
 	result := Vector3CrossProduct(v, cardinalAxis)
-
-	return result
-}
-
-// Vector3Length - Calculate vector length
-func Vector3Length(v Vector3) float32 {
-	return mathex.Sqrt(v.X*v.X + v.Y*v.Y + v.Z*v.Z)
-}
-
-// Vector3LengthSqr - Calculate vector square length
-func Vector3LengthSqr(v Vector3) float32 {
-	return v.X*v.X + v.Y*v.Y + v.Z*v.Z
-}
-
-// Vector3DotProduct - Calculate two vectors dot product
-func Vector3DotProduct(v1, v2 Vector3) float32 {
-	return v1.X*v2.X + v1.Y*v2.Y + v1.Z*v2.Z
-}
-
-// Vector3Distance - Calculate distance between two vectors
-func Vector3Distance(v1, v2 Vector3) float32 {
-	dx := v2.X - v1.X
-	dy := v2.Y - v1.Y
-	dz := v2.Z - v1.Z
-
-	return mathex.Sqrt(dx*dx + dy*dy + dz*dz)
-}
-
-// Vector3DistanceSqr - Calculate square distance between two vectors
-func Vector3DistanceSqr(v1 Vector3, v2 Vector3) float32 {
-	var result float32
-
-	dx := v2.X - v1.X
-	dy := v2.Y - v1.Y
-	dz := v2.Z - v1.Z
-	result = dx*dx + dy*dy + dz*dz
-
-	return result
-}
-
-// Vector3Angle - Calculate angle between two vectors
-func Vector3Angle(v1 Vector3, v2 Vector3) float32 {
-	var result float32
-
-	cross := Vector3{X: v1.Y*v2.Z - v1.Z*v2.Y, Y: v1.Z*v2.X - v1.X*v2.Z, Z: v1.X*v2.Y - v1.Y*v2.X}
-	length := mathex.Sqrt(cross.X*cross.X + cross.Y*cross.Y + cross.Z*cross.Z)
-	dot := v1.X*v2.X + v1.Y*v2.Y + v1.Z*v2.Z
-	result = float32(math.Atan2(float64(length), float64(dot)))
-
-	return result
-}
-
-// Vector3Negate - Negate provided vector (invert direction)
-func Vector3Negate(v Vector3) Vector3 {
-	return NewVector3(-v.X, -v.Y, -v.Z)
-}
-
-// Vector3Divide - Divide vector by vector
-func Vector3Divide(v1 Vector3, v2 Vector3) Vector3 {
-	return NewVector3(v1.X/v2.X, v1.Y/v2.Y, v1.Z/v2.Z)
-}
-
-// Vector3Normalize - Normalize provided vector
-func Vector3Normalize(v Vector3) Vector3 {
-	result := v
-
-	var length, ilength float32
-
-	length = Vector3Length(v)
-
-	if length == 0 {
-		length = 1.0
-	}
-
-	ilength = 1.0 / length
-
-	result.X *= ilength
-	result.Y *= ilength
-	result.Z *= ilength
-
-	return result
-}
-
-// Vector3Project - Calculate the projection of the vector v1 on to v2
-func Vector3Project(v1, v2 Vector3) Vector3 {
-	result := Vector3{}
-
-	v1dv2 := (v1.X*v2.X + v1.Y*v2.Y + v1.Z*v2.Z)
-	v2dv2 := (v2.X*v2.X + v2.Y*v2.Y + v2.Z*v2.Z)
-
-	mag := v1dv2 / v2dv2
-
-	result.X = v2.X * mag
-	result.Y = v2.Y * mag
-	result.Z = v2.Z * mag
-
-	return result
-}
-
-// Vector3Reject - Calculate the rejection of the vector v1 on to v2
-func Vector3Reject(v1, v2 Vector3) Vector3 {
-	result := Vector3{}
-
-	v1dv2 := (v1.X*v2.X + v1.Y*v2.Y + v1.Z*v2.Z)
-	v2dv2 := (v2.X*v2.X + v2.Y*v2.Y + v2.Z*v2.Z)
-
-	mag := v1dv2 / v2dv2
-
-	result.X = v1.X - (v2.X * mag)
-	result.Y = v1.Y - (v2.Y * mag)
-	result.Z = v1.Z - (v2.Z * mag)
 
 	return result
 }
@@ -394,13 +96,13 @@ func Vector3OrthoNormalize(v1, v2 *Vector3) {
 func Vector3Transform(v Vector3, mat Matrix) Vector3 {
 	result := Vector3{}
 
-	x := v.X
-	y := v.Y
-	z := v.Z
+	x := v.X()
+	y := v.Y()
+	z := v.Z()
 
-	result.X = mat.M0*x + mat.M4*y + mat.M8*z + mat.M12
-	result.Y = mat.M1*x + mat.M5*y + mat.M9*z + mat.M13
-	result.Z = mat.M2*x + mat.M6*y + mat.M10*z + mat.M14
+	result.X() = mat.M0*x + mat.M4*y + mat.M8*z + mat.M12
+	result.Y() = mat.M1*x + mat.M5*y + mat.M9*z + mat.M13
+	result.Z() = mat.M2*x + mat.M6*y + mat.M10*z + mat.M14
 
 	return result
 }
@@ -409,9 +111,9 @@ func Vector3Transform(v Vector3, mat Matrix) Vector3 {
 func Vector3RotateByQuaternion(v Vector3, q Quaternion) Vector3 {
 	var result Vector3
 
-	result.X = v.X*(q.X*q.X+q.W*q.W-q.Y*q.Y-q.Z*q.Z) + v.Y*(2*q.X*q.Y-2*q.W*q.Z) + v.Z*(2*q.X*q.Z+2*q.W*q.Y)
-	result.Y = v.X*(2*q.W*q.Z+2*q.X*q.Y) + v.Y*(q.W*q.W-q.X*q.X+q.Y*q.Y-q.Z*q.Z) + v.Z*(-2*q.W*q.X+2*q.Y*q.Z)
-	result.Z = v.X*(-2*q.W*q.Y+2*q.X*q.Z) + v.Y*(2*q.W*q.X+2*q.Y*q.Z) + v.Z*(q.W*q.W-q.X*q.X-q.Y*q.Y+q.Z*q.Z)
+	result.X() = v.X()*(q.X()*q.X()+q.W*q.W-q.Y()*q.Y()-q.Z()*q.Z()) + v.Y()*(2*q.X()*q.Y()-2*q.W*q.Z()) + v.Z()*(2*q.X()*q.Z()+2*q.W*q.Y())
+	result.Y() = v.X()*(2*q.W*q.Z()+2*q.X()*q.Y()) + v.Y()*(q.W*q.W-q.X()*q.X()+q.Y()*q.Y()-q.Z()*q.Z()) + v.Z()*(-2*q.W*q.X()+2*q.Y()*q.Z())
+	result.Z() = v.X()*(-2*q.W*q.Y()+2*q.X()*q.Z()) + v.Y()*(2*q.W*q.X()+2*q.Y()*q.Z()) + v.Z()*(q.W*q.W-q.X()*q.X()-q.Y()*q.Y()+q.Z()*q.Z())
 
 	return result
 }
@@ -424,47 +126,47 @@ func Vector3RotateByAxisAngle(v Vector3, axis Vector3, angle float32) Vector3 {
 	result := v
 
 	// Vector3Normalize(axis);
-	length := mathex.Sqrt(axis.X*axis.X + axis.Y*axis.Y + axis.Z*axis.Z)
+	length := mathex.Sqrt(axis.X()*axis.X() + axis.Y()*axis.Y() + axis.Z()*axis.Z())
 	if length == 0.0 {
 		length = 1.0
 	}
 	ilength := 1.0 / length
-	axis.X *= ilength
-	axis.Y *= ilength
-	axis.Z *= ilength
+	axis.X() *= ilength
+	axis.Y() *= ilength
+	axis.Z() *= ilength
 
 	angle /= 2.0
 	a := float32(math.Sin(float64(angle)))
-	b := axis.X * a
-	c := axis.Y * a
-	d := axis.Z * a
+	b := axis.X() * a
+	c := axis.Y() * a
+	d := axis.Z() * a
 	a = float32(math.Cos(float64(angle)))
 	w := NewVector3(b, c, d)
 
 	// Vector3CrossProduct(w, v)
-	wv := NewVector3(w.Y*v.Z-w.Z*v.Y, w.Z*v.X-w.X*v.Z, w.X*v.Y-w.Y*v.X)
+	wv := NewVector3(w.Y()*v.Z()-w.Z()*v.Y(), w.Z()*v.X()-w.X()*v.Z(), w.X()*v.Y()-w.Y()*v.X())
 
 	// Vector3CrossProduct(w, wv)
-	wwv := NewVector3(w.Y*wv.Z-w.Z*wv.Y, w.Z*wv.X-w.X*wv.Z, w.X*wv.Y-w.Y*wv.X)
+	wwv := NewVector3(w.Y()*wv.Z()-w.Z()*wv.Y(), w.Z()*wv.X()-w.X()*wv.Z(), w.X()*wv.Y()-w.Y()*wv.X())
 
 	// Vector3Scale(wv, 2*a)
 	a *= 2
-	wv.X *= a
-	wv.Y *= a
-	wv.Z *= a
+	wv.X() *= a
+	wv.Y() *= a
+	wv.Z() *= a
 
 	// Vector3Scale(wwv, 2)
-	wwv.X *= 2
-	wwv.Y *= 2
-	wwv.Z *= 2
+	wwv.X() *= 2
+	wwv.Y() *= 2
+	wwv.Z() *= 2
 
-	result.X += wv.X
-	result.Y += wv.Y
-	result.Z += wv.Z
+	result.X() += wv.X()
+	result.Y() += wv.Y()
+	result.Z() += wv.Z()
 
-	result.X += wwv.X
-	result.Y += wwv.Y
-	result.Z += wwv.Z
+	result.X() += wwv.X()
+	result.Y() += wwv.Y()
+	result.Z() += wwv.Z()
 
 	return result
 }
@@ -473,57 +175,18 @@ func Vector3RotateByAxisAngle(v Vector3, axis Vector3, angle float32) Vector3 {
 func Vector3Lerp(v1, v2 Vector3, amount float32) Vector3 {
 	result := Vector3{}
 
-	result.X = v1.X + amount*(v2.X-v1.X)
-	result.Y = v1.Y + amount*(v2.Y-v1.Y)
-	result.Z = v1.Z + amount*(v2.Z-v1.Z)
-
-	return result
-}
-
-// Vector3Reflect - Calculate reflected vector to normal
-func Vector3Reflect(vector, normal Vector3) Vector3 {
-	// I is the original vector
-	// N is the normal of the incident plane
-	// R = I - (2*N*( DotProduct[ I,N] ))
-
-	result := Vector3{}
-
-	dotProduct := Vector3DotProduct(vector, normal)
-
-	result.X = vector.X - (2.0*normal.X)*dotProduct
-	result.Y = vector.Y - (2.0*normal.Y)*dotProduct
-	result.Z = vector.Z - (2.0*normal.Z)*dotProduct
-
-	return result
-}
-
-// Vector3Min - Return min value for each pair of components
-func Vector3Min(vec1, vec2 Vector3) Vector3 {
-	result := Vector3{}
-
-	result.X = min(vec1.X, vec2.X)
-	result.Y = min(vec1.Y, vec2.Y)
-	result.Z = min(vec1.Z, vec2.Z)
-
-	return result
-}
-
-// Vector3Max - Return max value for each pair of components
-func Vector3Max(vec1, vec2 Vector3) Vector3 {
-	result := Vector3{}
-
-	result.X = max(vec1.X, vec2.X)
-	result.Y = max(vec1.Y, vec2.Y)
-	result.Z = max(vec1.Z, vec2.Z)
+	result.X() = v1.X() + amount*(v2.X()-v1.X())
+	result.Y() = v1.Y() + amount*(v2.Y()-v1.Y())
+	result.Z() = v1.Z() + amount*(v2.Z()-v1.Z())
 
 	return result
 }
 
 // Vector3Barycenter - Barycenter coords for p in triangle abc
 func Vector3Barycenter(p, a, b, c Vector3) Vector3 {
-	v0 := Vector3Subtract(b, a)
-	v1 := Vector3Subtract(c, a)
-	v2 := Vector3Subtract(p, a)
+	v0 := b.Sub(a)
+	v1 := c.Sub(a)
+	v2 := p.Sub(a)
 	d00 := Vector3DotProduct(v0, v0)
 	d01 := Vector3DotProduct(v0, v1)
 	d11 := Vector3DotProduct(v1, v1)
@@ -534,9 +197,9 @@ func Vector3Barycenter(p, a, b, c Vector3) Vector3 {
 
 	result := Vector3{}
 
-	result.Y = (d11*d20 - d01*d21) / denom
-	result.Z = (d00*d21 - d01*d20) / denom
-	result.X = 1.0 - (result.Z + result.Y)
+	result.Y() = (d11*d20 - d01*d21) / denom
+	result.Z() = (d00*d21 - d01*d20) / denom
+	result.X() = 1.0 - (result.Z() + result.Y())
 
 	return result
 }
@@ -619,19 +282,19 @@ func Vector3Unproject(source Vector3, projection Matrix, view Matrix) Vector3 {
 		M15: (a20*b03 - a21*b01 + a22*b00) * invDet}
 
 	// Create quaternion from source point
-	var quat = Quaternion{X: source.X, Y: source.Y, Z: source.Z, W: 1.0}
+	var quat = Quaternion{X: source.X(), Y: source.Y(), Z: source.Z(), W: 1.0}
 
 	// Multiply quat point by unprojecte matrix
 	var qtransformed = Quaternion{ // QuaternionTransform(quat, matViewProjInv)
-		X: matViewProjInv.M0*quat.X + matViewProjInv.M4*quat.Y + matViewProjInv.M8*quat.Z + matViewProjInv.M12*quat.W,
-		Y: matViewProjInv.M1*quat.X + matViewProjInv.M5*quat.Y + matViewProjInv.M9*quat.Z + matViewProjInv.M13*quat.W,
-		Z: matViewProjInv.M2*quat.X + matViewProjInv.M6*quat.Y + matViewProjInv.M10*quat.Z + matViewProjInv.M14*quat.W,
-		W: matViewProjInv.M3*quat.X + matViewProjInv.M7*quat.Y + matViewProjInv.M11*quat.Z + matViewProjInv.M15*quat.W}
+		X: matViewProjInv.M0*quat.X() + matViewProjInv.M4*quat.Y() + matViewProjInv.M8*quat.Z() + matViewProjInv.M12*quat.W,
+		Y: matViewProjInv.M1*quat.X() + matViewProjInv.M5*quat.Y() + matViewProjInv.M9*quat.Z() + matViewProjInv.M13*quat.W,
+		Z: matViewProjInv.M2*quat.X() + matViewProjInv.M6*quat.Y() + matViewProjInv.M10*quat.Z() + matViewProjInv.M14*quat.W,
+		W: matViewProjInv.M3*quat.X() + matViewProjInv.M7*quat.Y() + matViewProjInv.M11*quat.Z() + matViewProjInv.M15*quat.W}
 
 	// Normalized world points in vectors
-	result.X = qtransformed.X / qtransformed.W
-	result.Y = qtransformed.Y / qtransformed.W
-	result.Z = qtransformed.Z / qtransformed.W
+	result.X() = qtransformed.X() / qtransformed.W
+	result.Y() = qtransformed.Y() / qtransformed.W
+	result.Z() = qtransformed.Z() / qtransformed.W
 
 	return result
 }
@@ -640,16 +303,16 @@ func Vector3Unproject(source Vector3, projection Matrix, view Matrix) Vector3 {
 func Vector3ToFloatV(v Vector3) [3]float32 {
 	var result [3]float32
 
-	result[0] = v.X
-	result[1] = v.Y
-	result[2] = v.Z
+	result[0] = v.X()
+	result[1] = v.Y()
+	result[2] = v.Z()
 
 	return result
 }
 
 // Vector3Invert - Invert the given vector
 func Vector3Invert(v Vector3) Vector3 {
-	return NewVector3(1.0/v.X, 1.0/v.Y, 1.0/v.Z)
+	return NewVector3(1.0/v.X(), 1.0/v.Y(), 1.0/v.Z())
 }
 
 // Vector3Refract - Compute the direction of a refracted ray
@@ -660,14 +323,14 @@ func Vector3Invert(v Vector3) Vector3 {
 func Vector3Refract(v Vector3, n Vector3, r float32) Vector3 {
 	var result = Vector3{}
 
-	dot := v.X*n.X + v.Y*n.Y + v.Z*n.Z
+	dot := v.X()*n.X() + v.Y()*n.Y() + v.Z()*n.Z()
 	d := 1.0 - r*r*(1.0-dot*dot)
 
 	if d >= 0.0 {
 		d = mathex.Sqrt(d)
-		v.X = r*v.X - (r*dot+d)*n.X
-		v.Y = r*v.Y - (r*dot+d)*n.Y
-		v.Z = r*v.Z - (r*dot+d)*n.Z
+		v.X() = r*v.X() - (r*dot+d)*n.X()
+		v.Y() = r*v.Y() - (r*dot+d)*n.Y()
+		v.Z() = r*v.Z() - (r*dot+d)*n.Z()
 
 		result = v
 	}
@@ -701,7 +364,7 @@ func Mat2Transpose(matrix Mat2) Mat2 {
 
 // Mat2MultiplyVector2 - Multiplies a vector by a matrix 2x2
 func Mat2MultiplyVector2(matrix Mat2, vector Vector2) Vector2 {
-	return NewVector2(matrix.M00*vector.X+matrix.M01*vector.Y, matrix.M10*vector.X+matrix.M11*vector.Y)
+	return NewVector2(matrix.M00*vector.X()+matrix.M01*vector.Y(), matrix.M10*vector.X()+matrix.M11*vector.Y())
 }
 
 // MatrixDeterminant - Compute matrix determinant
@@ -943,9 +606,9 @@ func MatrixRotate(axis Vector3, angle float32) Matrix {
 
 	mat := MatrixIdentity()
 
-	x := axis.X
-	y := axis.Y
-	z := axis.Z
+	x := axis.X()
+	y := axis.Y()
+	z := axis.Z()
 
 	length := mathex.Sqrt(x*x + y*y + z*z)
 
@@ -1055,12 +718,12 @@ func MatrixRotateZ(angle float32) Matrix {
 func MatrixRotateXYZ(ang Vector3) Matrix {
 	result := MatrixIdentity()
 
-	cosz := float32(math.Cos(float64(-ang.Z)))
-	sinz := float32(math.Sin(float64(-ang.Z)))
-	cosy := float32(math.Cos(float64(-ang.Y)))
-	siny := float32(math.Sin(float64(-ang.Y)))
-	cosx := float32(math.Cos(float64(-ang.X)))
-	sinx := float32(math.Sin(float64(-ang.X)))
+	cosz := float32(math.Cos(float64(-ang.Z())))
+	sinz := float32(math.Sin(float64(-ang.Z())))
+	cosy := float32(math.Cos(float64(-ang.Y())))
+	siny := float32(math.Sin(float64(-ang.Y())))
+	cosx := float32(math.Cos(float64(-ang.X())))
+	sinx := float32(math.Sin(float64(-ang.X())))
 
 	result.M0 = cosz * cosy
 	result.M4 = (cosz * siny * sinx) - (sinz * cosx)
@@ -1082,12 +745,12 @@ func MatrixRotateXYZ(ang Vector3) Matrix {
 func MatrixRotateZYX(angle Vector3) Matrix {
 	var result = Matrix{}
 
-	var cz = float32(math.Cos(float64(angle.Z)))
-	var sz = float32(math.Sin(float64(angle.Z)))
-	var cy = float32(math.Cos(float64(angle.Y)))
-	var sy = float32(math.Sin(float64(angle.Y)))
-	var cx = float32(math.Cos(float64(angle.X)))
-	var sx = float32(math.Sin(float64(angle.X)))
+	var cz = float32(math.Cos(float64(angle.Z())))
+	var sz = float32(math.Sin(float64(angle.Z())))
+	var cy = float32(math.Cos(float64(angle.Y())))
+	var sy = float32(math.Sin(float64(angle.Y())))
+	var cx = float32(math.Cos(float64(angle.X())))
+	var sx = float32(math.Sin(float64(angle.X())))
 
 	result.M0 = cz * cy
 	result.M4 = cz*sy*sx - cx*sz
@@ -1194,25 +857,25 @@ func MatrixOrtho(left, right, bottom, top, near, far float32) Matrix {
 func MatrixLookAt(eye, target, up Vector3) Matrix {
 	var result Matrix
 
-	z := Vector3Subtract(eye, target)
+	z := eye.Sub(target)
 	z = Vector3Normalize(z)
 	x := Vector3CrossProduct(up, z)
 	x = Vector3Normalize(x)
 	y := Vector3CrossProduct(z, x)
 	y = Vector3Normalize(y)
 
-	result.M0 = x.X
-	result.M1 = x.Y
-	result.M2 = x.Z
-	result.M3 = -((x.X * eye.X) + (x.Y * eye.Y) + (x.Z * eye.Z))
-	result.M4 = y.X
-	result.M5 = y.Y
-	result.M6 = y.Z
-	result.M7 = -((y.X * eye.X) + (y.Y * eye.Y) + (y.Z * eye.Z))
-	result.M8 = z.X
-	result.M9 = z.Y
-	result.M10 = z.Z
-	result.M11 = -((z.X * eye.X) + (z.Y * eye.Y) + (z.Z * eye.Z))
+	result.M0 = x.X()
+	result.M1 = x.Y()
+	result.M2 = x.Z()
+	result.M3 = -((x.X() * eye.X()) + (x.Y() * eye.Y()) + (x.Z() * eye.Z()))
+	result.M4 = y.X()
+	result.M5 = y.Y()
+	result.M6 = y.Z()
+	result.M7 = -((y.X() * eye.X()) + (y.Y() * eye.Y()) + (y.Z() * eye.Z()))
+	result.M8 = z.X()
+	result.M9 = z.Y()
+	result.M10 = z.Z()
+	result.M11 = -((z.X() * eye.X()) + (z.Y() * eye.Y()) + (z.Z() * eye.Z()))
 	result.M12 = 0.0
 	result.M13 = 0.0
 	result.M14 = 0.0
@@ -1247,28 +910,28 @@ func MatrixToFloatV(mat Matrix) [16]float32 {
 
 // QuaternionAdd - Add two quaternions
 func QuaternionAdd(q1 Quaternion, q2 Quaternion) Quaternion {
-	var result = Quaternion{X: q1.X + q2.X, Y: q1.Y + q2.Y, Z: q1.Z + q2.Z, W: q1.W + q2.W}
+	var result = Quaternion{X: q1.X() + q2.X(), Y: q1.Y() + q2.Y(), Z: q1.Z() + q2.Z(), W: q1.W + q2.W}
 
 	return result
 }
 
 // QuaternionAddValue - Add quaternion and float value
 func QuaternionAddValue(q Quaternion, add float32) Quaternion {
-	var result = Quaternion{X: q.X + add, Y: q.Y + add, Z: q.Z + add, W: q.W + add}
+	var result = Quaternion{X: q.X() + add, Y: q.Y() + add, Z: q.Z() + add, W: q.W + add}
 
 	return result
 }
 
 // QuaternionSubtract - Subtract two quaternions
 func QuaternionSubtract(q1 Quaternion, q2 Quaternion) Quaternion {
-	var result = Quaternion{X: q1.X - q2.X, Y: q1.Y - q2.Y, Z: q1.Z - q2.Z, W: q1.W - q2.W}
+	var result = Quaternion{X: q1.X() - q2.X(), Y: q1.Y() - q2.Y(), Z: q1.Z() - q2.Z(), W: q1.W - q2.W}
 
 	return result
 }
 
 // QuaternionSubtractValue - Subtract quaternion and float value
 func QuaternionSubtractValue(q Quaternion, sub float32) Quaternion {
-	var result = Quaternion{X: q.X - sub, Y: q.Y - sub, Z: q.Z - sub, W: q.W - sub}
+	var result = Quaternion{X: q.X() - sub, Y: q.Y() - sub, Z: q.Z() - sub, W: q.W - sub}
 
 	return result
 }
@@ -1282,7 +945,7 @@ func QuaternionIdentity() Quaternion {
 
 // QuaternionLength - Compute the length of a quaternion
 func QuaternionLength(quat Quaternion) float32 {
-	return mathex.Sqrt(quat.X*quat.X + quat.Y*quat.Y + quat.Z*quat.Z + quat.W*quat.W)
+	return mathex.Sqrt(quat.X()*quat.X() + quat.Y()*quat.Y() + quat.Z()*quat.Z() + quat.W*quat.W)
 }
 
 // QuaternionNormalize - Normalize provided quaternion
@@ -1292,9 +955,9 @@ func QuaternionNormalize(q Quaternion) Quaternion {
 	length := QuaternionLength(q)
 
 	if length != 0.0 {
-		result.X /= length
-		result.Y /= length
-		result.Z /= length
+		result.X() /= length
+		result.Y() /= length
+		result.Z() /= length
 		result.W /= length
 	}
 
@@ -1311,9 +974,9 @@ func QuaternionInvert(quat Quaternion) Quaternion {
 	if lengthSq != 0.0 {
 		i := 1.0 / lengthSq
 
-		result.X *= -i
-		result.Y *= -i
-		result.Z *= -i
+		result.X() *= -i
+		result.Y() *= -i
+		result.Z() *= -i
 		result.W *= i
 	}
 
@@ -1324,18 +987,18 @@ func QuaternionInvert(quat Quaternion) Quaternion {
 func QuaternionMultiply(q1, q2 Quaternion) Quaternion {
 	var result Quaternion
 
-	qax := q1.X
-	qay := q1.Y
-	qaz := q1.Z
+	qax := q1.X()
+	qay := q1.Y()
+	qaz := q1.Z()
 	qaw := q1.W
-	qbx := q2.X
-	qby := q2.Y
-	qbz := q2.Z
+	qbx := q2.X()
+	qby := q2.Y()
+	qbz := q2.Z()
 	qbw := q2.W
 
-	result.X = qax*qbw + qaw*qbx + qay*qbz - qaz*qby
-	result.Y = qay*qbw + qaw*qby + qaz*qbx - qax*qbz
-	result.Z = qaz*qbw + qaw*qbz + qax*qby - qay*qbx
+	result.X() = qax*qbw + qaw*qbx + qay*qbz - qaz*qby
+	result.Y() = qay*qbw + qaw*qby + qaz*qbx - qax*qbz
+	result.Z() = qaz*qbw + qaw*qbz + qax*qby - qay*qbx
 	result.W = qaw*qbw - qax*qbx - qay*qby - qaz*qbz
 
 	return result
@@ -1345,9 +1008,9 @@ func QuaternionMultiply(q1, q2 Quaternion) Quaternion {
 func QuaternionScale(q Quaternion, mul float32) Quaternion {
 	var result = Quaternion{}
 
-	result.X = q.X * mul
-	result.Y = q.Y * mul
-	result.Z = q.Z * mul
+	result.X() = q.X() * mul
+	result.Y() = q.Y() * mul
+	result.Z() = q.Z() * mul
 	result.W = q.W * mul
 
 	return result
@@ -1355,7 +1018,7 @@ func QuaternionScale(q Quaternion, mul float32) Quaternion {
 
 // QuaternionDivide - Divide two quaternions
 func QuaternionDivide(q1 Quaternion, q2 Quaternion) Quaternion {
-	var result = Quaternion{X: q1.X / q2.X, Y: q1.Y / q2.Y, Z: q1.Z / q2.Z, W: q1.W / q2.W}
+	var result = Quaternion{X: q1.X() / q2.X(), Y: q1.Y() / q2.Y(), Z: q1.Z() / q2.Z(), W: q1.W / q2.W}
 
 	return result
 }
@@ -1364,9 +1027,9 @@ func QuaternionDivide(q1 Quaternion, q2 Quaternion) Quaternion {
 func QuaternionLerp(q1 Quaternion, q2 Quaternion, amount float32) Quaternion {
 	var result = Quaternion{}
 
-	result.X = q1.X + amount*(q2.X-q1.X)
-	result.Y = q1.Y + amount*(q2.Y-q1.Y)
-	result.Z = q1.Z + amount*(q2.Z-q1.Z)
+	result.X() = q1.X() + amount*(q2.X()-q1.X())
+	result.Y() = q1.Y() + amount*(q2.Y()-q1.Y())
+	result.Z() = q1.Z() + amount*(q2.Z()-q1.Z())
 	result.W = q1.W + amount*(q2.W-q1.W)
 
 	return result
@@ -1377,22 +1040,22 @@ func QuaternionNlerp(q1 Quaternion, q2 Quaternion, amount float32) Quaternion {
 	var result = Quaternion{}
 
 	// QuaternionLerp(q1, q2, amount)
-	result.X = q1.X + amount*(q2.X-q1.X)
-	result.Y = q1.Y + amount*(q2.Y-q1.Y)
-	result.Z = q1.Z + amount*(q2.Z-q1.Z)
+	result.X() = q1.X() + amount*(q2.X()-q1.X())
+	result.Y() = q1.Y() + amount*(q2.Y()-q1.Y())
+	result.Z() = q1.Z() + amount*(q2.Z()-q1.Z())
 	result.W = q1.W + amount*(q2.W-q1.W)
 
 	// QuaternionNormalize(q);
 	q := result
-	length := mathex.Sqrt(q.X*q.X + q.Y*q.Y + q.Z*q.Z + q.W*q.W)
+	length := mathex.Sqrt(q.X()*q.X() + q.Y()*q.Y() + q.Z()*q.Z() + q.W*q.W)
 	if length == 0.0 {
 		length = 1.0
 	}
 	ilength := 1.0 / length
 
-	result.X = q.X * ilength
-	result.Y = q.Y * ilength
-	result.Z = q.Z * ilength
+	result.X() = q.X() * ilength
+	result.Y() = q.Y() * ilength
+	result.Z() = q.Z() * ilength
 	result.W = q.W * ilength
 
 	return result
@@ -1402,7 +1065,7 @@ func QuaternionNlerp(q1 Quaternion, q2 Quaternion, amount float32) Quaternion {
 func QuaternionSlerp(q1, q2 Quaternion, amount float32) Quaternion {
 	var result Quaternion
 
-	cosHalfTheta := q1.X*q2.X + q1.Y*q2.Y + q1.Z*q2.Z + q1.W*q2.W
+	cosHalfTheta := q1.X()*q2.X() + q1.Y()*q2.Y() + q1.Z()*q2.Z() + q1.W*q2.W
 
 	if mathex.Abs(cosHalfTheta) >= 1.0 {
 		result = q1
@@ -1411,17 +1074,17 @@ func QuaternionSlerp(q1, q2 Quaternion, amount float32) Quaternion {
 		sinHalfTheta := mathex.Sqrt(1.0 - cosHalfTheta*cosHalfTheta)
 
 		if mathex.Abs(sinHalfTheta) < 0.001 {
-			result.X = q1.X*0.5 + q2.X*0.5
-			result.Y = q1.Y*0.5 + q2.Y*0.5
-			result.Z = q1.Z*0.5 + q2.Z*0.5
+			result.X() = q1.X()*0.5 + q2.X()*0.5
+			result.Y() = q1.Y()*0.5 + q2.Y()*0.5
+			result.Z() = q1.Z()*0.5 + q2.Z()*0.5
 			result.W = q1.W*0.5 + q2.W*0.5
 		} else {
 			ratioA := float32(math.Sin(float64((1-amount)*halfTheta))) / sinHalfTheta
 			ratioB := float32(math.Sin(float64(amount*halfTheta))) / sinHalfTheta
 
-			result.X = q1.X*ratioA + q2.X*ratioB
-			result.Y = q1.Y*ratioA + q2.Y*ratioB
-			result.Z = q1.Z*ratioA + q2.Z*ratioB
+			result.X() = q1.X()*ratioA + q2.X()*ratioB
+			result.Y() = q1.Y()*ratioA + q2.Y()*ratioB
+			result.Z() = q1.Z()*ratioA + q2.Z()*ratioB
 			result.W = q1.W*ratioA + q2.W*ratioB
 		}
 	}
@@ -1433,26 +1096,26 @@ func QuaternionSlerp(q1, q2 Quaternion, amount float32) Quaternion {
 func QuaternionFromVector3ToVector3(from Vector3, to Vector3) Quaternion {
 	var result = Quaternion{}
 
-	cos2Theta := from.X*to.X + from.Y*to.Y + from.Z*to.Z                                                       // Vector3DotProduct(from, to)
-	cross := Vector3{X: from.Y*to.Z - from.Z*to.Y, Y: from.Z*to.X - from.X*to.Z, Z: from.X*to.Y - from.Y*to.X} // Vector3CrossProduct(from, to)
+	cos2Theta := from.X()*to.X() + from.Y()*to.Y() + from.Z()*to.Z()                                                                   // Vector3DotProduct(from, to)
+	cross := Vector3{X: from.Y()*to.Z() - from.Z()*to.Y(), Y: from.Z()*to.X() - from.X()*to.Z(), Z: from.X()*to.Y() - from.Y()*to.X()} // Vector3CrossProduct(from, to)
 
-	result.X = cross.X
-	result.Y = cross.Y
-	result.Z = cross.Z
+	result.X() = cross.X()
+	result.Y() = cross.Y()
+	result.Z() = cross.Z()
 	result.W = 1.0 + cos2Theta
 
 	// QuaternionNormalize(q);
 	// NOTE: Normalize to essentially nlerp the original and identity to 0.5
 	q := result
-	length := mathex.Sqrt(q.X*q.X + q.Y*q.Y + q.Z*q.Z + q.W*q.W)
+	length := mathex.Sqrt(q.X()*q.X() + q.Y()*q.Y() + q.Z()*q.Z() + q.W*q.W)
 	if length == 0.0 {
 		length = 1.0
 	}
 	ilength := 1.0 / length
 
-	result.X = q.X * ilength
-	result.Y = q.Y * ilength
-	result.Z = q.Z * ilength
+	result.X() = q.X() * ilength
+	result.Y() = q.Y() * ilength
+	result.Z() = q.Z() * ilength
 	result.W = q.W * ilength
 
 	return result
@@ -1469,9 +1132,9 @@ func QuaternionFromMatrix(matrix Matrix) Quaternion {
 		invS := 1.0 / s
 
 		result.W = s * 0.25
-		result.X = (matrix.M6 - matrix.M9) * invS
-		result.Y = (matrix.M8 - matrix.M2) * invS
-		result.Z = (matrix.M1 - matrix.M4) * invS
+		result.X() = (matrix.M6 - matrix.M9) * invS
+		result.Y() = (matrix.M8 - matrix.M2) * invS
+		result.Z() = (matrix.M1 - matrix.M4) * invS
 	} else {
 		m00 := matrix.M0
 		m11 := matrix.M5
@@ -1482,25 +1145,25 @@ func QuaternionFromMatrix(matrix Matrix) Quaternion {
 			invS := 1.0 / s
 
 			result.W = (matrix.M6 - matrix.M9) * invS
-			result.X = s * 0.25
-			result.Y = (matrix.M4 + matrix.M1) * invS
-			result.Z = (matrix.M8 + matrix.M2) * invS
+			result.X() = s * 0.25
+			result.Y() = (matrix.M4 + matrix.M1) * invS
+			result.Z() = (matrix.M8 + matrix.M2) * invS
 		} else if m11 > m22 {
 			s := mathex.Sqrt(1.0+m11-m00-m22) * 2.0
 			invS := 1.0 / s
 
 			result.W = (matrix.M8 - matrix.M2) * invS
-			result.X = (matrix.M4 + matrix.M1) * invS
-			result.Y = s * 0.25
-			result.Z = (matrix.M9 + matrix.M6) * invS
+			result.X() = (matrix.M4 + matrix.M1) * invS
+			result.Y() = s * 0.25
+			result.Z() = (matrix.M9 + matrix.M6) * invS
 		} else {
 			s := mathex.Sqrt(1.0+m22-m00-m11) * 2.0
 			invS := 1.0 / s
 
 			result.W = (matrix.M1 - matrix.M4) * invS
-			result.X = (matrix.M8 + matrix.M2) * invS
-			result.Y = (matrix.M9 + matrix.M6) * invS
-			result.Z = s * 0.25
+			result.X() = (matrix.M8 + matrix.M2) * invS
+			result.Y() = (matrix.M9 + matrix.M6) * invS
+			result.Z() = s * 0.25
 		}
 	}
 
@@ -1511,9 +1174,9 @@ func QuaternionFromMatrix(matrix Matrix) Quaternion {
 func QuaternionToMatrix(q Quaternion) Matrix {
 	var result Matrix
 
-	x := q.X
-	y := q.Y
-	z := q.Z
+	x := q.X()
+	y := q.Y()
+	z := q.Z()
 	w := q.W
 
 	x2 := x + x
@@ -1565,9 +1228,9 @@ func QuaternionFromAxisAngle(axis Vector3, angle float32) Quaternion {
 	sinres := float32(math.Sin(float64(angle)))
 	cosres := float32(math.Cos(float64(angle)))
 
-	result.X = axis.X * sinres
-	result.Y = axis.Y * sinres
-	result.Z = axis.Z * sinres
+	result.X() = axis.X() * sinres
+	result.Y() = axis.Y() * sinres
+	result.Z() = axis.Z() * sinres
 	result.W = cosres
 
 	result = QuaternionNormalize(result)
@@ -1587,13 +1250,13 @@ func QuaternionToAxisAngle(q Quaternion, outAxis *Vector3, outAngle *float32) {
 	den := mathex.Sqrt(1.0 - q.W*q.W)
 
 	if den > 0.0001 {
-		resAxis.X = q.X / den
-		resAxis.Y = q.Y / den
-		resAxis.Z = q.Z / den
+		resAxis.X() = q.X() / den
+		resAxis.Y() = q.Y() / den
+		resAxis.Z() = q.Z() / den
 	} else {
 		// This occurs when the angle is zero.
 		// Not a problem: just set an arbitrary normalized axis.
-		resAxis.X = 1.0
+		resAxis.X() = 1.0
 	}
 
 	*outAxis = resAxis
@@ -1612,9 +1275,9 @@ func QuaternionFromEuler(pitch, yaw, roll float32) Quaternion {
 	z0 := float32(math.Cos(float64(roll * 0.5)))
 	z1 := float32(math.Sin(float64(roll * 0.5)))
 
-	result.X = x1*y0*z0 - x0*y1*z1
-	result.Y = x0*y1*z0 + x1*y0*z1
-	result.Z = x0*y0*z1 - x1*y1*z0
+	result.X() = x1*y0*z0 - x0*y1*z1
+	result.Y() = x0*y1*z0 + x1*y0*z1
+	result.Z() = x0*y0*z1 - x1*y1*z0
 	result.W = x0*y0*z0 + x1*y1*z1
 
 	return result
@@ -1626,19 +1289,19 @@ func QuaternionToEuler(q Quaternion) Vector3 {
 	var result Vector3
 
 	// Roll (x-axis rotation)
-	x0 := 2.0 * (q.W*q.X + q.Y*q.Z)
-	x1 := 1.0 - 2.0*(q.X*q.X+q.Y*q.Y)
-	result.X = float32(math.Atan2(float64(x0), float64(x1)))
+	x0 := 2.0 * (q.W*q.X() + q.Y()*q.Z())
+	x1 := 1.0 - 2.0*(q.X()*q.X()+q.Y()*q.Y())
+	result.X() = float32(math.Atan2(float64(x0), float64(x1)))
 
 	// Pitch (y-axis rotation)
-	y0 := 2.0 * (q.W*q.Y - q.Z*q.X)
+	y0 := 2.0 * (q.W*q.Y() - q.Z()*q.X())
 	y0 = mathex.Clamp(y0, -1.0, 1.0)
-	result.Y = float32(math.Asin(float64(y0)))
+	result.Y() = float32(math.Asin(float64(y0)))
 
 	// Yaw (z-axis rotation)
-	z0 := 2.0 * (q.W*q.Z + q.X*q.Y)
-	z1 := 1.0 - 2.0*(q.Y*q.Y+q.Z*q.Z)
-	result.Z = float32(math.Atan2(float64(z0), float64(z1)))
+	z0 := 2.0 * (q.W*q.Z() + q.X()*q.Y())
+	z1 := 1.0 - 2.0*(q.Y()*q.Y()+q.Z()*q.Z())
+	result.Z() = float32(math.Atan2(float64(z0), float64(z1)))
 
 	return result
 }
@@ -1647,14 +1310,14 @@ func QuaternionToEuler(q Quaternion) Vector3 {
 func QuaternionTransform(q Quaternion, mat Matrix) Quaternion {
 	var result Quaternion
 
-	x := q.X
-	y := q.Y
-	z := q.Z
+	x := q.X()
+	y := q.Y()
+	z := q.Z()
 	w := q.W
 
-	result.X = mat.M0*x + mat.M4*y + mat.M8*z + mat.M12*w
-	result.Y = mat.M1*x + mat.M5*y + mat.M9*z + mat.M13*w
-	result.Z = mat.M2*x + mat.M6*y + mat.M10*z + mat.M14*w
+	result.X() = mat.M0*x + mat.M4*y + mat.M8*z + mat.M12*w
+	result.Y() = mat.M1*x + mat.M5*y + mat.M9*z + mat.M13*w
+	result.Z() = mat.M2*x + mat.M6*y + mat.M10*z + mat.M14*w
 	result.W = mat.M3*x + mat.M7*y + mat.M11*z + mat.M15*w
 
 	return result

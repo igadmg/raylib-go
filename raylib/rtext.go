@@ -133,7 +133,7 @@ func DrawTextEx(font *Font, text string, position Vector2, fontSize float32, spa
 
 func DrawTextLayout(font *Font, text string, fontSize float32, spacing float32, tint color.RGBA, layoutFn func(wh Vector2) Rectangle) {
 	rect := layoutFn(MeasureTextEx(font, text, fontSize, spacing))
-	DrawTextEx(font, text, rect.XY, fontSize, spacing, tint)
+	DrawTextEx(font, text, rect.XY(), fontSize, spacing, tint)
 }
 
 // SetTextLineSpacing - Set vertical line spacing when drawing with line-breaks

@@ -14,6 +14,7 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/EliCDavis/vector"
 	"github.com/EliCDavis/vector/rect2"
 	"github.com/EliCDavis/vector/vector2"
 	"github.com/EliCDavis/vector/vector3"
@@ -251,190 +252,201 @@ const (
 	FlagMsaa4xHint = 0x00000020
 	// Set to try enabling interlaced video format (for V3D)
 	FlagInterlacedHint = 0x00010000
+)
 
+type KeyType int32
+
+const (
 	// KeyNull is used for no key pressed
-	KeyNull = 0
+	KeyNull KeyType = 0
 
 	// Keyboard Function Keys
-	KeySpace        = 32
-	KeyEscape       = 256
-	KeyEnter        = 257
-	KeyTab          = 258
-	KeyBackspace    = 259
-	KeyInsert       = 260
-	KeyDelete       = 261
-	KeyRight        = 262
-	KeyLeft         = 263
-	KeyDown         = 264
-	KeyUp           = 265
-	KeyPageUp       = 266
-	KeyPageDown     = 267
-	KeyHome         = 268
-	KeyEnd          = 269
-	KeyCapsLock     = 280
-	KeyScrollLock   = 281
-	KeyNumLock      = 282
-	KeyPrintScreen  = 283
-	KeyPause        = 284
-	KeyF1           = 290
-	KeyF2           = 291
-	KeyF3           = 292
-	KeyF4           = 293
-	KeyF5           = 294
-	KeyF6           = 295
-	KeyF7           = 296
-	KeyF8           = 297
-	KeyF9           = 298
-	KeyF10          = 299
-	KeyF11          = 300
-	KeyF12          = 301
-	KeyLeftShift    = 340
-	KeyLeftControl  = 341
-	KeyLeftAlt      = 342
-	KeyLeftSuper    = 343
-	KeyRightShift   = 344
-	KeyRightControl = 345
-	KeyRightAlt     = 346
-	KeyRightSuper   = 347
-	KeyKbMenu       = 348
-	KeyLeftBracket  = 91
-	KeyBackSlash    = 92
-	KeyRightBracket = 93
-	KeyGrave        = 96
+	KeySpace        KeyType = 32
+	KeyEscape       KeyType = 256
+	KeyEnter        KeyType = 257
+	KeyTab          KeyType = 258
+	KeyBackspace    KeyType = 259
+	KeyInsert       KeyType = 260
+	KeyDelete       KeyType = 261
+	KeyRight        KeyType = 262
+	KeyLeft         KeyType = 263
+	KeyDown         KeyType = 264
+	KeyUp           KeyType = 265
+	KeyPageUp       KeyType = 266
+	KeyPageDown     KeyType = 267
+	KeyHome         KeyType = 268
+	KeyEnd          KeyType = 269
+	KeyCapsLock     KeyType = 280
+	KeyScrollLock   KeyType = 281
+	KeyNumLock      KeyType = 282
+	KeyPrintScreen  KeyType = 283
+	KeyPause        KeyType = 284
+	KeyF1           KeyType = 290
+	KeyF2           KeyType = 291
+	KeyF3           KeyType = 292
+	KeyF4           KeyType = 293
+	KeyF5           KeyType = 294
+	KeyF6           KeyType = 295
+	KeyF7           KeyType = 296
+	KeyF8           KeyType = 297
+	KeyF9           KeyType = 298
+	KeyF10          KeyType = 299
+	KeyF11          KeyType = 300
+	KeyF12          KeyType = 301
+	KeyLeftShift    KeyType = 340
+	KeyLeftControl  KeyType = 341
+	KeyLeftAlt      KeyType = 342
+	KeyLeftSuper    KeyType = 343
+	KeyRightShift   KeyType = 344
+	KeyRightControl KeyType = 345
+	KeyRightAlt     KeyType = 346
+	KeyRightSuper   KeyType = 347
+	KeyKbMenu       KeyType = 348
+	KeyLeftBracket  KeyType = 91
+	KeyBackSlash    KeyType = 92
+	KeyRightBracket KeyType = 93
+	KeyGrave        KeyType = 96
 
 	// Keyboard Number Pad Keys
-	KeyKp0        = 320
-	KeyKp1        = 321
-	KeyKp2        = 322
-	KeyKp3        = 323
-	KeyKp4        = 324
-	KeyKp5        = 325
-	KeyKp6        = 326
-	KeyKp7        = 327
-	KeyKp8        = 328
-	KeyKp9        = 329
-	KeyKpDecimal  = 330
-	KeyKpDivide   = 331
-	KeyKpMultiply = 332
-	KeyKpSubtract = 333
-	KeyKpAdd      = 334
-	KeyKpEnter    = 335
-	KeyKpEqual    = 336
+	KeyKp0        KeyType = 320
+	KeyKp1        KeyType = 321
+	KeyKp2        KeyType = 322
+	KeyKp3        KeyType = 323
+	KeyKp4        KeyType = 324
+	KeyKp5        KeyType = 325
+	KeyKp6        KeyType = 326
+	KeyKp7        KeyType = 327
+	KeyKp8        KeyType = 328
+	KeyKp9        KeyType = 329
+	KeyKpDecimal  KeyType = 330
+	KeyKpDivide   KeyType = 331
+	KeyKpMultiply KeyType = 332
+	KeyKpSubtract KeyType = 333
+	KeyKpAdd      KeyType = 334
+	KeyKpEnter    KeyType = 335
+	KeyKpEqual    KeyType = 336
 
 	// Keyboard Alpha Numeric Keys
-	KeyApostrophe = 39
-	KeyComma      = 44
-	KeyMinus      = 45
-	KeyPeriod     = 46
-	KeySlash      = 47
-	KeyZero       = 48
-	KeyOne        = 49
-	KeyTwo        = 50
-	KeyThree      = 51
-	KeyFour       = 52
-	KeyFive       = 53
-	KeySix        = 54
-	KeySeven      = 55
-	KeyEight      = 56
-	KeyNine       = 57
-	KeySemicolon  = 59
-	KeyEqual      = 61
-	KeyA          = 65
-	KeyB          = 66
-	KeyC          = 67
-	KeyD          = 68
-	KeyE          = 69
-	KeyF          = 70
-	KeyG          = 71
-	KeyH          = 72
-	KeyI          = 73
-	KeyJ          = 74
-	KeyK          = 75
-	KeyL          = 76
-	KeyM          = 77
-	KeyN          = 78
-	KeyO          = 79
-	KeyP          = 80
-	KeyQ          = 81
-	KeyR          = 82
-	KeyS          = 83
-	KeyT          = 84
-	KeyU          = 85
-	KeyV          = 86
-	KeyW          = 87
-	KeyX          = 88
-	KeyY          = 89
-	KeyZ          = 90
+	KeyApostrophe KeyType = 39
+	KeyComma      KeyType = 44
+	KeyMinus      KeyType = 45
+	KeyPeriod     KeyType = 46
+	KeySlash      KeyType = 47
+	KeyZero       KeyType = 48
+	KeyOne        KeyType = 49
+	KeyTwo        KeyType = 50
+	KeyThree      KeyType = 51
+	KeyFour       KeyType = 52
+	KeyFive       KeyType = 53
+	KeySix        KeyType = 54
+	KeySeven      KeyType = 55
+	KeyEight      KeyType = 56
+	KeyNine       KeyType = 57
+	KeySemicolon  KeyType = 59
+	KeyEqual      KeyType = 61
+	KeyA          KeyType = 65
+	KeyB          KeyType = 66
+	KeyC          KeyType = 67
+	KeyD          KeyType = 68
+	KeyE          KeyType = 69
+	KeyF          KeyType = 70
+	KeyG          KeyType = 71
+	KeyH          KeyType = 72
+	KeyI          KeyType = 73
+	KeyJ          KeyType = 74
+	KeyK          KeyType = 75
+	KeyL          KeyType = 76
+	KeyM          KeyType = 77
+	KeyN          KeyType = 78
+	KeyO          KeyType = 79
+	KeyP          KeyType = 80
+	KeyQ          KeyType = 81
+	KeyR          KeyType = 82
+	KeyS          KeyType = 83
+	KeyT          KeyType = 84
+	KeyU          KeyType = 85
+	KeyV          KeyType = 86
+	KeyW          KeyType = 87
+	KeyX          KeyType = 88
+	KeyY          KeyType = 89
+	KeyZ          KeyType = 90
 
 	// Android keys
-	KeyBack       = 4
-	KeyMenu       = 82
-	KeyVolumeUp   = 24
-	KeyVolumeDown = 25
-
-	MouseLeftButton   = MouseButtonLeft
-	MouseRightButton  = MouseButtonRight
-	MouseMiddleButton = MouseButtonMiddle
+	KeyBack       KeyType = 4
+	KeyMenu       KeyType = 82
+	KeyVolumeUp   KeyType = 24
+	KeyVolumeDown KeyType = 25
 )
 
 // Mouse Buttons
+type MouseButtonType int32
+
 const (
-	MouseButtonLeft = iota
+	MouseButtonLeft MouseButtonType = iota
 	MouseButtonRight
 	MouseButtonMiddle
 	MouseButtonSide
 	MouseButtonExtra
 	MouseButtonForward
 	MouseButtonBack
+	MouseButtonNone // keep last
+
+	MouseLeftButton   = MouseButtonLeft
+	MouseRightButton  = MouseButtonRight
+	MouseMiddleButton = MouseButtonMiddle
 )
 
 // Mouse cursor
-type MouseCursor = int32
+type MouseCursorType int32
 
 const (
-	MouseCursorDefault      MouseCursor = iota // Default pointer shape
-	MouseCursorArrow                           // Arrow shape
-	MouseCursorIBeam                           // Text writing cursor shape
-	MouseCursorCrosshair                       // Cross shape
-	MouseCursorPointingHand                    // Pointing hand cursor
-	MouseCursorResizeEW                        // Horizontal resize/move arrow shape
-	MouseCursorResizeNS                        // Vertical resize/move arrow shape
-	MouseCursorResizeNWSE                      // Top-left to bottom-right diagonal resize/move arrow shape
-	MouseCursorResizeNESW                      // The top-right to bottom-left diagonal resize/move arrow shape
-	MouseCursorResizeAll                       // The omni-directional resize/move cursor shape
-	MouseCursorNotAllowed                      // The operation-not-allowed shape
+	MouseCursorDefault      MouseCursorType = iota // Default pointer shape
+	MouseCursorArrow                               // Arrow shape
+	MouseCursorIBeam                               // Text writing cursor shape
+	MouseCursorCrosshair                           // Cross shape
+	MouseCursorPointingHand                        // Pointing hand cursor
+	MouseCursorResizeEW                            // Horizontal resize/move arrow shape
+	MouseCursorResizeNS                            // Vertical resize/move arrow shape
+	MouseCursorResizeNWSE                          // Top-left to bottom-right diagonal resize/move arrow shape
+	MouseCursorResizeNESW                          // The top-right to bottom-left diagonal resize/move arrow shape
+	MouseCursorResizeAll                           // The omni-directional resize/move cursor shape
+	MouseCursorNotAllowed                          // The operation-not-allowed shape
 )
 
 // Gamepad Buttons
+type GamepadButtonType int32
+
 const (
-	GamepadButtonUnknown        = iota // Unknown button, just for error checking
-	GamepadButtonLeftFaceUp            // Gamepad left DPAD up button
-	GamepadButtonLeftFaceRight         // Gamepad left DPAD right button
-	GamepadButtonLeftFaceDown          // Gamepad left DPAD down button
-	GamepadButtonLeftFaceLeft          // Gamepad left DPAD left button
-	GamepadButtonRightFaceUp           // Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)
-	GamepadButtonRightFaceRight        // Gamepad right button right (i.e. PS3: Square, Xbox: X)
-	GamepadButtonRightFaceDown         // Gamepad right button down (i.e. PS3: Cross, Xbox: A)
-	GamepadButtonRightFaceLeft         // Gamepad right button left (i.e. PS3: Circle, Xbox: B)
-	GamepadButtonLeftTrigger1          // Gamepad top/back trigger left (first), it could be a trailing button
-	GamepadButtonLeftTrigger2          // Gamepad top/back trigger left (second), it could be a trailing button
-	GamepadButtonRightTrigger1         // Gamepad top/back trigger right (one), it could be a trailing button
-	GamepadButtonRightTrigger2         // Gamepad top/back trigger right (second), it could be a trailing button
-	GamepadButtonMiddleLeft            // Gamepad center buttons, left one (i.e. PS3: Select)
-	GamepadButtonMiddle                // Gamepad center buttons, middle one (i.e. PS3: PS, Xbox: XBOX)
-	GamepadButtonMiddleRight           // Gamepad center buttons, right one (i.e. PS3: Start)
-	GamepadButtonLeftThumb             // Gamepad joystick pressed button left
-	GamepadButtonRightThumb            // Gamepad joystick pressed button right
+	GamepadButtonUnknown        GamepadButtonType = iota // Unknown button, just for error checking
+	GamepadButtonLeftFaceUp                              // Gamepad left DPAD up button
+	GamepadButtonLeftFaceRight                           // Gamepad left DPAD right button
+	GamepadButtonLeftFaceDown                            // Gamepad left DPAD down button
+	GamepadButtonLeftFaceLeft                            // Gamepad left DPAD left button
+	GamepadButtonRightFaceUp                             // Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)
+	GamepadButtonRightFaceRight                          // Gamepad right button right (i.e. PS3: Square, Xbox: X)
+	GamepadButtonRightFaceDown                           // Gamepad right button down (i.e. PS3: Cross, Xbox: A)
+	GamepadButtonRightFaceLeft                           // Gamepad right button left (i.e. PS3: Circle, Xbox: B)
+	GamepadButtonLeftTrigger1                            // Gamepad top/back trigger left (first), it could be a trailing button
+	GamepadButtonLeftTrigger2                            // Gamepad top/back trigger left (second), it could be a trailing button
+	GamepadButtonRightTrigger1                           // Gamepad top/back trigger right (one), it could be a trailing button
+	GamepadButtonRightTrigger2                           // Gamepad top/back trigger right (second), it could be a trailing button
+	GamepadButtonMiddleLeft                              // Gamepad center buttons, left one (i.e. PS3: Select)
+	GamepadButtonMiddle                                  // Gamepad center buttons, middle one (i.e. PS3: PS, Xbox: XBOX)
+	GamepadButtonMiddleRight                             // Gamepad center buttons, right one (i.e. PS3: Start)
+	GamepadButtonLeftThumb                               // Gamepad joystick pressed button left
+	GamepadButtonRightThumb                              // Gamepad joystick pressed button right
 )
 
 // Gamepad Axis
+type GamepadAxisType int32
+
 const (
-	GamepadAxisLeftX        = iota // Gamepad left stick X axis
-	GamepadAxisLeftY               // Gamepad left stick Y axis
-	GamepadAxisRightX              // Gamepad right stick X axis
-	GamepadAxisRightY              // Gamepad right stick Y axis
-	GamepadAxisLeftTrigger         // Gamepad back trigger left, pressure level: [1..-1]
-	GamepadAxisRightTrigger        // Gamepad back trigger right, pressure level: [1..-1]
+	GamepadAxisLeftX        GamepadAxisType = iota // Gamepad left stick X axis
+	GamepadAxisLeftY                               // Gamepad left stick Y axis
+	GamepadAxisRightX                              // Gamepad right stick X axis
+	GamepadAxisRightY                              // Gamepad right stick Y axis
+	GamepadAxisLeftTrigger                         // Gamepad back trigger left, pressure level: [1..-1]
+	GamepadAxisRightTrigger                        // Gamepad back trigger right, pressure level: [1..-1]
 )
 
 // Some Basic Colors
@@ -499,11 +511,13 @@ type Vector2 = vector2.Float32
 type Vector2Int = vector2.Int
 
 var (
-	AnchorTopLeft     = NewVector2(0, 0)
-	AnchorTopRight    = NewVector2(1, 0)
-	AnchorCenter      = NewVector2(0.5, 0.5)
-	AnchorBottomLeft  = NewVector2(0, 1)
-	AnchorBottomRight = NewVector2(1, 1)
+	AnchorTopLeft      = NewVector2(0, 0)
+	AnchorTopRight     = NewVector2(1, 0)
+	AnchorTopCenter    = NewVector2(0.5, 0)
+	AnchorCenter       = NewVector2(0.5, 0.5)
+	AnchorBottomCenter = NewVector2(0.5, 1)
+	AnchorBottomLeft   = NewVector2(0, 1)
+	AnchorBottomRight  = NewVector2(1, 1)
 )
 
 // NewVector2 - Returns new Vector2
@@ -511,9 +525,28 @@ func NewVector2[XT, YT CoordinateT](x XT, y YT) Vector2 {
 	return vector2.New(float32(x), float32(y))
 }
 
+// Vector2Zero - Vector with components value 0.0
+func Vector2Zero() Vector2 {
+	return NewVector2(0.0, 0.0)
+}
+
+// Vector2One - Vector with components value 1.0
+func Vector2One() Vector2 {
+	return NewVector2(1.0, 1.0)
+}
+
 // NewVector2 - Returns new Vector2
 func NewVector2Int[XT, YT CoordinateT](x XT, y YT) Vector2Int {
 	return vector2.New(int(x), int(y))
+}
+
+func Vector2IntZero() Vector2Int {
+	return NewVector2Int(0, 0)
+}
+
+// Vector2One - Vector with components value 1.0
+func Vector2IntOne() Vector2Int {
+	return NewVector2Int(1, 1)
 }
 
 // Vector3 type
@@ -592,12 +625,12 @@ func NewRectangle[XT, YT, WT, HT CoordinateT](x XT, y YT, width WT, height HT) R
 	return rect2.New(vector2.New(float32(x), float32(y)), vector2.New(float32(width), float32(height)))
 }
 
-func NewRectangleV(xy, wh Vector2) Rectangle {
-	return rect2.New(vector2.New(xy.X, xy.Y), vector2.New(wh.X, wh.Y))
+func NewRectangleV[XYT, WHT vector.Number](xy vector2.Vector[XYT], wh vector2.Vector[WHT]) Rectangle {
+	return rect2.New(xy.ToFloat32(), wh.ToFloat32())
 }
 
-func NewRectangleWHV(wh Vector2) Rectangle {
-	return rect2.New(vector2.Zero[float32](), vector2.New(wh.X, wh.Y))
+func NewRectangleWHV[WHT vector.Number](wh vector2.Vector[WHT]) Rectangle {
+	return rect2.New(vector2.Zero[float32](), wh.ToFloat32())
 }
 
 // Camera3D type, defines a camera position/orientation in 3d space
@@ -1130,6 +1163,18 @@ func (i *Image) Unload() {
 	UnloadImage(i)
 }
 
+func (i *Image) GetSize() Vector2 {
+	return NewVector2(i.Width, i.Height)
+}
+
+func (i *Image) GetRect() Rectangle {
+	return NewRectangle(0, 0, i.Width, i.Height)
+}
+
+func (i *Image) DrawDef(dst *Image, dstRect Rectangle) {
+	ImageDraw(dst, i, i.GetRect(), dstRect, White)
+}
+
 // Texture2D type, bpp always RGBA (32bit)
 // NOTE: Data stored in GPU memory
 type Texture2D struct {
@@ -1204,16 +1249,16 @@ func (t *Texture2D) DrawPro(sourceRec, destRec Rectangle, origin Vector2, rotati
 
 func (t *Texture2D) DrawFlippedPro(sourceRec, destRec Rectangle, origin Vector2, rotation float32, tint color.RGBA) {
 	sourceRec = sourceRec.ScaleByVectorF(NewVector2(1, -1))
-	sourceRec.XY.Y = float32(t.Height) + sourceRec.WH.Y
+	sourceRec = sourceRec.SetY(float32(t.Height) + sourceRec.Height())
 	DrawTexturePro(t, sourceRec, destRec, origin, rotation, tint)
 }
 
 func (t *Texture2D) DrawProDef(destRec Rectangle) {
-	DrawTexturePro(t, t.GetRect(), destRec, NewVector2(0, 0), 0, White)
+	DrawTexturePro(t, t.GetRect(), destRec, Vector2Zero(), 0, White)
 }
 
 func (t *Texture2D) DrawProFlippedDef(destRec Rectangle) {
-	DrawTexturePro(t, t.GetRect().ScaleByVectorF(NewVector2(1, -1)), destRec, NewVector2(0, 0), 0, White)
+	DrawTexturePro(t, t.GetRect().ScaleByVectorF(NewVector2(1, -1)), destRec, Vector2Zero(), 0, White)
 }
 
 func (t *Texture2D) DrawTiled(source, dest Rectangle, origin Vector2, rotation, scale float32, tint color.RGBA) {

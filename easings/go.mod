@@ -2,7 +2,7 @@ module github.com/gen2brain/raylib-go/easings
 
 go 1.21
 
-replace github.com/EliCDavis/vector => github.com/igadmg/vector
+replace github.com/EliCDavis/vector => ../vector
 
 require github.com/EliCDavis/vector v1.6.0
 

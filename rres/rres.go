@@ -344,7 +344,7 @@ const (
 
 // LoadResourceChunk - Load one resource chunk for provided id
 func LoadResourceChunk(fileName string, rresId int32) ResourceChunk {
-	cfileName := TextAlloc(fileName)
+	cfileName := textAlloc(fileName)
 	ret := C.rresLoadResourceChunk(cfileName, C.int(rresId))
 	v := *(*ResourceChunk)(unsafe.Pointer(&ret))
 	return v
@@ -358,7 +358,7 @@ func UnloadResourceChunk(chunk *ResourceChunk) {
 
 // LoadResourceMulti - Load resource for provided id (multiple resource chunks)
 func LoadResourceMulti(fileName string, rresId int32) ResourceMulti {
-	cfileName := TextAlloc(fileName)
+	cfileName := textAlloc(fileName)
 	ret := C.rresLoadResourceMulti(cfileName, C.int(rresId))
 	v := *(*ResourceMulti)(unsafe.Pointer(&ret))
 	return v
@@ -372,7 +372,7 @@ func UnloadResourceMulti(multi *ResourceMulti) {
 
 // LoadResourceChunkInfo - Load resource chunk info for provided id
 func LoadResourceChunkInfo(fileName string, rresId int32) ResourceChunkInfo {
-	cfileName := TextAlloc(fileName)
+	cfileName := textAlloc(fileName)
 	ret := C.rresLoadResourceChunkInfo(cfileName, C.int(rresId))
 	v := *(*ResourceChunkInfo)(unsafe.Pointer(&ret))
 	return v
@@ -381,7 +381,7 @@ func LoadResourceChunkInfo(fileName string, rresId int32) ResourceChunkInfo {
 // LoadResourceChunkInfoAll - Load all resource chunks info
 func LoadResourceChunkInfoAll(fileName string) []ResourceChunkInfo {
 	// Convert the fileName into a CString and releases the memory afterwards
-	cfileName := TextAlloc(fileName)
+	cfileName := textAlloc(fileName)
 
 	// The length of the resulted array is saved in the chunkCount variable
 	var chunkCount C.uint
@@ -406,7 +406,7 @@ func LoadResourceChunkInfoAll(fileName string) []ResourceChunkInfo {
 
 // LoadCentralDirectory - Load central directory resource chunk from file
 func LoadCentralDirectory(fileName string) CentralDir {
-	cfileName := TextAlloc(fileName)
+	cfileName := textAlloc(fileName)
 	ret := C.rresLoadCentralDirectory(cfileName)
 	v := *(*CentralDir)(unsafe.Pointer(&ret))
 	return v
@@ -449,7 +449,7 @@ func GetDataType(fourCC [4]byte) ResourceDataType {
 //
 // NOTE: It requires CDIR available in the file (it's optinal by design)
 func GetResourceId(dir CentralDir, fileName string) int32 {
-	cfileName := TextAlloc(fileName)
+	cfileName := textAlloc(fileName)
 	cdir := *(*C.rresCentralDir)(unsafe.Pointer(&dir))
 	ret := C.rresGetResourceId(cdir, cfileName)
 	v := int32(ret)
@@ -471,7 +471,7 @@ func ComputeCRC32(data []byte) uint32 {
 //
 // You can use the WipeCipherPassword function to clear the password
 func SetCipherPassword(pass string) {
-	cpass := TextAlloc(pass)
+	cpass := textAlloc(pass)
 	C.rresSetCipherPassword(cpass)
 }
 
@@ -486,6 +486,6 @@ func GetCipherPassword() string {
 // This is an approach but no guarantee
 func WipeCipherPassword() {
 	cpass := C.rresGetCipherPassword()
-	C.explicit_bzero(unsafe.Pointer(cpass), C.strlen(cpass))
+	C.memset(unsafe.Pointer(cpass), 0, C.strlen(cpass))
 	C.free(unsafe.Pointer(cpass))
 }

@@ -7,7 +7,6 @@ package rl
 #include "raylib.h"
 #include <stdlib.h>
 #include <android/asset_manager.h>
-#include <android_native_app_glue.h>
 
 extern void android_init();
 
@@ -29,7 +28,7 @@ func InitWindow[WT, HT IntegerT](width WT, height HT, title string) {
 	cwidth := (C.int)(width)
 	cheight := (C.int)(height)
 
-	ctitle := TextAlloc(title)
+	ctitle := textAlloc(title)
 
 	C.InitWindow(cwidth, cheight, ctitle)
 	C.android_init()
@@ -94,7 +93,7 @@ func UnloadDroppedFiles() {
 
 // OpenAsset - Open asset
 func OpenAsset(name string) (Asset, error) {
-	cname := TextAlloc(name)
+	cname := textAlloc(name)
 
 	a := &asset{C.AAssetManager_open(C.asset_manager, cname, C.AASSET_MODE_UNKNOWN)}
 
