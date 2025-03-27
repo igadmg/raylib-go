@@ -818,7 +818,6 @@ RGFWDEF void RGFW_window_setFlags(RGFW_window* win, RGFW_windowFlags);
 /*! get the size of the screen to an area struct */
 RGFWDEF RGFW_area RGFW_getScreenSize(void);
 
-
 /*!
 	this function checks an *individual* event (and updates window structure attributes)
 	this means, using this function without a while loop may cause event lag
@@ -3150,7 +3149,6 @@ static void keyboard_keymap (void *data, struct wl_keyboard *keyboard, uint32_t 
 	char *keymap_string = mmap (NULL, size, PROT_READ, MAP_SHARED, fd, 0);
 	xkb_keymap_unref (keymap);
 	keymap = xkb_keymap_new_from_string (xkb_context, keymap_string, XKB_KEYMAP_FORMAT_TEXT_V1, XKB_KEYMAP_COMPILE_NO_FLAGS);
-
 	munmap (keymap_string, size);
 	close (fd);
 	xkb_state_unref (xkb_state);
@@ -9916,14 +9914,12 @@ RGFW_window* RGFW_createWindowPtr(const char* name, RGFW_rect rect, RGFW_windowF
 
 				var path = '/' + drop_dir + '/' + file.name.replace("//", '_');
 				var reader = new FileReader();
-
 				reader.onloadend = (e) => {
 					if (reader.readyState != 2) {
 						out('failed to read dropped file: '+file.name+': '+reader.error);
 					}
 					else {
 						var data = e.target.result;
-
 						_RGFW_writeFile(path, new Uint8Array(data), file.size);
 					}
 				};
@@ -10114,7 +10110,6 @@ void RGFW_window_swapBuffers(RGFW_window* win) {
 		glGenTextures(1,&texture);
 
 		glBindTexture(GL_TEXTURE_2D,texture);
-
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

@@ -308,7 +308,6 @@ Uint8 SDL_EventState(Uint32 type, int state)
         case SDL_ENABLE: SDL_SetEventEnabled(type, true); break;
         default: TRACELOG(LOG_WARNING, "Event sate: unknow type");
     }
-
     return stateBefore;
 }
 
@@ -1149,6 +1148,49 @@ Image GetClipboardImage(void)
     return image;
 }
 
+
+#if defined(SUPPORT_CLIPBOARD_IMAGE)
+// Get clipboard image
+Image GetClipboardImage(void)
+{
+    // Let's hope compiler put these arrays in static memory
+    const char *image_formats[] = {
+        "image/bmp",
+        "image/png",
+        "image/jpg",
+        "image/tiff",
+    };
+    const char *image_extensions[] = {
+        ".bmp",
+        ".png",
+        ".jpg",
+        ".tiff",
+    };
+
+
+    Image image = {0};
+    size_t dataSize = 0;
+    void  *fileData = NULL;
+    for (int i = 0; i < SDL_arraysize(image_formats); ++i)
+    {
+        // NOTE: This pointer should be free with SDL_free() at some point.
+        fileData = SDL_GetClipboardData(image_formats[i], &dataSize);
+        if (fileData) {
+            image = LoadImageFromMemory(image_extensions[i], fileData, dataSize);
+            if (IsImageValid(image))
+            {
+                TRACELOG(LOG_INFO, "Clipboard image: Got image from clipboard as a `%s` successfully", image_extensions[i]);
+                return image;
+            }
+        }
+    }
+
+    TRACELOG(LOG_WARNING, "Clipboard image: Couldn't get clipboard data. %s", SDL_GetError());
+    return image;
+}
+#endif
+
+
 // Show mouse cursor
 void ShowCursor(void)
 {
@@ -1483,6 +1525,10 @@ void PollInputEvents(void)
                         #endif
                     } break;
 
+                    case SDL_WINDOWEVENT_ENTER:
+                    {
+                        CORE.Input.Mouse.cursorOnScreen = true;
+                    } break;
                     case SDL_WINDOWEVENT_ENTER:
                     {
                         CORE.Input.Mouse.cursorOnScreen = true;
