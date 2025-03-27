@@ -105,6 +105,11 @@ func ToggleFullscreen() {
 	C.ToggleFullscreen()
 }
 
+// ToggleBorderlessWindowed - Borderless fullscreen toggle (only PLATFORM_DESKTOP)
+func ToggleBorderlessWindowed() {
+	C.ToggleBorderlessWindowed()
+}
+
 // MaximizeWindow - Set window state: maximized, if resizable
 func MaximizeWindow() {
 	C.MaximizeWindow()
@@ -234,7 +239,7 @@ func GetMonitorCount() int {
 	return v
 }
 
-// GetCurrentMonitor - Get current connected monitor
+// GetCurrentMonitor - Get current monitor where window is placed
 func GetCurrentMonitor() int {
 	ret := C.GetCurrentMonitor()
 	v := (int)(ret)
@@ -319,6 +324,15 @@ func GetClipboardText() string {
 	ret := C.GetClipboardText()
 	v := C.GoString(ret)
 	return v
+}
+
+// GetClipboardImage - Get clipboard image content
+//
+// Only works with SDL3 backend or Windows with GLFW/RGFW
+func GetClipboardImage() Image {
+	ret := C.GetClipboardImage()
+	v := newImageFromPointer(unsafe.Pointer(&ret))
+	return *v
 }
 
 // EnableEventWaiting - Enable waiting for events on EndDrawing(), no automatic event polling
@@ -440,8 +454,8 @@ func LoadShaderFromMemory(vsCode string, fsCode string) Shader {
 	return *newShaderFromPointer(&ret)
 }
 
-// IsShaderValid - Check if a shader is valid
-func IsShaderValid(shader *Shader) bool {
+// IsShaderValid - Check if a shader is valid (loaded on GPU)
+func IsShaderValid(shader Shader) bool {
 	cshader := shader.cptr()
 	ret := C.IsShaderValid(*cshader)
 	v := bool(ret)
@@ -509,12 +523,31 @@ func UnloadShader(shader *Shader) {
 	C.UnloadShader(cshader)
 }
 
-// GetMouseRay - Returns a ray trace from mouse position
+// GetMouseRay - Get a ray trace from mouse position
+//
+// Deprecated: Use [GetScreenToWorldRay] instead.
 func GetMouseRay(mousePosition Vector2, camera Camera) Ray {
-	cmousePosition := cvec2ptr(&mousePosition)
+	return GetScreenToWorldRay(mousePosition, camera)
+}
+
+// GetScreenToWorldRay - Get a ray trace from screen position (i.e mouse)
+func GetScreenToWorldRay(position Vector2, camera Camera) Ray {
+	cposition := position.cptr()
 	ccamera := camera.cptr()
-	ret := C.GetMouseRay(*cmousePosition, *ccamera)
-	return *newRayFromPointer(&ret)
+	ret := C.GetScreenToWorldRay(*cposition, *ccamera)
+	v := newRayFromPointer(unsafe.Pointer(&ret))
+	return v
+}
+
+// GetScreenToWorldRayEx - Get a ray trace from screen position (i.e mouse) in a viewport
+func GetScreenToWorldRayEx(position Vector2, camera Camera, width, height int32) Ray {
+	cposition := position.cptr()
+	ccamera := camera.cptr()
+	cwidth := (C.int)(width)
+	cheight := (C.int)(height)
+	ret := C.GetScreenToWorldRayEx(*cposition, *ccamera, cwidth, cheight)
+	v := newRayFromPointer(unsafe.Pointer(&ret))
+	return v
 }
 
 // GetCameraMatrix - Returns camera transform matrix (view matrix)
@@ -592,6 +625,28 @@ func GetTime() float64 {
 	return v
 }
 
+// Custom frame control functions
+// NOTE: SwapScreenBuffer and PollInputEvents are intended for advanced users that want full control over the frame processing
+// By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timing + PollInputEvents()
+// To avoid that behaviour and control frame processes manually you can either enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
+// or add CGO_CFLAGS="-DSUPPORT_CUSTOM_FRAME_CONTROL=1" to your build
+
+// SwapScreenBuffer - Swap back buffer to front buffer
+func SwapScreenBuffer() {
+	C.SwapScreenBuffer()
+}
+
+// Register all input events
+func PollInputEvents() {
+	C.PollInputEvents()
+}
+
+// WaitTime - Wait for some time (halt program execution)
+func WaitTime(seconds float64) {
+	cseconds := (C.double)(seconds)
+	C.WaitTime(cseconds)
+}
+
 // Fade - Returns color with alpha applied, alpha goes from 0.0f to 1.0f
 func Fade(col colorex.RGBA, alpha float32) colorex.RGBA {
 	ccolor := ccolorptr(&col)
@@ -600,7 +655,7 @@ func Fade(col colorex.RGBA, alpha float32) colorex.RGBA {
 	return *gocolorptr(&ret)
 }
 
-// ColorToInt - Returns hexadecimal value for a Color
+// ColorToInt - Get hexadecimal value for a Color (0xRRGGBBAA)
 func ColorToInt(col colorex.RGBA) int32 {
 	ccolor := ccolorptr(&col)
 	ret := C.ColorToInt(*ccolor)
@@ -678,6 +733,15 @@ func ColorAlphaBlend(src, dst, tint colorex.RGBA) colorex.RGBA {
 	return *gocolorptr(&ret)
 }
 
+// ColorLerp - Get color lerp interpolation between two colors, factor [0.0f..1.0f]
+func ColorLerp(col1, col2 color.RGBA, factor float32) color.RGBA {
+	ccol1 := colorCptr(col1)
+	ccol2 := colorCptr(col2)
+	ret := C.ColorLerp(*ccol1, *ccol2, C.float(factor))
+	v := newColorFromPointer(unsafe.Pointer(&ret))
+	return v
+}
+
 // GetColor - Returns a Color struct from hexadecimal value
 func GetColor(hexValue uint) colorex.RGBA {
 	chexValue := (C.uint)(hexValue)
@@ -701,30 +765,6 @@ func Vector3ToFloat(vec Vector3) []float32 {
 	data[0] = vec.X
 	data[1] = vec.Y
 	data[2] = vec.Z
-
-	return data
-}
-
-// MatrixToFloat - Converts Matrix to float32 slice
-func MatrixToFloat(mat Matrix) []float32 {
-	data := make([]float32, 16)
-
-	data[0] = mat.M0
-	data[1] = mat.M4
-	data[2] = mat.M8
-	data[3] = mat.M12
-	data[4] = mat.M1
-	data[5] = mat.M5
-	data[6] = mat.M9
-	data[7] = mat.M13
-	data[8] = mat.M2
-	data[9] = mat.M6
-	data[10] = mat.M10
-	data[11] = mat.M14
-	data[12] = mat.M3
-	data[13] = mat.M7
-	data[14] = mat.M11
-	data[15] = mat.M15
 
 	return data
 }
@@ -956,6 +996,11 @@ func SetGamepadMappings(mappings string) int32 {
 	return v
 }
 
+// SetGamepadVibration - Set gamepad vibration for both motors (duration in seconds)
+func SetGamepadVibration(gamepad int32, leftMotor, rightMotor, duration float32) {
+	C.SetGamepadVibration(C.int(gamepad), C.float(leftMotor), C.float(rightMotor), C.float(duration))
+}
+
 // IsMouseButtonPressed - Detect if a mouse button has been pressed once
 func IsMouseButtonPressed(button MouseButtonType) bool {
 	cbutton := (C.int)(button)
@@ -1088,4 +1133,25 @@ func GetTouchPointCount() int32 {
 	ret := C.GetTouchPointCount()
 	v := (int32)(ret)
 	return v
+}
+
+// BeginVrStereoMode - Begin stereo rendering (requires VR simulator)
+func BeginVrStereoMode(config VrStereoConfig) {
+	C.BeginVrStereoMode(*(*C.VrStereoConfig)(unsafe.Pointer(&config)))
+}
+
+// EndVrStereoMode - End stereo rendering (requires VR simulator)
+func EndVrStereoMode() {
+	C.EndVrStereoMode()
+}
+
+// LoadVrStereoConfig - Load VR stereo config for VR simulator device parameters
+func LoadVrStereoConfig(device VrDeviceInfo) VrStereoConfig {
+	ret := C.LoadVrStereoConfig(*(*C.VrDeviceInfo)(unsafe.Pointer(&device)))
+	return *(*VrStereoConfig)(unsafe.Pointer(&ret))
+}
+
+// UnloadVrStereoConfig - Unload VR stereo config
+func UnloadVrStereoConfig(config VrStereoConfig) {
+	C.UnloadVrStereoConfig(*(*C.VrStereoConfig)(unsafe.Pointer(&config)))
 }

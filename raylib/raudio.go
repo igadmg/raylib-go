@@ -16,13 +16,33 @@ static void audioStreamWrapperCallback(void *data, unsigned int frames) {
 static void setAudioStreamCallbackWrapper(AudioStream stream) {
 	SetAudioStreamCallback(stream, audioStreamWrapperCallback);
 }
+
+extern void internalAudioMixedProcessorGo(void *, int);
+
+static void audioMixedProcessorCallback(void *data, unsigned int frames) {
+	internalAudioMixedProcessorGo(data, frames);
+}
+
+static void setAudioMixedProcessorCallbackWrapper() {
+	AttachAudioMixedProcessor(audioMixedProcessorCallback);
+}
+
+static void unsetAudioMixedProcessorCallbackWrapper() {
+	DetachAudioMixedProcessor(audioMixedProcessorCallback);
+}
 */
 import "C"
 import (
+	"reflect"
+	"sync"
 	"unsafe"
 )
 
-var internalAudioStreamCallback AudioCallback
+var (
+	internalAudioStreamCallback AudioCallback
+	audioMixedProcessorsMutex   = sync.RWMutex{}
+	audioMixedProcessors        = []AudioCallback{}
+)
 
 // SetAudioStreamCallback - Audio thread callback to request new data
 func SetAudioStreamCallback(stream AudioStream, callback AudioCallback) {
@@ -35,6 +55,75 @@ func internalAudioStreamCallbackGo(data unsafe.Pointer, frames C.int) {
 	if internalAudioStreamCallback != nil {
 		internalAudioStreamCallback(unsafe.Slice((*float32)(data), frames), int(frames))
 	}
+}
+
+func AttachAudioMixedProcessor(callback AudioCallback) {
+	audioMixedProcessorsMutex.Lock()
+	defer audioMixedProcessorsMutex.Unlock()
+
+	if len(audioMixedProcessors) == 0 {
+		C.setAudioMixedProcessorCallbackWrapper()
+	}
+
+	audioMixedProcessors = append(audioMixedProcessors, callback)
+}
+
+func DetachAudioMixedProcessor(callback AudioCallback) {
+	audioMixedProcessorsMutex.Lock()
+	defer audioMixedProcessorsMutex.Unlock()
+
+	callbackPtr := reflect.ValueOf(callback).Pointer()
+	for i := len(audioMixedProcessors) - 1; i >= 0; i-- {
+		if reflect.ValueOf(audioMixedProcessors[i]).Pointer() == callbackPtr {
+			audioMixedProcessors = append(audioMixedProcessors[:i], audioMixedProcessors[i+1:]...)
+			break
+		}
+	}
+
+	if len(audioMixedProcessors) == 0 {
+		C.unsetAudioMixedProcessorCallbackWrapper()
+	}
+}
+
+//export internalAudioMixedProcessorGo
+func internalAudioMixedProcessorGo(data unsafe.Pointer, frames C.int) {
+	for _, callback := range audioMixedProcessors {
+		callback(unsafe.Slice((*float32)(data), frames), int(frames))
+	}
+}
+
+// newWaveFromPointer - Returns new Wave from pointer
+func newWaveFromPointer(ptr unsafe.Pointer) Wave {
+	return *(*Wave)(ptr)
+}
+
+// cptr returns C pointer
+func (w *Wave) cptr() *C.Wave {
+	return (*C.Wave)(unsafe.Pointer(w))
+}
+
+// newSoundFromPointer - Returns new Sound from pointer
+func newSoundFromPointer(ptr unsafe.Pointer) Sound {
+	return *(*Sound)(ptr)
+}
+
+func (s *Sound) cptr() *C.Sound {
+	return (*C.Sound)(unsafe.Pointer(s))
+}
+
+// newAudioStreamFromPointer - Returns new AudioStream from pointer
+func newAudioStreamFromPointer(ptr unsafe.Pointer) AudioStream {
+	return *(*AudioStream)(ptr)
+}
+
+// cptr returns C pointer
+func (a *AudioStream) cptr() *C.AudioStream {
+	return (*C.AudioStream)(unsafe.Pointer(a))
+}
+
+// newMusicFromPointer - Returns new Music from pointer
+func newMusicFromPointer(ptr unsafe.Pointer) Music {
+	return *(*Music)(ptr)
 }
 
 // InitAudioDevice - Initialize audio device and context
@@ -83,8 +172,8 @@ func LoadWaveFromMemory(fileType string, fileData []byte, dataSize int32) Wave {
 	return *newWaveFromPointer(&ret)
 }
 
-// IsWaveReady - Checks if wave data is ready
-func IsWaveValid(wave *Wave) bool {
+// IsWaveValid - Checks if wave data is valid (data loaded and parameters)
+func IsWaveValid(wave Wave) bool {
 	cwave := wave.cptr()
 	ret := C.IsWaveValid(*cwave)
 	v := bool(ret)
@@ -112,8 +201,8 @@ func LoadSoundAlias(source Sound) Sound {
 	return *newSoundFromPointer(&ret)
 }
 
-// IsSoundReady - Checks if a sound is ready
-func IsSoundValid(sound *Sound) bool {
+// IsSoundValid - Checks if a sound is valid (data loaded and buffers initialized)
+func IsSoundValid(sound Sound) bool {
 	csound := sound.cptr()
 	ret := C.IsSoundValid(*csound)
 	v := bool(ret)
@@ -201,7 +290,7 @@ func SetSoundPan(sound Sound, pan float32) {
 }
 
 // WaveFormat - Convert wave data to desired format
-func WaveFormat(wave Wave, sampleRate int32, sampleSize int32, channels int32) {
+func WaveFormat(wave *Wave, sampleRate int32, sampleSize int32, channels int32) {
 	cwave := wave.cptr()
 	csampleRate := (C.int)(sampleRate)
 	csampleSize := (C.int)(sampleSize)
@@ -216,12 +305,12 @@ func WaveCopy(wave Wave) Wave {
 	return *newWaveFromPointer(&ret)
 }
 
-// WaveCrop - Crop a wave to defined samples range
-func WaveCrop(wave Wave, initSample int32, finalSample int32) {
+// WaveCrop - Crop a wave to defined frames range
+func WaveCrop(wave *Wave, initFrame int32, finalFrame int32) {
 	cwave := wave.cptr()
-	cinitSample := (C.int)(initSample)
-	cfinalSample := (C.int)(finalSample)
-	C.WaveCrop(cwave, cinitSample, cfinalSample)
+	cinitFrame := (C.int)(initFrame)
+	cfinalFrame := (C.int)(finalFrame)
+	C.WaveCrop(cwave, cinitFrame, cfinalFrame)
 }
 
 // LoadWaveSamples - Get samples data from wave as a floats array
@@ -253,10 +342,10 @@ func LoadMusicStreamFromMemory(fileType string, fileData []byte, dataSize int32)
 	return *newMusicFromPointer(&ret)
 }
 
-// IsMusicReady - Checks if a music stream is ready
-func IsMusicValid(music *Music) bool {
-	cmusic := music.cptr()
-	ret := C.IsMusicValid(*cmusic)
+// IsMusicValid - Checks if a music stream is valid (context and buffers initialized)
+func IsMusicValid(music Music) bool {
+	cmusic := *(*C.Music)(unsafe.Pointer(&music))
+	ret := C.IsMusicValid(cmusic)
 	v := bool(ret)
 	return v
 }
@@ -358,8 +447,8 @@ func LoadAudioStream(sampleRate uint32, sampleSize uint32, channels uint32) Audi
 	return *newAudioStreamFromPointer(&ret)
 }
 
-// IsAudioStreamReady - Checks if an audio stream is ready
-func IsAudioStreamValid(stream *AudioStream) bool {
+// IsAudioStreamValid - Checks if an audio stream is valid (buffers initialized)
+func IsAudioStreamValid(stream AudioStream) bool {
 	cstream := stream.cptr()
 	ret := C.IsAudioStreamValid(*cstream)
 	v := bool(ret)

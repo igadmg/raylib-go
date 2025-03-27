@@ -1,8 +1,5 @@
-//go:build (sdl || sdl3) && !rgfw && !drm && !android
-// +build sdl sdl3
-// +build !rgfw
-// +build !drm
-// +build !android
+//go:build rgfw && !sdl && !sdl3 && !drm && !android
+// +build rgfw,!sdl,!sdl3,!drm,!android
 
 package rl
 
@@ -18,11 +15,12 @@ import (
 )
 
 // InitWindow - Initialize Window and OpenGL Graphics
-func InitWindow[WT, HT IntegerT](width WT, height HT, title string) {
+func InitWindow(width int32, height int32, title string) {
 	cwidth := (C.int)(width)
 	cheight := (C.int)(height)
 
-	ctitle := textAlloc(title)
+	ctitle := C.CString(title)
+	defer C.free(unsafe.Pointer(ctitle))
 
 	C.InitWindow(cwidth, cheight, ctitle)
 }

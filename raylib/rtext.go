@@ -71,7 +71,7 @@ func LoadFontFromMemory(fileType string, fileData []byte, fontSize int32, codepo
 	return *newFontFromPointer(&ret)
 }
 
-// IsFontValid - Check if a font is valid
+// IsFontValid - Check if a font is valid (font data loaded, WARNING: GPU texture not checked)
 func IsFontValid(font Font) bool {
 	cfont := font.cptr()
 	ret := C.IsFontValid(*cfont)
@@ -80,12 +80,16 @@ func IsFontValid(font Font) bool {
 }
 
 // LoadFontData - Load font data for further use
-func LoadFontData(fileData []byte, fontSize int32, codePoints []int32, typ int32) []GlyphInfo {
+func LoadFontData(fileData []byte, fontSize int32, codePoints []rune, codepointCount, typ int32) []GlyphInfo {
 	cfileData := (*C.uchar)(unsafe.Pointer(&fileData[0]))
 	cdataSize := (C.int)(len(fileData))
 	cfontSize := (C.int)(fontSize)
-	ccodePoints := (*C.int)(unsafe.Pointer(&codePoints[0]))
-	ccodePointCount := (C.int)(len(codePoints))
+	ccodePoints := (*C.int)(unsafe.SliceData(codePoints))
+	// In case no chars count provided, default to 95
+	if codepointCount <= 0 {
+		codepointCount = 95
+	}
+	ccodePointCount := (C.int)(codepointCount)
 	ctype := (C.int)(typ)
 	ret := C.LoadFontData(cfileData, cdataSize, cfontSize, ccodePoints, ccodePointCount, ctype)
 	v := unsafe.Slice((*GlyphInfo)(unsafe.Pointer(ret)), ccodePointCount)
@@ -137,6 +141,20 @@ func DrawTextLayout(font Font, text string, fontSize float32, spacing float32, t
 	DrawTextEx(font, text, rect.Position, fontSize, spacing, tint)
 }
 
+// DrawTextPro - Draw text using Font and pro parameters (rotation)
+func DrawTextPro(font Font, text string, position Vector2, origin Vector2, rotation, fontSize float32, spacing float32, tint color.RGBA) {
+	cfont := font.cptr()
+	ctext := C.CString(text)
+	defer C.free(unsafe.Pointer(ctext))
+	cposition := position.cptr()
+	crotation := (C.float)(rotation)
+	corigin := origin.cptr()
+	cfontSize := (C.float)(fontSize)
+	cspacing := (C.float)(spacing)
+	ctint := colorCptr(tint)
+	C.DrawTextPro(*cfont, ctext, *cposition, *corigin, crotation, cfontSize, cspacing, *ctint)
+}
+
 // SetTextLineSpacing - Set vertical line spacing when drawing with line-breaks
 func SetTextLineSpacing(spacing int) {
 	cspacing := (C.int)(spacing)
@@ -185,4 +203,36 @@ func GetGlyphAtlasRec(font Font, codepoint int32) Rectangle {
 	ccodepoint := (C.int)(codepoint)
 	ret := C.GetGlyphAtlasRec(*cfont, ccodepoint)
 	return *gorec2ptr(&ret)
+}
+
+// GenImageFontAtlas - Generate image font atlas using chars info
+func GenImageFontAtlas(glyphs []GlyphInfo, glyphRecs []*Rectangle, fontSize int32, padding int32, packMethod int32) Image {
+	cglyphs := (*C.GlyphInfo)(unsafe.Pointer(&glyphs[0]))
+	cglyphRecs := (**C.Rectangle)(unsafe.Pointer(&glyphRecs[0]))
+	cglyphCount := C.int(len(glyphs))
+	ret := C.GenImageFontAtlas(cglyphs, cglyphRecs, cglyphCount, C.int(fontSize), C.int(padding), C.int(packMethod))
+	v := newImageFromPointer(unsafe.Pointer(&ret))
+	return *v
+}
+
+// DrawTextCodepoint - Draw one character (codepoint)
+func DrawTextCodepoint(font Font, codepoint rune, position Vector2, fontSize float32, tint color.RGBA) {
+	cfont := font.cptr()
+	ccodepoint := (C.int)(codepoint)
+	cposition := position.cptr()
+	cfontSize := (C.float)(fontSize)
+	ctint := colorCptr(tint)
+	C.DrawTextCodepoint(*cfont, ccodepoint, *cposition, cfontSize, *ctint)
+}
+
+// DrawTextCodepoints - Draw multiple character (codepoint)
+func DrawTextCodepoints(font Font, codepoints []rune, position Vector2, fontSize float32, spacing float32, tint color.RGBA) {
+	cfont := font.cptr()
+	ccodepoints := (*C.int)(unsafe.SliceData(codepoints))
+	ccodepointCount := C.int(len(codepoints))
+	cposition := position.cptr()
+	cfontSize := (C.float)(fontSize)
+	cspacing := (C.float)(spacing)
+	ctint := colorCptr(tint)
+	C.DrawTextCodepoints(*cfont, ccodepoints, ccodepointCount, *cposition, cfontSize, cspacing, *ctint)
 }

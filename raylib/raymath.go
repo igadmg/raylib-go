@@ -911,6 +911,12 @@ func MatrixToFloatV(mat Matrix) [16]float32 {
 	return result
 }
 
+// MatrixToFloat - Converts Matrix to float32 slice
+func MatrixToFloat(mat Matrix) []float32 {
+	data := MatrixToFloatV(mat)
+	return data[:]
+}
+
 // QuaternionAdd - Add two quaternions
 func QuaternionAdd(q1 Quaternion, q2 Quaternion) Quaternion {
 	var result = Quaternion{X: q1.X() + q2.X(), Y: q1.Y() + q2.Y(), Z: q1.Z() + q2.Z(), W: q1.W + q2.W}
@@ -1324,4 +1330,69 @@ func QuaternionTransform(q Quaternion, mat Matrix) Quaternion {
 	result.W = mat.M3*x + mat.M7*y + mat.M11*z + mat.M15*w
 
 	return result
+}
+
+// QuaternionEquals - Check whether two given quaternions are almost equal
+func QuaternionEquals(p, q Quaternion) bool {
+	return (math.Abs(float64(p.X-q.X)) <= 0.000001*math.Max(1.0, math.Max(math.Abs(float64(p.X)), math.Abs(float64(q.X)))) &&
+		math.Abs(float64(p.Y-q.Y)) <= 0.000001*math.Max(1.0, math.Max(math.Abs(float64(p.Y)), math.Abs(float64(q.Y)))) &&
+		math.Abs(float64(p.Z-q.Z)) <= 0.000001*math.Max(1.0, math.Max(math.Abs(float64(p.Z)), math.Abs(float64(q.Z)))) &&
+		math.Abs(float64(p.W-q.W)) <= 0.000001*math.Max(1.0, math.Max(math.Abs(float64(p.W)), math.Abs(float64(q.W)))) ||
+		math.Abs(float64(p.X+q.X)) <= 0.000001*math.Max(1.0, math.Max(math.Abs(float64(p.X)), math.Abs(float64(q.X)))) &&
+			math.Abs(float64(p.Y+q.Y)) <= 0.000001*math.Max(1.0, math.Max(math.Abs(float64(p.Y)), math.Abs(float64(q.Y)))) &&
+			math.Abs(float64(p.Z+q.Z)) <= 0.000001*math.Max(1.0, math.Max(math.Abs(float64(p.Z)), math.Abs(float64(q.Z)))) &&
+			math.Abs(float64(p.W+q.W)) <= 0.000001*math.Max(1.0, math.Max(math.Abs(float64(p.W)), math.Abs(float64(q.W)))))
+}
+
+// MatrixDecompose - Decompose a transformation matrix into its rotational, translational and scaling components
+func MatrixDecompose(mat Matrix, translation *Vector3, rotation *Quaternion, scale *Vector3) {
+	// Extract translation.
+	translation.X = mat.M12
+	translation.Y = mat.M13
+	translation.Z = mat.M14
+
+	// Extract upper-left for determinant computation
+	a := mat.M0
+	b := mat.M4
+	c := mat.M8
+	d := mat.M1
+	e := mat.M5
+	f := mat.M9
+	g := mat.M2
+	h := mat.M6
+	i := mat.M10
+	A := e*i - f*h
+	B := f*g - d*i
+	C := d*h - e*g
+
+	// Extract scale
+	det := a*A + b*B + c*C
+	abc := NewVector3(a, b, c)
+	def := NewVector3(d, e, f)
+	ghi := NewVector3(g, h, i)
+
+	scalex := Vector3Length(abc)
+	scaley := Vector3Length(def)
+	scalez := Vector3Length(ghi)
+	s := NewVector3(scalex, scaley, scalez)
+
+	if det < 0 {
+		s = Vector3Negate(s)
+	}
+
+	*scale = s
+
+	// Remove scale from the matrix if it is not close to zero
+	clone := mat
+	if !FloatEquals(det, 0) {
+		clone.M0 /= s.X
+		clone.M5 /= s.Y
+		clone.M10 /= s.Z
+
+		// Extract rotation
+		*rotation = QuaternionFromMatrix(clone)
+	} else {
+		// Set to identity if close to zero
+		*rotation = QuaternionIdentity()
+	}
 }

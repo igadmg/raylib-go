@@ -214,8 +214,8 @@ func LoadModelFromMesh(data Mesh) Model {
 	return *newModelFromPointer(&ret)
 }
 
-// IsModelValid - Check if a model is valid
-func IsModelValid(model *Model) bool {
+// IsModelValid - Check if a model is valid (loaded in GPU, VAO/VBOs)
+func IsModelValid(model Model) bool {
 	cmodel := model.cptr()
 	ret := C.IsModelValid(*cmodel)
 	v := bool(ret)
@@ -275,6 +275,26 @@ func DrawModelWiresEx(model Model, position Vector3, rotationAxis Vector3, rotat
 	C.DrawModelWiresEx(*cmodel, *cposition, *crotationAxis, crotationAngle, *cscale, *ctint)
 }
 
+// DrawModelPoints - Draw a model as points
+func DrawModelPoints(model Model, position Vector3, scale float32, tint color.RGBA) {
+	cmodel := model.cptr()
+	cposition := position.cptr()
+	cscale := (C.float)(scale)
+	ctint := colorCptr(tint)
+	C.DrawModelPoints(*cmodel, *cposition, cscale, *ctint)
+}
+
+// DrawModelPointsEx - Draw a model as points with extended parameters
+func DrawModelPointsEx(model Model, position Vector3, rotationAxis Vector3, rotationAngle float32, scale Vector3, tint color.RGBA) {
+	cmodel := model.cptr()
+	cposition := position.cptr()
+	crotationAxis := rotationAxis.cptr()
+	crotationAngle := (C.float)(rotationAngle)
+	cscale := scale.cptr()
+	ctint := colorCptr(tint)
+	C.DrawModelPointsEx(*cmodel, *cposition, *crotationAxis, crotationAngle, *cscale, *ctint)
+}
+
 // DrawBoundingBox - Draw bounding box (wires)
 func DrawBoundingBox(box BoundingBox, col colorex.RGBA) {
 	cbox := box.cptr()
@@ -283,13 +303,13 @@ func DrawBoundingBox(box BoundingBox, col colorex.RGBA) {
 }
 
 // DrawBillboard - Draw a billboard texture
-func DrawBillboard(camera Camera, texture Texture2D, center Vector3, size float32, tint colorex.RGBA) {
+func DrawBillboard(camera Camera, texture Texture2D, center Vector3, scale float32, tint colorex.RGBA) {
 	ccamera := camera.cptr()
 	ctexture := texture.cptr()
 	ccenter := cvec3ptr(&center)
-	csize := (C.float)(size)
+	cscale := (C.float)(scale)
 	ctint := ccolorptr(&tint)
-	C.DrawBillboard(*ccamera, *ctexture, *ccenter, csize, *ctint)
+	C.DrawBillboard(*ccamera, *ctexture, *ccenter, cscale, *ctint)
 }
 
 // DrawBillboardRec - Draw a billboard texture defined by sourceRec
@@ -315,68 +335,6 @@ func DrawBillboardPro(camera Camera, texture Texture2D, sourceRec Rectangle, pos
 	crotation := (C.float)(rotation)
 	ctint := ccolorptr(&tint)
 	C.DrawBillboardPro(*ccamera, *ctexture, *csourceRec, *cposition, *cup, *csize, *corigin, crotation, *ctint)
-}
-
-// List of VaoIDs of meshes created by calling UploadMesh()
-// Used by UnloadMesh() to determine if mesh is go-managed or C-allocated
-var goManagedMeshIDs = make([]uint32, 0)
-
-// UploadMesh - Upload vertex data into a VAO (if supported) and VBO
-func UploadMesh(mesh *Mesh, dynamic bool) {
-	// check if mesh has already been uploaded to prevent duplication
-	if mesh.VaoID != 0 {
-		TraceLog(LogWarning, "VAO: [ID %d] Trying to re-load an already loaded mesh", mesh.VaoID)
-		return
-	}
-
-	pinner := runtime.Pinner{}
-	// Mesh pointer fields must be pinned to allow a Mesh pointer to be passed to C.UploadMesh() below
-	// nil checks are required because Pin() will panic if passed nil
-	if mesh.Vertices != nil {
-		pinner.Pin(mesh.Vertices)
-	}
-	if mesh.Texcoords != nil {
-		pinner.Pin(mesh.Texcoords)
-	}
-	if mesh.Texcoords2 != nil {
-		pinner.Pin(mesh.Texcoords2)
-	}
-	if mesh.Normals != nil {
-		pinner.Pin(mesh.Normals)
-	}
-	if mesh.Tangents != nil {
-		pinner.Pin(mesh.Tangents)
-	}
-	if mesh.Colors != nil {
-		pinner.Pin(mesh.Colors)
-	}
-	if mesh.Indices != nil {
-		pinner.Pin(mesh.Indices)
-	}
-	if mesh.AnimVertices != nil {
-		pinner.Pin(mesh.AnimVertices)
-	}
-	if mesh.AnimNormals != nil {
-		pinner.Pin(mesh.AnimNormals)
-	}
-	if mesh.BoneIds != nil {
-		pinner.Pin(mesh.BoneIds)
-	}
-	if mesh.BoneWeights != nil {
-		pinner.Pin(mesh.BoneWeights)
-	}
-	// VboID of a new mesh should always be nil before uploading, but including this in case a mesh happens to have it set.
-	if mesh.VboID != nil {
-		pinner.Pin(mesh.VboID)
-	}
-
-	cMesh := mesh.cptr()
-	C.UploadMesh(cMesh, C.bool(dynamic))
-
-	// Add new mesh VaoID to list
-	goManagedMeshIDs = append(goManagedMeshIDs, mesh.VaoID)
-
-	pinner.Unpin()
 }
 
 // UpdateMeshBuffer - Update mesh vertex data in GPU for a specific buffer index
@@ -557,8 +515,8 @@ func LoadMaterialDefault() Material {
 	return *newMaterialFromPointer(&ret)
 }
 
-// IsMaterialValid - Check if a material is valid
-func IsMaterialValid(material *Material) bool {
+// IsMaterialValid - Check if a material is valid (shader assigned, map textures loaded in GPU)
+func IsMaterialValid(material Material) bool {
 	cmaterial := material.cptr()
 	ret := C.IsMaterialValid(*cmaterial)
 	v := bool(ret)
@@ -596,12 +554,20 @@ func LoadModelAnimations(fileName string) []ModelAnimation {
 	return v
 }
 
-// UpdateModelAnimation - Update model animation pose
+// UpdateModelAnimation - Update model animation pose (CPU)
 func UpdateModelAnimation(model Model, anim ModelAnimation, frame int32) {
 	cmodel := model.cptr()
 	canim := anim.cptr()
 	cframe := (C.int)(frame)
 	C.UpdateModelAnimation(*cmodel, *canim, cframe)
+}
+
+// UpdateModelAnimationBones - Update model animation mesh bone matrices (GPU skinning)
+func UpdateModelAnimationBones(model Model, anim ModelAnimation, frame int32) {
+	cmodel := model.cptr()
+	canim := anim.cptr()
+	cframe := (C.int)(frame)
+	C.UpdateModelAnimationBones(*cmodel, *canim, cframe)
 }
 
 // UnloadModelAnimation - Unload animation data

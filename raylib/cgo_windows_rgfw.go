@@ -1,17 +1,11 @@
-//go:build windows && (sdl || sdl3) && !rgfw
-// +build windows
-// +build sdl sdl3
-// +build !rgfw
+//go:build windows && rgfw && !sdl && !sdl3
+// +build windows,rgfw,!sdl,!sdl3
 
 package rl
 
 /*
-#cgo windows LDFLAGS: -lgdi32 -lwinmm -lole32
-#cgo windows,sdl LDFLAGS: -lSDL2
-#cgo windows,sdl3 LDFLAGS: -lSDL3
-#cgo windows CFLAGS: -Iexternal -Wno-stringop-overflow
-#cgo windows,sdl CFLAGS: -DPLATFORM_DESKTOP_SDL
-#cgo windows,sdl3 CFLAGS: -DPLATFORM_DESKTOP_SDL -DPLATFORM_DESKTOP_SDL3
+#cgo windows LDFLAGS: -lgdi32 -lwinmm
+#cgo windows CFLAGS: -Iexternal -DPLATFORM_DESKTOP_RGFW -Wno-stringop-overflow -Wno-discarded-qualifiers
 
 #cgo windows,!es2,!es3 LDFLAGS: -lopengl32
 

@@ -57,7 +57,7 @@ type Wave struct {
 	// Number of channels (1-mono, 2-stereo)
 	Channels uint32
 	// Buffer data pointer
-	data unsafe.Pointer
+	Data unsafe.Pointer
 }
 
 // NewWave - Returns new Wave
@@ -189,6 +189,27 @@ type AudioProcessor struct {
 	Process *[0]byte
 	Next    *AudioProcessor
 	Prev    *AudioProcessor
+}
+
+// AutomationEvent - Automation event
+type AutomationEvent struct {
+	Frame  uint32
+	Type   uint32
+	Params [4]int32
+}
+
+// AutomationEventList - Automation event list
+type AutomationEventList struct {
+	Capacity uint32
+	Count    uint32
+	// Events array (c array)
+	//
+	// Use AutomationEventList.GetEvents instead (go slice)
+	Events *AutomationEvent
+}
+
+func (a *AutomationEventList) GetEvents() []AutomationEvent {
+	return unsafe.Slice(a.Events, a.Count)
 }
 
 // CameraMode type
@@ -361,10 +382,16 @@ const (
 
 	// Android keys
 	KeyBack       KeyType = 4
-	KeyMenu       KeyType = 82
+	KeyMenu       KeyType = 5
 	KeyVolumeUp   KeyType = 24
 	KeyVolumeDown KeyType = 25
+
+	MouseLeftButton   = MouseButtonLeft
+	MouseRightButton  = MouseButtonRight
+	MouseMiddleButton = MouseButtonMiddle
 )
+
+type MouseButton int32
 
 // Mouse Buttons
 type MouseButtonType int32
@@ -689,14 +716,31 @@ type ShaderUniformDataType int32
 
 // ShaderUniformDataType enumeration
 const (
+	// Shader uniform type: float
 	ShaderUniformFloat ShaderUniformDataType = iota
+	// Shader uniform type: vec2 (2 float)
 	ShaderUniformVec2
+	// Shader uniform type: vec3 (3 float)
 	ShaderUniformVec3
+	// Shader uniform type: vec4 (4 float)
 	ShaderUniformVec4
+	// Shader uniform type: int
 	ShaderUniformInt
+	// Shader uniform type: ivec2 (2 int)
 	ShaderUniformIvec2
+	// Shader uniform type: ivec2 (3 int)
 	ShaderUniformIvec3
+	// Shader uniform type: ivec2 (4 int)
 	ShaderUniformIvec4
+	// Shader uniform type: unsigned int
+	ShaderUniformUint
+	// Shader uniform type: uivec2 (2 unsigned int)
+	ShaderUniformUivec2
+	// Shader uniform type: uivec3 (3 unsigned int)
+	ShaderUniformUivec3
+	// Shader uniform type: uivec4 (4 unsigned int)
+	ShaderUniformUivec4
+	// Shader uniform type: sampler2d
 	ShaderUniformSampler2d
 )
 
@@ -755,6 +799,10 @@ type Mesh struct {
 	BoneIds *int32
 	// BoneWeights
 	BoneWeights *float32
+	// Bones animated transformation matrices
+	BoneMatrices *Matrix
+	// Number of bones
+	BoneCount int32
 	// OpenGL Vertex Array Object id
 	VaoID uint32
 	// OpenGL Vertex Buffer Objects id (7 types of vertex data)
@@ -868,7 +916,29 @@ type ModelAnimation struct {
 	FrameCount int32
 	Bones      *BoneInfo
 	FramePoses **Transform
-	Name       [32]int8
+	Name       [32]uint8
+}
+
+// GetBones returns the bones information (skeleton) of a ModelAnimation as go slice
+func (m ModelAnimation) GetBones() []BoneInfo {
+	return unsafe.Slice(m.Bones, m.BoneCount)
+}
+
+// GetFramePose returns the Transform for a specific bone at a specific frame
+func (m ModelAnimation) GetFramePose(frame, bone int) Transform {
+	framePoses := unsafe.Slice(m.FramePoses, m.FrameCount)
+	return unsafe.Slice(framePoses[frame], m.BoneCount)[bone]
+}
+
+// GetName returns the ModelAnimation's name as go string
+func (m ModelAnimation) GetName() string {
+	var end int
+	for end = range m.Name {
+		if m.Name[end] == 0 {
+			break
+		}
+	}
+	return string(m.Name[:end])
 }
 
 // RayCollision type - ray hit information
@@ -1096,14 +1166,13 @@ const (
 	CubemapLayoutLineHorizontal          // Layout is defined by a horizontal line with faces
 	CubemapLayoutCrossThreeByFour        // Layout is defined by a 3x4 cross with cubemap faces
 	CubemapLayoutCrossFourByThree        // Layout is defined by a 4x3 cross with cubemap faces
-	CubemapLayoutPanorama                // Layout is defined by a panorama image (equirrectangular map)
 )
 
 // Image type, bpp always RGBA (32bit)
 // NOTE: Data stored in CPU memory (RAM)
 type Image struct {
-	// Image raw data
-	data unsafe.Pointer
+	// Image raw Data
+	Data unsafe.Pointer
 	// Image base width
 	Width int32
 	// Image base height
@@ -1336,7 +1405,6 @@ type VrDeviceInfo struct {
 	VResolution            int32      // Vertical resolution in pixels
 	HScreenSize            float32    // Horizontal size in meters
 	VScreenSize            float32    // Vertical size in meters
-	VScreenCenter          float32    // Screen center in meters
 	EyeToScreenDistance    float32    // Distance between eye and display in meters
 	LensSeparationDistance float32    // Lens separation distance in meters
 	InterpupillaryDistance float32    // IPD (distance between pupils) in meters

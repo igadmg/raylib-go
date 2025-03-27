@@ -18,6 +18,20 @@ func SetShapesTexture(texture Texture2D, source Rectangle) {
 	C.SetShapesTexture(*ctexture, *csource)
 }
 
+// GetShapesTexture - Get texture that is used for shapes drawing
+func GetShapesTexture() Texture2D {
+	ret := C.GetShapesTexture()
+	v := newTexture2DFromPointer(unsafe.Pointer(&ret))
+	return v
+}
+
+// GetShapesTextureRectangle - Get texture source rectangle that is used for shapes drawing
+func GetShapesTextureRectangle() Rectangle {
+	ret := C.GetShapesTextureRectangle()
+	v := newRectangleFromPointer(unsafe.Pointer(&ret))
+	return v
+}
+
 // DrawPixel - Draw a pixel
 func DrawPixel[XT, YT CoordinateT](posX XT, posY YT, col colorex.RGBA) {
 	cposX := (C.int)(posX)
@@ -143,6 +157,14 @@ func DrawCircleLines(centerX, centerY int32, radius float32, col colorex.RGBA) {
 	cradius := (C.float)(radius)
 	ccolor := ccolorptr(&col)
 	C.DrawCircleLines(ccenterX, ccenterY, cradius, *ccolor)
+}
+
+// DrawCircleLinesV - Draw circle outline (Vector version)
+func DrawCircleLinesV(center Vector2, radius float32, col color.RGBA) {
+	ccenter := center.cptr()
+	cradius := (C.float)(radius)
+	ccolor := colorCptr(col)
+	C.DrawCircleLinesV(*ccenter, cradius, *ccolor)
 }
 
 // DrawEllipse - Draw ellipse
@@ -541,6 +563,17 @@ func CheckCollisionCircleRec(center Vector2, radius float32, rec Rectangle) bool
 	cradius := (C.float)(radius)
 	crec := crect2ptr(&rec)
 	ret := C.CheckCollisionCircleRec(*ccenter, cradius, *crec)
+	v := bool(ret)
+	return v
+}
+
+// CheckCollisionCircleLine - Check if circle collides with a line created betweeen two points [p1] and [p2]
+func CheckCollisionCircleLine(center Vector2, radius float32, p1, p2 Vector2) bool {
+	ccenter := center.cptr()
+	cradius := (C.float)(radius)
+	cp1 := p1.cptr()
+	cp2 := p2.cptr()
+	ret := C.CheckCollisionCircleLine(*ccenter, cradius, *cp1, *cp2)
 	v := bool(ret)
 	return v
 }

@@ -1,21 +1,11 @@
-//go:build freebsd && !linux && (sdl || sdl3) && !rgfw && !drm && !android
-// +build freebsd
-// +build !linux
-// +build sdl sdl3
-// +build !rgfw
-// +build !drm
-// +build !android
+//go:build freebsd && rgfw && !linux && !drm && !sdl && !sdl3 && !android
+// +build freebsd,rgfw,!linux,!drm,!sdl,!sdl3,!android
 
 package rl
 
 /*
-#cgo freebsd CFLAGS: -I. -I/usr/local/include
-#cgo freebsd,sdl CFLAGS: -DPLATFORM_DESKTOP_SDL
-#cgo freebsd,sdl3 CFLAGS: -DPLATFORM_DESKTOP_SDL -DPLATFORM_DESKTOP_SDL3
-#cgo freebsd LDFLAGS: -L/usr/local/lib
-
-#cgo freebsd,sdl pkg-config: sdl2
-#cgo freebsd,sdl3 pkg-config: sdl3
+#cgo freebsd CFLAGS: -I. -I/usr/local/include -DPLATFORM_DESKTOP_RGFW
+#cgo freebsd LDFLAGS: -L/usr/local/lib -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lm -lpthread -ldl -lrt
 
 #cgo freebsd,!es2,!es3 LDFLAGS: -lGL
 
