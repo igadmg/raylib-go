@@ -27,7 +27,7 @@
 *
 *   LICENSE: zlib/libpng
 *
-*   Copyright (c) 2013-2024 Ramon Santamaria (@raysan5) and contributors
+*   Copyright (c) 2013-2025 Ramon Santamaria (@raysan5) and contributors
 *
 *   This software is provided "as-is", without any express or implied warranty. In no event
 *   will the authors be held liable for any damages arising from the use of this software.
@@ -60,9 +60,7 @@
 typedef struct {
     // Application data
     struct android_app *app;            // Android activity
-#if !defined(PLATFORM_ANDROID_GOLANG)
     struct android_poll_source *source; // Android events polling source
-#endif
     bool appEnabled;                    // Flag to detect if app is active ** = true
     bool contextRebindRequired;         // Used to know context rebind required
 
@@ -77,14 +75,14 @@ typedef struct {
 // Global Variables Definition
 //----------------------------------------------------------------------------------
 extern CoreData CORE;                   // Global CORE state context
-
+extern bool isGpuReady;                 // Flag to note GPU has been initialized successfully
 static PlatformData platform = { 0 };   // Platform specific data
 
 //----------------------------------------------------------------------------------
 // Local Variables Definition
 //----------------------------------------------------------------------------------
 #define KEYCODE_MAP_SIZE 162
-static const KeyboardKey KeycodeMap[KEYCODE_MAP_SIZE] = {
+static const KeyboardKey mapKeycode[KEYCODE_MAP_SIZE] = {
     KEY_NULL,           // AKEYCODE_UNKNOWN
     0,                  // AKEYCODE_SOFT_LEFT
     0,                  // AKEYCODE_SOFT_RIGHT
@@ -255,10 +253,8 @@ static const KeyboardKey KeycodeMap[KEYCODE_MAP_SIZE] = {
 int InitPlatform(void);          // Initialize platform (graphics, inputs and more)
 void ClosePlatform(void);        // Close platform
 
-#if !defined(PLATFORM_ANDROID_GOLANG)
 static void AndroidCommandCallback(struct android_app *app, int32_t cmd);           // Process Android activity lifecycle commands
 static int32_t AndroidInputCallback(struct android_app *app, AInputEvent *event);   // Process Android inputs
-#endif
 static GamepadButton AndroidTranslateGamepadButton(int button);                     // Map Android gamepad button to raylib gamepad button
 
 //----------------------------------------------------------------------------------
@@ -274,6 +270,9 @@ static GamepadButton AndroidTranslateGamepadButton(int button);                 
 // To allow easier porting to android, we allow the user to define a
 // main function which we call from android_main, defined by ourselves
 extern int main(int argc, char *argv[]);
+#else
+extern int android_run();
+#endif
 
 // Android main function
 void android_main(struct android_app *app)
@@ -281,8 +280,12 @@ void android_main(struct android_app *app)
     char arg0[] = "raylib";     // NOTE: argv[] are mutable
     platform.app = app;
 
+#if !defined(PLATFORM_ANDROID_GOLANG)
     // NOTE: Return from main is ignored
     (void)main(1, (char *[]) { arg0, NULL });
+#else
+    (void)android_run();
+#endif
 
     // Request to end the native activity
     ANativeActivity_finish(app->activity);
@@ -294,8 +297,12 @@ void android_main(struct android_app *app)
     // Waiting for application events before complete finishing
     while (!app->destroyRequested)
     {
-        while ((pollResult = ALooper_pollOnce(0, NULL, &pollEvents, (void **)&platform.source)) >= 0)
+        // Poll all events until we reach return value TIMEOUT, meaning no events left to process
+        while ((pollResult = ALooper_pollOnce(0, NULL, &pollEvents, (void **)&platform.source)) > ALOOPER_POLL_TIMEOUT)
         {
+            if (pollResult == ALOOPER_POLL_CALLBACK)
+                continue;
+
             if (platform.source != NULL) platform.source->process(app, platform.source);
         }
     }
@@ -306,8 +313,6 @@ struct android_app *GetAndroidApp(void)
 {
     return platform.app;
 }
-
-#endif
 
 //----------------------------------------------------------------------------------
 // Module Functions Definition: Window and Graphics Device
@@ -438,7 +443,7 @@ int GetMonitorCount(void)
     return 1;
 }
 
-// Get number of monitors
+// Get current monitor where window is placed
 int GetCurrentMonitor(void)
 {
     TRACELOG(LOG_WARNING, "GetCurrentMonitor() not implemented on target platform");
@@ -467,17 +472,21 @@ int GetMonitorHeight(int monitor)
 }
 
 // Get selected monitor physical width in millimetres
+// NOTE: It seems to return a slightly underestimated value on some devices
 int GetMonitorPhysicalWidth(int monitor)
 {
-    TRACELOG(LOG_WARNING, "GetMonitorPhysicalWidth() not implemented on target platform");
-    return 0;
+    int widthPixels = ANativeWindow_getWidth(platform.app->window);
+    float dpi = AConfiguration_getDensity(platform.app->config);
+    return (widthPixels/dpi)*25.4f;
 }
 
 // Get selected monitor physical height in millimetres
+// NOTE: It seems to return a slightly underestimated value on some devices
 int GetMonitorPhysicalHeight(int monitor)
 {
-    TRACELOG(LOG_WARNING, "GetMonitorPhysicalHeight() not implemented on target platform");
-    return 0;
+    int heightPixels = ANativeWindow_getHeight(platform.app->window);
+    float dpi = AConfiguration_getDensity(platform.app->config);
+    return (heightPixels/dpi)*25.4f;
 }
 
 // Get selected monitor refresh rate
@@ -504,8 +513,9 @@ Vector2 GetWindowPosition(void)
 // Get window scale DPI factor for current monitor
 Vector2 GetWindowScaleDPI(void)
 {
-    TRACELOG(LOG_WARNING, "GetWindowScaleDPI() not implemented on target platform");
-    return (Vector2){ 1.0f, 1.0f };
+    int density = AConfiguration_getDensity(platform.app->config);
+    float scale = (float)density/160;
+    return (Vector2){ scale, scale };
 }
 
 // Set clipboard text content
@@ -520,6 +530,16 @@ const char *GetClipboardText(void)
 {
     TRACELOG(LOG_WARNING, "GetClipboardText() not implemented on target platform");
     return NULL;
+}
+
+// Get clipboard image
+Image GetClipboardImage(void)
+{
+    Image image = { 0 };
+
+    TRACELOG(LOG_WARNING, "GetClipboardImage() not implemented on target platform");
+
+    return image;
 }
 
 // Show mouse cursor
@@ -622,9 +642,9 @@ int SetGamepadMappings(const char *mappings)
 }
 
 // Set gamepad vibration
-void SetGamepadVibration(int gamepad, float leftMotor, float rightMotor)
+void SetGamepadVibration(int gamepad, float leftMotor, float rightMotor, float duration)
 {
-    TRACELOG(LOG_WARNING, "GamepadSetVibration() not implemented on target platform");
+    TRACELOG(LOG_WARNING, "SetGamepadVibration() not implemented on target platform");
 }
 
 // Set mouse position XY
@@ -638,6 +658,18 @@ void SetMousePosition(int x, int y)
 void SetMouseCursor(int cursor)
 {
     TRACELOG(LOG_WARNING, "SetMouseCursor() not implemented on target platform");
+}
+
+void SetMouseCursorImage(Image image, int xhot, int yhot)
+{
+    TRACELOG(LOG_WARNING, "SetMouseCursorImage() not implemented on target platform");
+}
+
+// Get physical key name.
+const char *GetKeyName(int key)
+{
+    TRACELOG(LOG_WARNING, "GetKeyName() not implemented on target platform");
+    return "";
 }
 
 // Register all input events
@@ -683,28 +715,31 @@ void PollInputEvents(void)
         CORE.Input.Keyboard.keyRepeatInFrame[i] = 0;
     }
 
-#if !defined(PLATFORM_ANDROID_GOLANG)
+    CORE.Window.resizedLastFrame = false;
+
     // Android ALooper_pollOnce() variables
     int pollResult = 0;
     int pollEvents = 0;
 
-    // Poll Events (registered events)
+    // Poll Events (registered events) until we reach TIMEOUT which indicates there are no events left to poll
     // NOTE: Activity is paused if not enabled (platform.appEnabled)
-    while ((pollResult = ALooper_pollOnce(platform.appEnabled? 0 : -1, NULL, &pollEvents, (void**)&platform.source)) >= 0)
+    while ((pollResult = ALooper_pollOnce(platform.appEnabled? 0 : -1, NULL, &pollEvents, ((void **)&platform.source)) > ALOOPER_POLL_TIMEOUT))
     {
+        if (pollResult == ALOOPER_POLL_CALLBACK)
+                continue;
+
         // Process this event
         if (platform.source != NULL) platform.source->process(platform.app, platform.source);
 
-        // NOTE: Never close window, native activity is controlled by the system!
+        // NOTE: Allow closing the window in case a configuration change happened.
+        // The android_main function should be allowed to return to its caller in order for the
+        // Android OS to relaunch the activity.
         if (platform.app->destroyRequested != 0)
         {
-            //CORE.Window.shouldClose = true;
-            //ANativeActivity_finish(platform.app->activity);
+            CORE.Window.shouldClose = true;
         }
     }
-#endif
 }
-
 
 //----------------------------------------------------------------------------------
 // Module Internal Functions Definition
@@ -750,7 +785,6 @@ int InitPlatform(void)
     CORE.Window.flags &= ~FLAG_WINDOW_UNFOCUSED;    // false
     //----------------------------------------------------------------------------
 
-#if !defined(PLATFORM_ANDROID_GOLANG)
     // Initialize App command system
     // NOTE: On APP_CMD_INIT_WINDOW -> InitGraphicsDevice(), InitTimer(), LoadFontDefault()...
     //----------------------------------------------------------------------------
@@ -761,7 +795,6 @@ int InitPlatform(void)
     //----------------------------------------------------------------------------
     platform.app->onInputEvent = AndroidInputCallback;
     //----------------------------------------------------------------------------
-#endif
 
     // Initialize storage system
     //----------------------------------------------------------------------------
@@ -772,7 +805,6 @@ int InitPlatform(void)
 
     TRACELOG(LOG_INFO, "PLATFORM: ANDROID: Initialized successfully");
 
-#if !defined(PLATFORM_ANDROID_GOLANG)
     // Android ALooper_pollOnce() variables
     int pollResult = 0;
     int pollEvents = 0;
@@ -780,17 +812,19 @@ int InitPlatform(void)
     // Wait for window to be initialized (display and context)
     while (!CORE.Window.ready)
     {
-        // Process events loop
-        while ((pollResult = ALooper_pollOnce(0, NULL, &pollEvents, (void**)&platform.source)) >= 0)
+        // Process events until we reach TIMEOUT, which indicates no more events queued.
+        while ((pollResult = ALooper_pollOnce(0, NULL, &pollEvents, ((void **)&platform.source)) > ALOOPER_POLL_TIMEOUT))
         {
+            if (pollResult == ALOOPER_POLL_CALLBACK)
+                continue;
+
             // Process this event
             if (platform.source != NULL) platform.source->process(platform.app, platform.source);
 
-            // NOTE: Never close window, native activity is controlled by the system!
+            // NOTE: It's highly likely destroyRequested will never be non-zero at the start of the activity lifecycle.
             //if (platform.app->destroyRequested != 0) CORE.Window.shouldClose = true;
         }
     }
-#endif
 
     return 0;
 }
@@ -818,6 +852,12 @@ void ClosePlatform(void)
         eglTerminate(platform.device);
         platform.device = EGL_NO_DISPLAY;
     }
+
+    // NOTE: Reset global state in case the activity is being relaunched.
+    if (platform.app->destroyRequested != 0) {
+        CORE = (CoreData){0};
+        platform = (PlatformData){0};
+    }
 }
 
 // Initialize display device and framebuffer
@@ -838,22 +878,20 @@ static int InitGraphicsDevice(ANativeWindow* window)
         TRACELOG(LOG_INFO, "DISPLAY: Trying to enable MSAA x4");
     }
 
-    const EGLint framebufferAttribs[] =
-    {
-        EGL_RENDERABLE_TYPE, (rlGetVersion() == RL_OPENGL_ES_30)? EGL_OPENGL_ES3_BIT : EGL_OPENGL_ES2_BIT,      // Type of context support
+    const EGLint framebufferAttribs[] = {
+        EGL_RENDERABLE_TYPE, (rlGetVersion() == RL_OPENGL_ES_30)? EGL_OPENGL_ES3_BIT : EGL_OPENGL_ES2_BIT, // Type of context support
         EGL_RED_SIZE, 8,            // RED color bit depth (alternative: 5)
         EGL_GREEN_SIZE, 8,          // GREEN color bit depth (alternative: 6)
         EGL_BLUE_SIZE, 8,           // BLUE color bit depth (alternative: 5)
         //EGL_TRANSPARENT_TYPE, EGL_NONE, // Request transparent framebuffer (EGL_TRANSPARENT_RGB does not work on RPI)
-        EGL_DEPTH_SIZE, 16,         // Depth buffer size (Required to use Depth testing!)
+        EGL_DEPTH_SIZE, 24,         // Depth buffer size (Required to use Depth testing!)
         //EGL_STENCIL_SIZE, 8,      // Stencil buffer size
-        EGL_SAMPLE_BUFFERS, sampleBuffer,    // Activate MSAA
+        EGL_SAMPLE_BUFFERS, sampleBuffer, // Activate MSAA
         EGL_SAMPLES, samples,       // 4x Antialiasing if activated (Free on MALI GPUs)
         EGL_NONE
     };
 
-    const EGLint contextAttribs[] =
-    {
+    const EGLint contextAttribs[] = {
         EGL_CONTEXT_CLIENT_VERSION, 2,
         EGL_NONE
     };
@@ -943,7 +981,6 @@ static int InitGraphicsDevice(ANativeWindow* window)
     return 0;
 }
 
-#if !defined(PLATFORM_ANDROID_GOLANG)
 // ANDROID: Process activity lifecycle commands
 static void AndroidCommandCallback(struct android_app *app, int32_t cmd)
 {
@@ -989,6 +1026,7 @@ static void AndroidCommandCallback(struct android_app *app, int32_t cmd)
                     // Initialize OpenGL context (states and resources)
                     // NOTE: CORE.Window.currentFbo.width and CORE.Window.currentFbo.height not used, just stored as globals in rlgl
                     rlglInit(CORE.Window.currentFbo.width, CORE.Window.currentFbo.height);
+                    isGpuReady = true;
 
                     // Setup default viewport
                     // NOTE: It updated CORE.Window.render.width and CORE.Window.render.height
@@ -1083,145 +1121,68 @@ static void AndroidCommandCallback(struct android_app *app, int32_t cmd)
         case APP_CMD_SAVE_STATE: break;
         case APP_CMD_STOP: break;
         case APP_CMD_DESTROY: break;
-        case APP_CMD_CONFIG_CHANGED:
+        case APP_CMD_CONFIG_CHANGED: break;
+        case APP_CMD_WINDOW_RESIZED:
         {
-            //AConfiguration_fromAssetManager(platform.app->config, platform.app->activity->assetManager);
-            //print_cur_config(platform.app);
+            int width = ANativeWindow_getWidth(platform.app->window);
+            int height = ANativeWindow_getHeight(platform.app->window);
 
-            // Check screen orientation here!
+            SetupViewport(width, height);
+
+            CORE.Window.currentFbo.width = width;
+            CORE.Window.currentFbo.height = height;
+            CORE.Window.resizedLastFrame = true;
+
+            CORE.Window.display.width = width;
+            CORE.Window.display.height = height;
+            CORE.Window.screen.width = width;
+            CORE.Window.screen.height = height;
+
+            eglMakeCurrent(platform.device, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+
+            if (platform.surface != EGL_NO_SURFACE)
+            {
+                eglDestroySurface(platform.device, platform.surface);
+                platform.surface = EGL_NO_SURFACE;
+            }
+
+            EGLint displayFormat = 0;
+
+            // EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is guaranteed to be accepted by ANativeWindow_setBuffersGeometry()
+            // As soon as we picked a EGLConfig, we can safely reconfigure the ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID
+            eglGetConfigAttrib(platform.device, platform.config, EGL_NATIVE_VISUAL_ID, &displayFormat);
+
+            SetupFramebuffer(CORE.Window.display.width, CORE.Window.display.height);
+
+            ANativeWindow_setBuffersGeometry(platform.app->window, CORE.Window.render.width, CORE.Window.render.height, displayFormat);
+            //ANativeWindow_setBuffersGeometry(window, 0, 0, displayFormat);       // Force use of native display size
+
+            platform.surface = eglCreateWindowSurface(platform.device, platform.config, platform.app->window, NULL);
+
+            // There must be at least one frame displayed before the buffers are swapped
+            //eglSwapInterval(platform.device, 1);
+
+            if (eglMakeCurrent(platform.device, platform.surface, platform.surface, platform.context) == EGL_FALSE)
+            {
+                TRACELOG(LOG_WARNING, "DISPLAY: Failed to attach EGL rendering context to EGL surface");
+            }
+            else
+            {
+                CORE.Window.render.width = CORE.Window.screen.width;
+                CORE.Window.render.height = CORE.Window.screen.height;
+                CORE.Window.currentFbo.width = CORE.Window.render.width;
+                CORE.Window.currentFbo.height = CORE.Window.render.height;
+
+                TRACELOG(LOG_INFO, "DISPLAY: Device initialized successfully");
+                TRACELOG(LOG_INFO, "    > Display size: %i x %i", CORE.Window.display.width, CORE.Window.display.height);
+                TRACELOG(LOG_INFO, "    > Screen size:  %i x %i", CORE.Window.screen.width, CORE.Window.screen.height);
+                TRACELOG(LOG_INFO, "    > Render size:  %i x %i", CORE.Window.render.width, CORE.Window.render.height);
+                TRACELOG(LOG_INFO, "    > Viewport offsets: %i, %i", CORE.Window.renderOffset.x, CORE.Window.renderOffset.y);
+            }
         } break;
         default: break;
     }
 }
-#else
-void AndroidInitWindow(ANativeWindow* window)
-{
-    if (window == NULL)
-        return;
-
-    if (platform.contextRebindRequired)
-    {
-        // Reset screen scaling to full display size
-        EGLint displayFormat = 0;
-        eglGetConfigAttrib(platform.device, platform.config, EGL_NATIVE_VISUAL_ID, &displayFormat);
-
-        // Adding renderOffset here feels rather hackish, but the viewport scaling is wrong after the
-        // context rebinding if the screen is scaled unless offsets are added. There's probably a more
-        // appropriate way to fix this
-        ANativeWindow_setBuffersGeometry(window,
-            CORE.Window.render.width + CORE.Window.renderOffset.x,
-            CORE.Window.render.height + CORE.Window.renderOffset.y,
-            displayFormat);
-
-        // Recreate display surface and re-attach OpenGL context
-        platform.surface = eglCreateWindowSurface(platform.device, platform.config, window, NULL);
-        eglMakeCurrent(platform.device, platform.surface, platform.surface, platform.context);
-
-        platform.contextRebindRequired = false;
-    }
-    else
-    {
-        CORE.Window.display.width = ANativeWindow_getWidth(window);
-        CORE.Window.display.height = ANativeWindow_getHeight(window);
-
-        // Initialize graphics device (display device and OpenGL context)
-        InitGraphicsDevice(window);
-
-        // Initialize OpenGL context (states and resources)
-        // NOTE: CORE.Window.currentFbo.width and CORE.Window.currentFbo.height not used, just stored as globals in rlgl
-        rlglInit(CORE.Window.currentFbo.width, CORE.Window.currentFbo.height);
-
-        // Setup default viewport
-        // NOTE: It updated CORE.Window.render.width and CORE.Window.render.height
-        SetupViewport(CORE.Window.currentFbo.width, CORE.Window.currentFbo.height);
-
-        // Initialize hi-res timer
-        InitTimer();
-
-    #if defined(SUPPORT_MODULE_RTEXT) && defined(SUPPORT_DEFAULT_FONT)
-        // Load default font
-        // WARNING: External function: Module required: rtext
-        LoadFontDefault();
-        #if defined(SUPPORT_MODULE_RSHAPES)
-        // Set font white rectangle for shapes drawing, so shapes and text can be batched together
-        // WARNING: rshapes module is required, if not available, default internal white rectangle is used
-        Rectangle rec = GetFontDefault().recs[95];
-        if (CORE.Window.flags & FLAG_MSAA_4X_HINT)
-        {
-            // NOTE: We try to maxime rec padding to avoid pixel bleeding on MSAA filtering
-            SetShapesTexture(GetFontDefault().texture, (Rectangle){ rec.x + 2, rec.y + 2, 1, 1 });
-        }
-        else
-        {
-            // NOTE: We set up a 1px padding on char rectangle to avoid pixel bleeding
-            SetShapesTexture(GetFontDefault().texture, (Rectangle){ rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2 });
-        }
-        #endif
-    #else
-        #if defined(SUPPORT_MODULE_RSHAPES)
-        // Set default texture and rectangle to be used for shapes drawing
-        // NOTE: rlgl default texture is a 1x1 pixel UNCOMPRESSED_R8G8B8A8
-        Texture2D texture = { rlGetTextureIdDefault(), 1, 1, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8 };
-        SetShapesTexture(texture, (Rectangle){ 0.0f, 0.0f, 1.0f, 1.0f });    // WARNING: Module required: rshapes
-        #endif
-    #endif
-
-        // Initialize random seed
-        SetRandomSeed((unsigned int)time(NULL));
-
-        // TODO: GPU assets reload in case of lost focus (lost context)
-        // NOTE: This problem has been solved just unbinding and rebinding context from display
-        /*
-        if (assetsReloadRequired)
-        {
-            for (int i = 0; i < assetCount; i++)
-            {
-                // TODO: Unload old asset if required
-
-                // Load texture again to pointed texture
-                (*textureAsset + i) = LoadTexture(assetPath[i]);
-            }
-        }
-        */
-    }
-}
-
-void AndroidGainedFocus()
-{
-    platform.appEnabled = true;
-    CORE.Window.flags &= ~FLAG_WINDOW_UNFOCUSED;
-    //ResumeMusicStream();
-}
-
-void AndroidLostFocus()
-{
-    platform.appEnabled = false;
-    CORE.Window.flags |= FLAG_WINDOW_UNFOCUSED;
-    //PauseMusicStream();
-}
-
-void AndroidTerminateWindow()
-{
-    // Detach OpenGL context and destroy display surface
-    // NOTE 1: This case is used when the user exits the app without closing it. We detach the context to ensure everything is recoverable upon resuming.
-    // NOTE 2: Detaching context before destroying display surface avoids losing our resources (textures, shaders, VBOs...)
-    // NOTE 3: In some cases (too many context loaded), OS could unload context automatically... :(
-    if (platform.device != EGL_NO_DISPLAY)
-    {
-        eglMakeCurrent(platform.device, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-
-        if (platform.surface != EGL_NO_SURFACE)
-        {
-            eglDestroySurface(platform.device, platform.surface);
-            platform.surface = EGL_NO_SURFACE;
-        }
-
-        platform.contextRebindRequired = true;
-    }
-    // If 'platform.device' is already set to 'EGL_NO_DISPLAY'
-    // this means that the user has already called 'CloseWindow()'
-}
-#endif
 
 // ANDROID: Map Android gamepad button to raylib gamepad button
 static GamepadButton AndroidTranslateGamepadButton(int button)
@@ -1250,12 +1211,8 @@ static GamepadButton AndroidTranslateGamepadButton(int button)
     }
 }
 
-#if !defined(PLATFORM_ANDROID_GOLANG)
 // ANDROID: Get input events
 static int32_t AndroidInputCallback(struct android_app *app, AInputEvent *event)
-#else
-int32_t AndroidInputCallback(AInputEvent *event)
-#endif
 {
     // If additional inputs are required check:
     // https://developer.android.com/ndk/reference/group/input
@@ -1281,9 +1238,9 @@ int32_t AndroidInputCallback(AInputEvent *event)
             CORE.Input.Gamepad.axisState[0][GAMEPAD_AXIS_RIGHT_Y] = AMotionEvent_getAxisValue(
                     event, AMOTION_EVENT_AXIS_RZ, 0);
             CORE.Input.Gamepad.axisState[0][GAMEPAD_AXIS_LEFT_TRIGGER] = AMotionEvent_getAxisValue(
-                    event, AMOTION_EVENT_AXIS_BRAKE, 0) * 2.0f - 1.0f;
+                    event, AMOTION_EVENT_AXIS_BRAKE, 0)*2.0f - 1.0f;
             CORE.Input.Gamepad.axisState[0][GAMEPAD_AXIS_RIGHT_TRIGGER] = AMotionEvent_getAxisValue(
-                    event, AMOTION_EVENT_AXIS_GAS, 0) * 2.0f - 1.0f;
+                    event, AMOTION_EVENT_AXIS_GAS, 0)*2.0f - 1.0f;
 
             // dpad is reported as an axis on android
             float dpadX = AMotionEvent_getAxisValue(event, AMOTION_EVENT_AXIS_HAT_X, 0);
@@ -1349,7 +1306,7 @@ int32_t AndroidInputCallback(AInputEvent *event)
             return 1; // Handled gamepad button
         }
 
-        KeyboardKey key = (keycode > 0 && keycode < KEYCODE_MAP_SIZE) ? KeycodeMap[keycode] : KEY_NULL;
+        KeyboardKey key = ((keycode > 0) && (keycode < KEYCODE_MAP_SIZE))? mapKeycode[keycode] : KEY_NULL;
         if (key != KEY_NULL)
         {
             // Save current key and its state
@@ -1400,10 +1357,10 @@ int32_t AndroidInputCallback(AInputEvent *event)
         CORE.Input.Touch.position[i] = (Vector2){ AMotionEvent_getX(event, i), AMotionEvent_getY(event, i) };
 
         // Normalize CORE.Input.Touch.position[i] for CORE.Window.screen.width and CORE.Window.screen.height
-        float widthRatio = (float)(CORE.Window.screen.width + CORE.Window.renderOffset.x) / (float)CORE.Window.display.width;
-        float heightRatio = (float)(CORE.Window.screen.height + CORE.Window.renderOffset.y) / (float)CORE.Window.display.height;
-        CORE.Input.Touch.position[i].x = CORE.Input.Touch.position[i].x * widthRatio - (float)CORE.Window.renderOffset.x / 2;
-        CORE.Input.Touch.position[i].y = CORE.Input.Touch.position[i].y * heightRatio - (float)CORE.Window.renderOffset.y / 2;
+        float widthRatio = (float)(CORE.Window.screen.width + CORE.Window.renderOffset.x)/(float)CORE.Window.display.width;
+        float heightRatio = (float)(CORE.Window.screen.height + CORE.Window.renderOffset.y)/(float)CORE.Window.display.height;
+        CORE.Input.Touch.position[i].x = CORE.Input.Touch.position[i].x*widthRatio - (float)CORE.Window.renderOffset.x/2;
+        CORE.Input.Touch.position[i].y = CORE.Input.Touch.position[i].y*heightRatio - (float)CORE.Window.renderOffset.y/2;
     }
 
     int32_t action = AMotionEvent_getAction(event);

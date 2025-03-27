@@ -8,9 +8,13 @@ package rl
 import "C"
 import (
 	"fmt"
-	"image/color"
+	"iter"
 	"runtime"
 	"unsafe"
+
+	"github.com/igadmg/goex/image/colorex"
+	"github.com/igadmg/raylib-go/raymath/rect2"
+	"github.com/igadmg/raylib-go/raymath/vector2"
 )
 
 type PackContext struct {
@@ -18,7 +22,7 @@ type PackContext struct {
 	nodes   []C.stbrp_node
 }
 
-type PackRect = C.stbrp_rect
+type PackRect C.stbrp_rect
 
 func (r PackRect) Id() int {
 	return int(r.id)
@@ -72,7 +76,7 @@ func (ctx *PackContext) PackRects(rects ...PackRect) ([]PackRect, error) {
 	crects := unsafe.SliceData(rects)
 	p.Pin(ctx.context.active_head)
 	p.Pin(ctx.context.free_head)
-	res := C.stbrp_pack_rects(&ctx.context, crects, C.int(len(rects)))
+	res := C.stbrp_pack_rects(&ctx.context, (*C.stbrp_rect)(crects), C.int(len(rects)))
 
 	if res == 0 {
 		return nil, fmt.Errorf("failed to pack rects")
@@ -99,8 +103,8 @@ func LoadImageAtlas(width, height int, fileNames ...string) (ImageAtlas, error) 
 	rect := make([]PackRect, len(images))
 	for i, img := range images {
 		img_size := img.GetSize().AddXY(2, 2)
-		rect[i].w = C.int(img_size.X())
-		rect[i].h = C.int(img_size.Y())
+		rect[i].w = C.int(img_size.X)
+		rect[i].h = C.int(img_size.Y)
 	}
 	icons, err := PackRects(width, height, rect...)
 	if err != nil {
@@ -135,8 +139,8 @@ func LoadImageAtlasEx(width, height int, imgFn func(path string) Image, fileName
 	rect := make([]PackRect, len(images))
 	for i, img := range images {
 		img_size := img.GetSize().AddXY(2, 2)
-		rect[i].w = C.int(img_size.X())
-		rect[i].h = C.int(img_size.Y())
+		rect[i].w = C.int(img_size.X)
+		rect[i].h = C.int(img_size.Y)
 	}
 	icons, err := PackRects(width, height, rect...)
 	if err != nil {
@@ -169,15 +173,15 @@ type TextureAtlasItem struct {
 }
 
 func (t TextureAtlasItem) DrawExDef(position Vector2) {
-	DrawTexturePro(t.Texture, t.Rect, NewRectangleV(position, t.Rect.WH()), Vector2Zero(), 0, White)
+	DrawTexturePro(t.Texture, t.Rect, rect2.NewFloat32(position, t.Rect.Size), vector2.Zero[float32](), 0, White)
 }
 
 func (t TextureAtlasItem) DrawProDef(destRec Rectangle) {
-	DrawTexturePro(t.Texture, t.Rect, destRec, Vector2Zero(), 0, White)
+	DrawTexturePro(t.Texture, t.Rect, destRec, vector2.Zero[float32](), 0, White)
 }
 
-func (t TextureAtlasItem) DrawProTintedDef(destRec Rectangle, tint color.RGBA) {
-	DrawTexturePro(t.Texture, t.Rect, destRec, Vector2Zero(), 0, tint)
+func (t TextureAtlasItem) DrawProTintedDef(destRec Rectangle, tint colorex.RGBA) {
+	DrawTexturePro(t.Texture, t.Rect, destRec, vector2.Zero[float32](), 0, tint)
 }
 
 type TextureAtlas struct {
@@ -194,7 +198,7 @@ func LoadTextureAtlas(width, height int, fileNames ...string) (TextureAtlas, err
 
 	iaImage := ia.Image
 	return TextureAtlas{
-		Texture: LoadTextureFromImage(&iaImage),
+		Texture: LoadTextureFromImage(iaImage),
 		Atlas:   ia.Atlas,
 	}, nil
 }
@@ -208,7 +212,7 @@ func LoadTextureAtlasEx(width, height int, imgFn func(path string) Image, fileNa
 
 	iaImage := ia.Image
 	return TextureAtlas{
-		Texture: LoadTextureFromImage(&iaImage),
+		Texture: LoadTextureFromImage(iaImage),
 		Atlas:   ia.Atlas,
 	}, nil
 }
@@ -232,6 +236,16 @@ func (t *TextureAtlas) GetItemSet(ids ...int) []TextureAtlasItem {
 		itemSet[i] = t.GetItem(id)
 	}
 	return itemSet
+}
+
+func (t *TextureAtlas) GetItemSetIter(ids iter.Seq[int]) iter.Seq[TextureAtlasItem] {
+	return func(yield func(TextureAtlasItem) bool) {
+		for id := range ids {
+			if !yield(t.GetItem(id)) {
+				return
+			}
+		}
+	}
 }
 
 func (t *TextureAtlas) ToItemSet() []TextureAtlasItem {

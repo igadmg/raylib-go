@@ -1,10 +1,13 @@
 //go:build RAY_MATH
+
 package rl
 
 import (
 	"math"
 
-	"github.com/EliCDavis/vector/mathex"
+	mathex "github.com/igadmg/raylib-go/raymath"
+	"github.com/igadmg/raylib-go/raymath/vector2"
+	"github.com/igadmg/raylib-go/raymath/vector3"
 )
 
 // Vector2LineAngle - Calculate angle defined by a two vectors line
@@ -19,7 +22,7 @@ func Vector2Transform(v Vector2, mat Matrix) Vector2 {
 	var y = v.Y()
 	var z float32
 
-	return NewVector2(
+	return vector2.NewFloat32(
 		mat.M0*x+mat.M4*y+mat.M8*z+mat.M12,
 		mat.M1*x+mat.M5*y+mat.M9*z+mat.M13)
 }
@@ -28,7 +31,7 @@ func Vector2Transform(v Vector2, mat Matrix) Vector2 {
 func Vector2Reflect(v Vector2, normal Vector2) Vector2 {
 	dotProduct := v.X()*normal.X() + v.Y()*normal.Y() // Dot product
 
-	return NewVector2(
+	return vector2.NewFloat32(
 		v.X()-2.0*normal.X()*dotProduct,
 		v.Y()-2.0*normal.Y()*dotProduct)
 }
@@ -38,7 +41,7 @@ func Vector2Rotate(v Vector2, angle float32) Vector2 {
 	cosres := float32(math.Cos(float64(angle)))
 	sinres := float32(math.Sin(float64(angle)))
 
-	return NewVector2(
+	return vector2.NewFloat32(
 		v.X()*cosres-v.Y()*sinres,
 		v.X()*sinres+v.Y()*cosres)
 }
@@ -55,7 +58,7 @@ func Vector2MoveTowards(v Vector2, target Vector2, maxDistance float32) Vector2 
 
 	dist := mathex.Sqrt(value)
 
-	return NewVector2(
+	return vector2.NewFloat32(
 		v.X()+dx/dist*maxDistance,
 		v.Y()+dy/dist*maxDistance)
 }
@@ -63,15 +66,15 @@ func Vector2MoveTowards(v Vector2, target Vector2, maxDistance float32) Vector2 
 // Vector3Perpendicular - Calculate one vector perpendicular vector
 func Vector3Perpendicular(v Vector3) Vector3 {
 	min := mathex.Abs(v.X())
-	cardinalAxis := NewVector3(1.0, 0.0, 0.0)
+	cardinalAxis := vector3.NewFloat32(1.0, 0.0, 0.0)
 
 	if mathex.Abs(v.Y()) < min {
 		min = mathex.Abs(v.Y())
-		cardinalAxis = NewVector3(0.0, 1.0, 0.0)
+		cardinalAxis = vector3.NewFloat32(0.0, 1.0, 0.0)
 	}
 
 	if mathex.Abs(v.Z()) < min {
-		cardinalAxis = NewVector3(0.0, 0.0, 1.0)
+		cardinalAxis = vector3.NewFloat32(0.0, 0.0, 1.0)
 	}
 
 	result := Vector3CrossProduct(v, cardinalAxis)
@@ -141,13 +144,13 @@ func Vector3RotateByAxisAngle(v Vector3, axis Vector3, angle float32) Vector3 {
 	c := axis.Y() * a
 	d := axis.Z() * a
 	a = float32(math.Cos(float64(angle)))
-	w := NewVector3(b, c, d)
+	w := vector3.NewFloat32(b, c, d)
 
 	// Vector3CrossProduct(w, v)
-	wv := NewVector3(w.Y()*v.Z()-w.Z()*v.Y(), w.Z()*v.X()-w.X()*v.Z(), w.X()*v.Y()-w.Y()*v.X())
+	wv := vector3.NewFloat32(w.Y()*v.Z()-w.Z()*v.Y(), w.Z()*v.X()-w.X()*v.Z(), w.X()*v.Y()-w.Y()*v.X())
 
 	// Vector3CrossProduct(w, wv)
-	wwv := NewVector3(w.Y()*wv.Z()-w.Z()*wv.Y(), w.Z()*wv.X()-w.X()*wv.Z(), w.X()*wv.Y()-w.Y()*wv.X())
+	wwv := vector3.NewFloat32(w.Y()*wv.Z()-w.Z()*wv.Y(), w.Z()*wv.X()-w.X()*wv.Z(), w.X()*wv.Y()-w.Y()*wv.X())
 
 	// Vector3Scale(wv, 2*a)
 	a *= 2
@@ -312,7 +315,7 @@ func Vector3ToFloatV(v Vector3) [3]float32 {
 
 // Vector3Invert - Invert the given vector
 func Vector3Invert(v Vector3) Vector3 {
-	return NewVector3(1.0/v.X(), 1.0/v.Y(), 1.0/v.Z())
+	return vector3.NewFloat32(1.0/v.X(), 1.0/v.Y(), 1.0/v.Z())
 }
 
 // Vector3Refract - Compute the direction of a refracted ray
@@ -364,7 +367,7 @@ func Mat2Transpose(matrix Mat2) Mat2 {
 
 // Mat2MultiplyVector2 - Multiplies a vector by a matrix 2x2
 func Mat2MultiplyVector2(matrix Mat2, vector Vector2) Vector2 {
-	return NewVector2(matrix.M00*vector.X()+matrix.M01*vector.Y(), matrix.M10*vector.X()+matrix.M11*vector.Y())
+	return vector2.NewFloat32(matrix.M00*vector.X()+matrix.M01*vector.Y(), matrix.M10*vector.X()+matrix.M11*vector.Y())
 }
 
 // MatrixDeterminant - Compute matrix determinant
@@ -1244,7 +1247,7 @@ func QuaternionToAxisAngle(q Quaternion, outAxis *Vector3, outAngle *float32) {
 		q = QuaternionNormalize(q)
 	}
 
-	resAxis := NewVector3(0.0, 0.0, 0.0)
+	resAxis := vector3.NewFloat32(0.0, 0.0, 0.0)
 
 	resAngle := 2.0 * float32(math.Acos(float64(q.W)))
 	den := mathex.Sqrt(1.0 - q.W*q.W)

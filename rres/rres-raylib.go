@@ -12,7 +12,7 @@ import "C"
 import (
 	"unsafe"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 // LoadDataFromResource - Load raw data from rres resource chunk

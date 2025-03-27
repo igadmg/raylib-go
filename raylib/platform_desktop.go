@@ -90,6 +90,10 @@ func LoadDroppedFiles() []string {
 func UnloadDroppedFiles() {
 }
 
+type asset struct {
+	*os.File
+}
+
 // OpenAsset - Open asset
 func OpenAsset(name string) (Asset, error) {
 	f, err := os.Open(name)
@@ -97,5 +101,13 @@ func OpenAsset(name string) (Asset, error) {
 		return nil, err
 	}
 
-	return f, nil
+	return &asset{f}, nil
+}
+
+func (a *asset) Size() int64 {
+	fi, err := a.Stat()
+	if err != nil {
+		return 0
+	}
+	return fi.Size()
 }

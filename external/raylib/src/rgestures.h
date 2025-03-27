@@ -21,7 +21,7 @@
 *
 *   LICENSE: zlib/libpng
 *
-*   Copyright (c) 2014-2024 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2014-2025 Ramon Santamaria (@raysan5)
 *
 *   This software is provided "as-is", without any express or implied warranty. In no event
 *   will the authors be held liable for any damages arising from the use of this software.
@@ -44,14 +44,14 @@
 #define RGESTURES_H
 
 #ifndef PI
-    #define PI 3.14159265358979323846
+#define PI 3.14159265358979323846
 #endif
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
 //----------------------------------------------------------------------------------
 #ifndef MAX_TOUCH_POINTS
-    #define MAX_TOUCH_POINTS        8        // Maximum number of touch points supported
+#define MAX_TOUCH_POINTS        8        // Maximum number of touch points supported
 #endif
 
 //----------------------------------------------------------------------------------
@@ -60,9 +60,9 @@
 //----------------------------------------------------------------------------------
 // Boolean type
 #if (defined(__STDC__) && __STDC_VERSION__ >= 199901L) || (defined(_MSC_VER) && _MSC_VER >= 1800)
-    #include <stdbool.h>
+#include <stdbool.h>
 #elif !defined(__cplusplus) && !defined(bool) && !defined(RL_BOOL_TYPE)
-    typedef enum bool { false = 0, true = !false } bool;
+typedef enum bool{ false = 0, true = !false } bool;
 #endif
 
 #if !defined(RL_VECTOR2_TYPE)
@@ -128,6 +128,9 @@ bool IsGestureDetected(int gesture);                    // Check if a gesture ha
 int GetGestureDetected(void);                           // Get latest detected gesture
 
 float GetGestureHoldDuration(void);                     // Get gesture hold time in seconds
+float GetGestureSwipeDistance(void);                    // Get gesture swipe distance
+float GetGestureSwipeIntensity(void);                   // Get gesture swipe intensity
+float GetGestureSwipeAngle(void);                       // Get gesture swipe angle
 Vector2 GetGestureDragVector(void);                     // Get gesture drag vector
 float GetGestureDragAngle(void);                        // Get gesture drag angle
 Vector2 GetGesturePinchVector(void);                    // Get gesture pinch delta
@@ -150,28 +153,28 @@ float GetGesturePinchAngle(void);                       // Get gesture pinch ang
 
 #if defined(RGESTURES_STANDALONE)
 #if defined(_WIN32)
-    #if defined(__cplusplus)
-    extern "C" {        // Prevents name mangling of functions
-    #endif
+#if defined(__cplusplus)
+extern "C" {        // Prevents name mangling of functions
+#endif
     // Functions required to query time on Windows
     int __stdcall QueryPerformanceCounter(unsigned long long int *lpPerformanceCount);
     int __stdcall QueryPerformanceFrequency(unsigned long long int *lpFrequency);
-    #if defined(__cplusplus)
-    }
-    #endif
+#if defined(__cplusplus)
+}
+#endif
 #elif defined(__linux__)
-    #if _POSIX_C_SOURCE < 199309L
-        #undef _POSIX_C_SOURCE
-        #define _POSIX_C_SOURCE 199309L // Required for CLOCK_MONOTONIC if compiled with c99 without gnu ext.
-    #endif
-    #include <sys/time.h>               // Required for: timespec
-    #include <time.h>                   // Required for: clock_gettime()
+#if _POSIX_C_SOURCE < 199309L
+#undef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 199309L // Required for CLOCK_MONOTONIC if compiled with c99 without gnu ext.
+#endif
+#include <sys/time.h>               // Required for: timespec
+#include <time.h>                   // Required for: clock_gettime()
 
-    #include <math.h>                   // Required for: sqrtf(), atan2f()
+#include <math.h>                   // Required for: sqrtf(), atan2f()
 #endif
 #if defined(__APPLE__)                  // macOS also defines __MACH__
-    #include <mach/clock.h>             // Required for: clock_get_time()
-    #include <mach/mach.h>              // Required for: mach_timespec_t
+#include <mach/clock.h>             // Required for: clock_get_time()
+#include <mach/mach.h>              // Required for: mach_timespec_t
 #endif
 #endif
 
@@ -185,6 +188,8 @@ float GetGesturePinchAngle(void);                       // Get gesture pinch ang
 #define TAP_TIMEOUT         0.3f        // Tap minimum time, measured in seconds
 #define PINCH_TIMEOUT       0.3f        // Pinch minimum time, measured in seconds
 #define DOUBLETAP_RANGE     0.03f       // DoubleTap range, measured in normalized screen units (0.0f to 1.0f)
+#define DRAG_RANGE          0.03f       // Drag range, measured in normalized screen units (0.0f to 1.0f)
+#define DRAG_DIRECTION      30.0f       // Drag direction diference to reset swipe start point
 
 //----------------------------------------------------------------------------------
 // Types and Structures Definition
@@ -213,13 +218,16 @@ typedef struct {
         double timeDuration;            // HOLD duration in seconds
     } Hold;
     struct {
+        float frameDirection;           // DRAG last frame drag direction
         Vector2 vector;                 // DRAG vector (between initial and current position)
         float angle;                    // DRAG angle (relative to x-axis)
-        float distance;                 // DRAG distance (from initial touch point to final) (normalized [0..1])
-        float intensity;                // DRAG intensity, how far why did the DRAG (pixels per frame)
     } Drag;
     struct {
+        Vector2 start;                  // SWIPE start position of touch start or drag change direction
         double startTime;               // SWIPE start time to calculate drag intensity
+        float distance;                 // SWIPE distance (from start point to final) (normalized [0..1])
+        float intensity;                // SWIPE intensity, how far why did the SWIPE (pixels per frame)
+        float angle;                    // SWIPE angle (relative to x-axis)
     } Swipe;
     struct {
         Vector2 vector;                 // PINCH vector (between first and second touch points)
@@ -240,8 +248,11 @@ static GesturesData GESTURES = {
 //----------------------------------------------------------------------------------
 // Module specific Functions Declaration
 //----------------------------------------------------------------------------------
+static Vector2 rgVector2Subtract(Vector2 v1, Vector2 v2);
+static float rgVector2Direction(Vector2 v);
 static float rgVector2Angle(Vector2 initialPosition, Vector2 finalPosition);
 static float rgVector2Distance(Vector2 v1, Vector2 v2);
+static bool rgVector2CloserThan(Vector2 v1, Vector2 v2, float distance);
 static double rgGetCurrentTime(void);
 
 //----------------------------------------------------------------------------------
@@ -274,7 +285,10 @@ void ProcessGestureEvent(GestureEvent event)
             GESTURES.Touch.tapCounter++;    // Tap counter
 
             // Detect GESTURE_DOUBLE_TAP
-            if ((GESTURES.current == GESTURE_NONE) && (GESTURES.Touch.tapCounter >= 2) && ((rgGetCurrentTime() - GESTURES.Touch.eventTime) < TAP_TIMEOUT) && (rgVector2Distance(GESTURES.Touch.downPositionA, event.position[0]) < DOUBLETAP_RANGE))
+            if ((GESTURES.current == GESTURE_NONE)
+                && (GESTURES.Touch.tapCounter >= 2)
+                && ((rgGetCurrentTime() - GESTURES.Touch.eventTime) < TAP_TIMEOUT)
+                && rgVector2CloserThan(GESTURES.Touch.downPositionA, event.position[0], DOUBLETAP_RANGE))
             {
                 GESTURES.current = GESTURE_DOUBLETAP;
                 GESTURES.Touch.tapCounter = 0;
@@ -292,6 +306,7 @@ void ProcessGestureEvent(GestureEvent event)
             GESTURES.Touch.eventTime = rgGetCurrentTime();
 
             GESTURES.Swipe.startTime = rgGetCurrentTime();
+            GESTURES.Swipe.start = event.position[0];
 
             GESTURES.Drag.vector = (Vector2){ 0.0f, 0.0f };
         }
@@ -301,26 +316,28 @@ void ProcessGestureEvent(GestureEvent event)
             if (GESTURES.current == GESTURE_DRAG || GESTURES.current == GESTURE_HOLD) GESTURES.Touch.upPosition = event.position[0];
 
             // NOTE: GESTURES.Drag.intensity dependent on the resolution of the screen
-            GESTURES.Drag.distance = rgVector2Distance(GESTURES.Touch.downPositionA, GESTURES.Touch.upPosition);
-            GESTURES.Drag.intensity = GESTURES.Drag.distance/(float)((rgGetCurrentTime() - GESTURES.Swipe.startTime));
+            GESTURES.Swipe.distance = rgVector2Distance(GESTURES.Swipe.start, GESTURES.Touch.upPosition);
+            GESTURES.Swipe.intensity = GESTURES.Swipe.distance / (float)((rgGetCurrentTime() - GESTURES.Swipe.startTime));
+
+            //TraceLog(LOG_WARNING, TextFormat("Touch up distance %.3f intensity %.3f", GESTURES.Swipe.distance, GESTURES.Swipe.intensity));
 
             // Detect GESTURE_SWIPE
-            if ((GESTURES.Drag.intensity > FORCE_TO_SWIPE) && (GESTURES.current != GESTURE_DRAG))
+            if ((GESTURES.Swipe.intensity > FORCE_TO_SWIPE)/* && (GESTURES.current != GESTURE_DRAG)*/)
             {
                 // NOTE: Angle should be inverted in Y
-                GESTURES.Drag.angle = 360.0f - rgVector2Angle(GESTURES.Touch.downPositionA, GESTURES.Touch.upPosition);
+                GESTURES.Swipe.angle = 360.0f - rgVector2Angle(GESTURES.Swipe.start, GESTURES.Touch.upPosition);
 
-                if ((GESTURES.Drag.angle < 30) || (GESTURES.Drag.angle > 330)) GESTURES.current = GESTURE_SWIPE_RIGHT;          // Right
-                else if ((GESTURES.Drag.angle >= 30) && (GESTURES.Drag.angle <= 150)) GESTURES.current = GESTURE_SWIPE_UP;      // Up
-                else if ((GESTURES.Drag.angle > 150) && (GESTURES.Drag.angle < 210)) GESTURES.current = GESTURE_SWIPE_LEFT;     // Left
-                else if ((GESTURES.Drag.angle >= 210) && (GESTURES.Drag.angle <= 330)) GESTURES.current = GESTURE_SWIPE_DOWN;   // Down
+                if ((GESTURES.Swipe.angle < 30) || (GESTURES.Swipe.angle > 330)) GESTURES.current = GESTURE_SWIPE_RIGHT;          // Right
+                else if ((GESTURES.Swipe.angle >= 30) && (GESTURES.Swipe.angle <= 150)) GESTURES.current = GESTURE_SWIPE_UP;      // Up
+                else if ((GESTURES.Swipe.angle > 150) && (GESTURES.Swipe.angle < 210)) GESTURES.current = GESTURE_SWIPE_LEFT;     // Left
+                else if ((GESTURES.Swipe.angle >= 210) && (GESTURES.Swipe.angle <= 330)) GESTURES.current = GESTURE_SWIPE_DOWN;   // Down
                 else GESTURES.current = GESTURE_NONE;
             }
             else
             {
-                GESTURES.Drag.distance = 0.0f;
-                GESTURES.Drag.intensity = 0.0f;
-                GESTURES.Drag.angle = 0.0f;
+                GESTURES.Swipe.distance = 0.0f;
+                GESTURES.Swipe.intensity = 0.0f;
+                GESTURES.Swipe.angle = 0.0f;
 
                 GESTURES.current = GESTURE_NONE;
             }
@@ -330,6 +347,7 @@ void ProcessGestureEvent(GestureEvent event)
         }
         else if (event.touchAction == TOUCH_ACTION_MOVE)
         {
+            Vector2 prevDownPositionA = GESTURES.Touch.moveDownPositionA;
             GESTURES.Touch.moveDownPositionA = event.position[0];
 
             if (GESTURES.current == GESTURE_HOLD)
@@ -339,15 +357,27 @@ void ProcessGestureEvent(GestureEvent event)
                 GESTURES.Hold.resetRequired = false;
 
                 // Detect GESTURE_DRAG
-                if ((rgGetCurrentTime() - GESTURES.Touch.eventTime) > DRAG_TIMEOUT)
+                if (((rgGetCurrentTime() - GESTURES.Touch.eventTime) > DRAG_TIMEOUT)
+                    || rgVector2CloserThan(GESTURES.Touch.downDragPosition, GESTURES.Touch.moveDownPositionA, DRAG_RANGE))
                 {
                     GESTURES.Touch.eventTime = rgGetCurrentTime();
                     GESTURES.current = GESTURE_DRAG;
                 }
             }
 
-            GESTURES.Drag.vector.x = GESTURES.Touch.moveDownPositionA.x - GESTURES.Touch.downDragPosition.x;
-            GESTURES.Drag.vector.y = GESTURES.Touch.moveDownPositionA.y - GESTURES.Touch.downDragPosition.y;
+            if (GESTURES.current == GESTURE_DRAG) {
+                float curDirection = rgVector2Direction(rgVector2Subtract(GESTURES.Touch.moveDownPositionA, prevDownPositionA));
+                float delta = fabsf(curDirection - GESTURES.Drag.frameDirection);
+                if (delta > 180) delta = fabs(delta - 360);
+                if (delta > DRAG_DIRECTION) {
+                    GESTURES.Swipe.start = GESTURES.Touch.moveDownPositionA;
+                    //TraceLog(LOG_WARNING, TextFormat("Reset drag direction %.3f [x: %.3f, t: %.3f]", curDirection, GESTURES.Swipe.start.x, GESTURES.Swipe.start.y));
+                }
+
+                GESTURES.Drag.frameDirection = curDirection;
+                GESTURES.Drag.vector = rgVector2Subtract(GESTURES.Touch.moveDownPositionA, GESTURES.Touch.downDragPosition);
+                GESTURES.Drag.angle = 360.0f - rgVector2Angle(GESTURES.Touch.moveDownPositionA, GESTURES.Touch.downDragPosition);
+            }
         }
     }
     else if (GESTURES.Touch.pointCount == 2)    // Two touch points
@@ -362,8 +392,7 @@ void ProcessGestureEvent(GestureEvent event)
 
             //GESTURES.Pinch.distance = rgVector2Distance(GESTURES.Touch.downPositionA, GESTURES.Touch.downPositionB);
 
-            GESTURES.Pinch.vector.x = GESTURES.Touch.downPositionB.x - GESTURES.Touch.downPositionA.x;
-            GESTURES.Pinch.vector.y = GESTURES.Touch.downPositionB.y - GESTURES.Touch.downPositionA.y;
+            GESTURES.Pinch.vector = rgVector2Subtract(GESTURES.Touch.downPositionB, GESTURES.Touch.downPositionA);
 
             GESTURES.current = GESTURE_HOLD;
             GESTURES.Hold.timeDuration = rgGetCurrentTime();
@@ -375,12 +404,12 @@ void ProcessGestureEvent(GestureEvent event)
             GESTURES.Touch.moveDownPositionA = event.position[0];
             GESTURES.Touch.moveDownPositionB = event.position[1];
 
-            GESTURES.Pinch.vector.x = GESTURES.Touch.moveDownPositionB.x - GESTURES.Touch.moveDownPositionA.x;
-            GESTURES.Pinch.vector.y = GESTURES.Touch.moveDownPositionB.y - GESTURES.Touch.moveDownPositionA.y;
+            GESTURES.Pinch.vector = rgVector2Subtract(GESTURES.Touch.moveDownPositionB, GESTURES.Touch.moveDownPositionA);
 
-            if ((rgVector2Distance(GESTURES.Touch.previousPositionA, GESTURES.Touch.moveDownPositionA) >= MINIMUM_PINCH) || (rgVector2Distance(GESTURES.Touch.previousPositionB, GESTURES.Touch.moveDownPositionB) >= MINIMUM_PINCH))
+            if (!rgVector2CloserThan(GESTURES.Touch.previousPositionA, GESTURES.Touch.moveDownPositionA, MINIMUM_PINCH)
+                || !rgVector2CloserThan(GESTURES.Touch.previousPositionB, GESTURES.Touch.moveDownPositionB, MINIMUM_PINCH))
             {
-                if ( rgVector2Distance(GESTURES.Touch.previousPositionA, GESTURES.Touch.previousPositionB) > rgVector2Distance(GESTURES.Touch.moveDownPositionA, GESTURES.Touch.moveDownPositionB) ) GESTURES.current = GESTURE_PINCH_IN;
+                if (rgVector2Distance(GESTURES.Touch.previousPositionA, GESTURES.Touch.previousPositionB) > rgVector2Distance(GESTURES.Touch.moveDownPositionA, GESTURES.Touch.moveDownPositionB)) GESTURES.current = GESTURE_PINCH_IN;
                 else GESTURES.current = GESTURE_PINCH_OUT;
             }
             else
@@ -434,7 +463,13 @@ int GetGestureDetected(void)
     return (GESTURES.enabledFlags & GESTURES.current);
 }
 
-// Hold time measured in ms
+// Get position of tab and double tap gestures
+Vector2 GetGestureTapPosition(void)
+{
+    return GESTURES.Touch.downPositionA;
+}
+
+// Hold time measured in seconds
 float GetGestureHoldDuration(void)
 {
     // NOTE: time is calculated on current gesture HOLD
@@ -446,6 +481,33 @@ float GetGestureHoldDuration(void)
     return (float)time;
 }
 
+// Get swipe distance
+// NOTE: distance (from start point to final) (normalized [0..1])
+float GetGestureSwipeDistance(void)
+{
+    // NOTE: swipe distance is calculated on one touch points TOUCH_ACTION_UP
+
+    return GESTURES.Swipe.distance;
+}
+
+// Get swipe intensity
+// NOTE: intensity in pixels per frame
+float GetGestureSwipeIntensity(void)
+{
+    // NOTE: swipe intensity is calculated on one touch points TOUCH_ACTION_UP
+
+    return GESTURES.Swipe.intensity;
+}
+
+// Get swipe angle
+// NOTE: Angle in degrees, horizontal-right is 0, counterclockwise
+float GetGestureSwipeAngle(void)
+{
+    // NOTE: swipe angle is calculated on one touch points TOUCH_ACTION_UP
+
+    return GESTURES.Swipe.angle;
+}
+
 // Get drag vector (between initial touch point to current)
 Vector2 GetGestureDragVector(void)
 {
@@ -454,11 +516,11 @@ Vector2 GetGestureDragVector(void)
     return GESTURES.Drag.vector;
 }
 
-// Get drag angle
+// Get swipe angle
 // NOTE: Angle in degrees, horizontal-right is 0, counterclockwise
 float GetGestureDragAngle(void)
 {
-    // NOTE: drag angle is calculated on one touch points TOUCH_ACTION_UP
+    // NOTE: swipe angle is calculated on one touch points TOUCH_ACTION_MOVE
 
     return GESTURES.Drag.angle;
 }
@@ -483,6 +545,23 @@ float GetGesturePinchAngle(void)
 //----------------------------------------------------------------------------------
 // Module specific Functions Definition
 //----------------------------------------------------------------------------------
+static Vector2 rgVector2Subtract(Vector2 v1, Vector2 v2)
+{
+    Vector2 result = { v1.x - v2.x, v1.y - v2.y };
+
+    return result;
+}
+
+// Get angle from two-points vector with X-axis
+static float rgVector2Direction(Vector2 v)
+{
+    float angle = atan2f(v.y, v.x)*(180.0f/PI);
+
+    if (angle < 0) angle += 360.0f;
+
+    return angle;
+}
+
 // Get angle from two-points vector with X-axis
 static float rgVector2Angle(Vector2 v1, Vector2 v2)
 {
@@ -506,6 +585,16 @@ static float rgVector2Distance(Vector2 v1, Vector2 v2)
     return result;
 }
 
+static bool rgVector2CloserThan(Vector2 v1, Vector2 v2, float distance)
+{
+    float result;
+
+    float dx = v2.x - v1.x;
+    float dy = v2.y - v1.y;
+
+    return (dx*dx + dy*dy) < distance*distance;
+}
+
 // Time measure returned are seconds
 static double rgGetCurrentTime(void)
 {
@@ -517,7 +606,7 @@ static double rgGetCurrentTime(void)
 #if defined(_WIN32)
     unsigned long long int clockFrequency, currentTime;
 
-    QueryPerformanceFrequency(&clockFrequency);     // BE CAREFUL: Costly operation!
+    QueryPerformanceFrequency(&clockFrequency); // BE CAREFUL: Costly operation!
     QueryPerformanceCounter(&currentTime);
 
     time = (double)currentTime/clockFrequency;  // Time in seconds

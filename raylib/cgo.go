@@ -9,12 +9,12 @@ package rl
 */
 import "C"
 import (
-	"image/color"
 	"unsafe"
 
-	"github.com/EliCDavis/vector/vector2"
-	"github.com/EliCDavis/vector/vector3"
-	"github.com/EliCDavis/vector/vector4"
+	"github.com/igadmg/goex/image/colorex"
+	"github.com/igadmg/raylib-go/raymath/vector2"
+	"github.com/igadmg/raylib-go/raymath/vector3"
+	"github.com/igadmg/raylib-go/raymath/vector4"
 )
 
 // core
@@ -60,12 +60,12 @@ func (m *Matrix) cptr() *C.Matrix {
 }
 
 // gocolorptr - Returns new Color from pointer
-func gocolorptr(ptr *C.Color) *color.RGBA {
-	return (*color.RGBA)(unsafe.Pointer(ptr))
+func gocolorptr(ptr *C.Color) *colorex.RGBA {
+	return (*colorex.RGBA)(unsafe.Pointer(ptr))
 }
 
 // ccolorptr returns color C pointer
-func ccolorptr(col *color.RGBA) *C.Color {
+func ccolorptr(col *colorex.RGBA) *C.Color {
 	return (*C.Color)(unsafe.Pointer(col))
 }
 
@@ -298,5 +298,5 @@ func (s *Music) cptr() *C.Music {
 func textAlloc(text string) *C.char {
 	ctext := (*C.char)(unsafe.Pointer(unsafe.StringData(text)))
 	clen := (C.int)(len(text))
-	return C.TextAlloc(ctext, &clen)
+	return C.TextAlloc(ctext, (*C.int)(unsafe.Pointer(&clen)))
 }

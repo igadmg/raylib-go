@@ -505,7 +505,7 @@ RRESAPI void rresUnloadCentralDirectory(rresCentralDir dir);                    
 RRESAPI unsigned int rresGetDataType(const unsigned char *fourCC);                  // Get rresResourceDataType from FourCC code
 RRESAPI int rresGetResourceId(rresCentralDir dir, const char *fileName);            // Get resource id for a provided filename
                                                                                     // NOTE: It requires CDIR available in the file (it's optinal by design)
-RRESAPI unsigned int rresComputeCRC32(unsigned char *data, int len);                // Compute CRC32 for provided data
+RRESAPI unsigned int rresComputeCRC32(unsigned char *data, int len);                   // Compute CRC32 for provided data
 
 // Manage password for data encryption/decryption
 // NOTE: The cipher password is kept as an internal pointer to provided string, it's up to the user to manage that sensible data properly
@@ -519,7 +519,6 @@ RRESAPI const char *rresGetCipherPassword(void);                      // Get pas
 #endif
 
 #endif // RRES_H
-
 
 /***********************************************************************************
 *
@@ -1075,7 +1074,7 @@ static rresResourceChunkData rresLoadResourceChunkData(rresResourceChunkInfo inf
 
             int rawSize = info.baseSize - sizeof(int) - (chunkData.propCount*sizeof(int));
             chunkData.raw = RRES_MALLOC(rawSize);
-            memcpy(chunkData.raw, ((unsigned char *)data) + sizeof(int) + (chunkData.propCount*sizeof(int)), rawSize);
+            if (chunkData.raw != NULL) memcpy(chunkData.raw, ((unsigned char *)data) + sizeof(int) + (chunkData.propCount*sizeof(int)), rawSize);
         }
         else
         {
@@ -1083,7 +1082,7 @@ static rresResourceChunkData rresLoadResourceChunkData(rresResourceChunkInfo inf
             // We just return the loaded resource packed data from .rres file,
             // it's up to the user to manage decompression/decryption on user library
             chunkData.raw = RRES_MALLOC(info.packedSize);
-            memcpy(chunkData.raw, (unsigned char *)data, info.packedSize);
+            if (chunkData.raw != NULL) memcpy(chunkData.raw, (unsigned char *)data, info.packedSize);
         }
     }
 

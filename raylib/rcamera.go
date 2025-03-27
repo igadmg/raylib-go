@@ -1,4 +1,5 @@
 //go:build RAY_MATH
+
 package rl
 
 // GetCameraForward - Returns the cameras forward vector (normalized)

@@ -15,22 +15,48 @@ func SetGesturesEnabled(gestureFlags uint32) {
 func IsGestureDetected(gesture Gestures) bool {
 	cgesture := (C.uint)(gesture)
 	ret := C.IsGestureDetected(cgesture)
-	v := bool(ret)
-	return v
+	return bool(ret)
 }
 
 // GetGestureDetected - Get latest detected gesture
 func GetGestureDetected() Gestures {
 	ret := C.GetGestureDetected()
-	v := (Gestures)(ret)
-	return v
+	return (Gestures)(ret)
+}
+
+func GetGestureTapPosition() Vector2 {
+	ret := C.GetGestureTapPosition()
+	return *govec2ptr(&ret)
 }
 
 // GetGestureHoldDuration - Get gesture hold time in milliseconds
 func GetGestureHoldDuration() float32 {
 	ret := C.GetGestureHoldDuration()
-	v := (float32)(ret)
-	return v
+	return (float32)(ret)
+}
+
+func GetGestureSwipeData() (distance, intensity, angle float32) {
+	return GetGestureSwipeDistance(),
+		GetGestureSwipeIntensity(),
+		GetGestureSwipeAngle()
+}
+
+// GetGestureSwipeDistance - Get gesture swipe angle
+func GetGestureSwipeDistance() float32 {
+	ret := C.GetGestureSwipeDistance()
+	return (float32)(ret)
+}
+
+// GetGestureSwipeIntensity - Get gesture swipe angle
+func GetGestureSwipeIntensity() float32 {
+	ret := C.GetGestureSwipeIntensity()
+	return (float32)(ret)
+}
+
+// GetGestureSwipeAngle - Get gesture swipe angle
+func GetGestureSwipeAngle() float32 {
+	ret := C.GetGestureSwipeAngle()
+	return (float32)(ret)
 }
 
 // GetGestureDragVector - Get gesture drag vector
@@ -39,11 +65,10 @@ func GetGestureDragVector() Vector2 {
 	return *govec2ptr(&ret)
 }
 
-// GetGestureDragAngle - Get gesture drag angle
+// GetGestureDragAngle - Get gesture drag vector
 func GetGestureDragAngle() float32 {
 	ret := C.GetGestureDragAngle()
-	v := (float32)(ret)
-	return v
+	return (float32)(ret)
 }
 
 // GetGesturePinchVector - Get gesture pinch delta

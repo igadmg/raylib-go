@@ -8,8 +8,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/EliCDavis/vector/mathex"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
+	rm "github.com/igadmg/raylib-go/raymath"
 )
 
 // ShapeType type
@@ -150,7 +150,7 @@ var (
 	accumulator float32
 
 	// Physics world gravity force
-	gravityForce = rl.NewVector2(0, 9.81)
+	gravityForce = vector2.NewFloat32(0, 9.81)
 
 	// Physics bodies pointers array
 	bodies [64]*Body
@@ -241,7 +241,7 @@ func NewBodyRectangle(pos rl.Vector2, width, height, density float32) *Body {
 		Shape: Shape{
 			Type:       PolygonShape,
 			Transform:  rl.Mat2Radians(0.0),
-			VertexData: createRectanglePolygon(pos, rl.NewVector2(width, height)),
+			VertexData: createRectanglePolygon(pos, vector2.NewFloat32(width, height)),
 		},
 		StaticFriction:  0.4,
 		DynamicFriction: 0.2,
@@ -466,7 +466,7 @@ func Shatter(body *Body, position rl.Vector2, force float32) {
 			nextVertex := getNextIndex(j, newData.VertexCount)
 			face := rl.Vector2Subtract(newData.Positions[nextVertex], newData.Positions[j])
 
-			newData.Normals[j] = rl.NewVector2(face.Y, -face.X)
+			newData.Normals[j] = vector2.NewFloat32(face.Y, -face.X)
 			normalize(&newData.Normals[j])
 		}
 
@@ -671,7 +671,7 @@ func createRandomPolygon(radius float32, sides int) Polygon {
 		nextIndex := getNextIndex(i, sides)
 		face := rl.Vector2Subtract(data.Positions[nextIndex], data.Positions[i])
 
-		data.Normals[i] = rl.NewVector2(face.Y, -face.X)
+		data.Normals[i] = vector2.NewFloat32(face.Y, -face.X)
 		normalize(&data.Normals[i])
 	}
 
@@ -684,17 +684,17 @@ func createRectanglePolygon(pos rl.Vector2, size rl.Vector2) Polygon {
 	data.VertexCount = 4
 
 	// Calculate polygon vertices positions
-	data.Positions[0] = rl.NewVector2(pos.X+size.X/2, pos.Y-size.Y/2)
-	data.Positions[1] = rl.NewVector2(pos.X+size.X/2, pos.Y+size.Y/2)
-	data.Positions[2] = rl.NewVector2(pos.X-size.X/2, pos.Y+size.Y/2)
-	data.Positions[3] = rl.NewVector2(pos.X-size.X/2, pos.Y-size.Y/2)
+	data.Positions[0] = vector2.NewFloat32(pos.X+size.X/2, pos.Y-size.Y/2)
+	data.Positions[1] = vector2.NewFloat32(pos.X+size.X/2, pos.Y+size.Y/2)
+	data.Positions[2] = vector2.NewFloat32(pos.X-size.X/2, pos.Y+size.Y/2)
+	data.Positions[3] = vector2.NewFloat32(pos.X-size.X/2, pos.Y-size.Y/2)
 
 	// Calculate polygon faces normals
 	for i := 0; i < data.VertexCount; i++ {
 		nextIndex := getNextIndex(i, data.VertexCount)
 		face := rl.Vector2Subtract(data.Positions[nextIndex], data.Positions[i])
 
-		data.Normals[i] = rl.NewVector2(face.Y, -face.X)
+		data.Normals[i] = vector2.NewFloat32(face.Y, -face.X)
 		normalize(&data.Normals[i])
 	}
 
@@ -945,20 +945,20 @@ func solveCircleToCircle(manifold *Manifold) {
 		return
 	}
 
-	distance := mathex.Sqrt(distSqr)
+	distance := rm.Sqrt(distSqr)
 	manifold.ContactsCount = 1
 	if distance == 0 {
 		manifold.Penetration = bodyA.Shape.Radius
-		manifold.Normal = rl.NewVector2(1, 0)
+		manifold.Normal = vector2.NewFloat32(1, 0)
 		manifold.Contacts[0] = bodyA.Position
 	} else {
 		manifold.Penetration = radius - distance
 		// Faster than using normalize() due to sqrt is already performed
-		manifold.Normal = rl.NewVector2(
+		manifold.Normal = vector2.NewFloat32(
 			normal.X/distance,
 			normal.Y/distance,
 		)
-		manifold.Contacts[0] = rl.NewVector2(
+		manifold.Contacts[0] = vector2.NewFloat32(
 			manifold.Normal.X*bodyA.Shape.Radius+bodyA.Position.X,
 			manifold.Normal.Y*bodyA.Shape.Radius+bodyA.Position.Y,
 		)
@@ -1031,8 +1031,8 @@ func solveDifferentShapes(manifold *Manifold, bodyA *Body, bodyB *Body) {
 	if separation < epsilon {
 		manifold.ContactsCount = 1
 		var normal rl.Vector2 = rl.Mat2MultiplyVector2(bodyB.Shape.Transform, vertexData.Normals[faceNormal])
-		manifold.Normal = rl.NewVector2(-normal.X, -normal.Y)
-		manifold.Contacts[0] = rl.NewVector2(
+		manifold.Normal = vector2.NewFloat32(-normal.X, -normal.Y)
+		manifold.Contacts[0] = vector2.NewFloat32(
 			manifold.Normal.X*bodyA.Shape.Radius+bodyA.Position.X,
 			manifold.Normal.Y*bodyA.Shape.Radius+bodyA.Position.Y,
 		)
@@ -1082,8 +1082,8 @@ func solveDifferentShapes(manifold *Manifold, bodyA *Body, bodyB *Body) {
 		}
 
 		normal = rl.Mat2MultiplyVector2(bodyB.Shape.Transform, normal)
-		manifold.Normal = rl.NewVector2(-normal.X, -normal.Y)
-		manifold.Contacts[0] = rl.NewVector2(
+		manifold.Normal = vector2.NewFloat32(-normal.X, -normal.Y)
+		manifold.Contacts[0] = vector2.NewFloat32(
 			manifold.Normal.X*bodyA.Shape.Radius+bodyA.Position.X,
 			manifold.Normal.Y*bodyA.Shape.Radius+bodyA.Position.Y,
 		)
@@ -1152,13 +1152,13 @@ func solvePolygonToPolygon(manifold *Manifold) {
 	normalize(&sidePlaneNormal)
 
 	// Orthogonalize
-	refFaceNormal := rl.NewVector2(sidePlaneNormal.Y, -sidePlaneNormal.X)
+	refFaceNormal := vector2.NewFloat32(sidePlaneNormal.Y, -sidePlaneNormal.X)
 	refC := rl.Vector2DotProduct(refFaceNormal, v1)
 	negSide := rl.Vector2DotProduct(sidePlaneNormal, v1) * float32(-1)
 	posSide := rl.Vector2DotProduct(sidePlaneNormal, v2)
 
 	// Clip incident face to reference face side planes (due to floating point error, possible to not have required points
-	if clip(rl.NewVector2(-sidePlaneNormal.X, -sidePlaneNormal.Y), negSide, &incidentFace[0], &incidentFace[1]) < 2 {
+	if clip(vector2.NewFloat32(-sidePlaneNormal.X, -sidePlaneNormal.Y), negSide, &incidentFace[0], &incidentFace[1]) < 2 {
 		return
 	}
 
@@ -1168,7 +1168,7 @@ func solvePolygonToPolygon(manifold *Manifold) {
 
 	// Flip normal if required
 	if flip {
-		manifold.Normal = rl.NewVector2(-refFaceNormal.X, -refFaceNormal.Y)
+		manifold.Normal = vector2.NewFloat32(-refFaceNormal.X, -refFaceNormal.Y)
 	} else {
 		manifold.Normal = refFaceNormal
 	}
@@ -1227,9 +1227,9 @@ func initializeManifolds(manifold *Manifold) {
 	}
 
 	// // Calculate average restitution, static and dynamic friction
-	manifold.Restitution = mathex.Sqrt(bodyA.Restitution * bodyB.Restitution)
-	manifold.StaticFriction = mathex.Sqrt(bodyA.StaticFriction * bodyB.StaticFriction)
-	manifold.DynamicFriction = mathex.Sqrt(bodyA.DynamicFriction * bodyB.DynamicFriction)
+	manifold.Restitution = rm.Sqrt(bodyA.Restitution * bodyB.Restitution)
+	manifold.StaticFriction = rm.Sqrt(bodyA.StaticFriction * bodyB.StaticFriction)
+	manifold.DynamicFriction = rm.Sqrt(bodyA.DynamicFriction * bodyB.DynamicFriction)
 
 	for i := 0; i < manifold.ContactsCount; i++ {
 		// Caculate radius from center of mass to contact
@@ -1238,7 +1238,7 @@ func initializeManifolds(manifold *Manifold) {
 
 		crossA := rl.Vector2Cross(bodyA.AngularVelocity, radiusA)
 		crossB := rl.Vector2Cross(bodyB.AngularVelocity, radiusB)
-		radiusV := rl.NewVector2(
+		radiusV := vector2.NewFloat32(
 			bodyB.Velocity.X+crossB.X-bodyA.Velocity.X-crossA.X,
 			bodyB.Velocity.Y+crossB.Y-bodyA.Velocity.Y-crossA.Y,
 		)
@@ -1246,7 +1246,7 @@ func initializeManifolds(manifold *Manifold) {
 		// Determine if we should perform a resting collision or not;
 		// The idea is if the only thing moving this object is gravity, then the collision should be
 		// performed without any restitution
-		rad := rl.NewVector2(gravityForce.X*deltaTime/1000, gravityForce.Y*deltaTime/1000)
+		rad := vector2.NewFloat32(gravityForce.X*deltaTime/1000, gravityForce.Y*deltaTime/1000)
 		if rl.Vector2LenSqr(radiusV) < (rl.Vector2LenSqr(rad) + epsilon) {
 			manifold.Restitution = 0
 		}
@@ -1262,7 +1262,7 @@ func integrateImpulses(manifold *Manifold) {
 	}
 
 	// Early out and positional correct if both objects have infinite mass
-	if mathex.Abs(bodyA.InverseMass+bodyB.InverseMass) <= epsilon {
+	if rm.Abs(bodyA.InverseMass+bodyB.InverseMass) <= epsilon {
 		bodyA.Velocity = rl.Vector2{}
 		bodyB.Velocity = rl.Vector2{}
 		return
@@ -1274,7 +1274,7 @@ func integrateImpulses(manifold *Manifold) {
 		radiusB := rl.Vector2Subtract(manifold.Contacts[i], bodyB.Position)
 
 		// Calculate relative velocity
-		radiusV := rl.NewVector2(
+		radiusV := vector2.NewFloat32(
 			bodyB.Velocity.X+rl.Vector2Cross(bodyB.AngularVelocity, radiusB).X-
 				bodyA.Velocity.X-rl.Vector2Cross(bodyA.AngularVelocity, radiusA).X,
 			bodyB.Velocity.Y+rl.Vector2Cross(bodyB.AngularVelocity, radiusB).Y-
@@ -1301,7 +1301,7 @@ func integrateImpulses(manifold *Manifold) {
 		impulse /= float32(manifold.ContactsCount)
 
 		// Apply impulse to each physics body
-		impulseV := rl.NewVector2(manifold.Normal.X*impulse, manifold.Normal.Y*impulse)
+		impulseV := vector2.NewFloat32(manifold.Normal.X*impulse, manifold.Normal.Y*impulse)
 
 		if bodyA.Enabled {
 			bodyA.Velocity.X += bodyA.InverseMass * (-impulseV.X)
@@ -1309,7 +1309,7 @@ func integrateImpulses(manifold *Manifold) {
 
 			if !bodyA.FreezeOrient {
 				bodyA.AngularVelocity += bodyA.InverseInertia *
-					rl.Vector2CrossProduct(radiusA, rl.NewVector2(-impulseV.X, -impulseV.Y))
+					rl.Vector2CrossProduct(radiusA, vector2.NewFloat32(-impulseV.X, -impulseV.Y))
 			}
 		}
 
@@ -1330,7 +1330,7 @@ func integrateImpulses(manifold *Manifold) {
 			bodyB.Velocity.Y + rl.Vector2Cross(bodyB.AngularVelocity, radiusB).Y -
 			bodyA.Velocity.Y - rl.Vector2Cross(bodyA.AngularVelocity, radiusA).Y
 
-		tangent := rl.NewVector2(
+		tangent := vector2.NewFloat32(
 			radiusV.X-manifold.Normal.X*rl.Vector2DotProduct(radiusV, manifold.Normal),
 			radiusV.Y-manifold.Normal.Y*rl.Vector2DotProduct(radiusV, manifold.Normal),
 		)
@@ -1341,7 +1341,7 @@ func integrateImpulses(manifold *Manifold) {
 		impulseTangent /= inverseMassSum
 		impulseTangent /= float32(manifold.ContactsCount)
 
-		absImpulseTangent := mathex.Abs(impulseTangent)
+		absImpulseTangent := rm.Abs(impulseTangent)
 
 		// Don't apply tiny friction impulses
 		if absImpulseTangent <= epsilon {
@@ -1351,9 +1351,9 @@ func integrateImpulses(manifold *Manifold) {
 		// Apply coulumb's law
 		var tangentImpulse rl.Vector2
 		if absImpulseTangent < impulse*manifold.StaticFriction {
-			tangentImpulse = rl.NewVector2(tangent.X*impulseTangent, tangent.Y*impulseTangent)
+			tangentImpulse = vector2.NewFloat32(tangent.X*impulseTangent, tangent.Y*impulseTangent)
 		} else {
-			tangentImpulse = rl.NewVector2(
+			tangentImpulse = vector2.NewFloat32(
 				tangent.X*(-impulse)*manifold.DynamicFriction,
 				tangent.Y*(-impulse)*manifold.DynamicFriction,
 			)
@@ -1366,7 +1366,7 @@ func integrateImpulses(manifold *Manifold) {
 
 			if !bodyA.FreezeOrient {
 				bodyA.AngularVelocity += bodyA.InverseInertia *
-					rl.Vector2CrossProduct(radiusA, rl.NewVector2(-tangentImpulse.X, -tangentImpulse.Y))
+					rl.Vector2CrossProduct(radiusA, vector2.NewFloat32(-tangentImpulse.X, -tangentImpulse.Y))
 			}
 		}
 
@@ -1408,7 +1408,7 @@ func correctPositions(manifold *Manifold) {
 
 	corrCoeff := float32(math.Max(float64(manifold.Penetration-penetrationAllowance), 0)) /
 		(bodyA.InverseMass + bodyB.InverseMass) * penetrationCorrection
-	correction := rl.NewVector2(corrCoeff*manifold.Normal.X, corrCoeff*manifold.Normal.Y)
+	correction := vector2.NewFloat32(corrCoeff*manifold.Normal.X, corrCoeff*manifold.Normal.Y)
 
 	if bodyA.Enabled {
 		bodyA.Position.X -= correction.X * bodyA.InverseMass
@@ -1456,7 +1456,7 @@ func findAxisLeastPenetration(shapeA Shape, shapeB Shape) (int, float32) {
 		normal = rl.Mat2MultiplyVector2(buT, transNormal)
 
 		// Retrieve vertex on face from A shape, transform into B shape's model space
-		support := getSupport(shapeB, rl.NewVector2(-normal.X, -normal.Y))
+		support := getSupport(shapeB, vector2.NewFloat32(-normal.X, -normal.Y))
 
 		// Retrieve vertex on face from A shape, transform into B shape's model space
 		vertex := dataA.Positions[i]
@@ -1553,7 +1553,7 @@ func biasGreaterThan(valueA float32, valueB float32) bool {
 
 // triangleBarycenter - Returns the barycenter of a triangle given by 3 points
 func triangleBarycenter(v1 rl.Vector2, v2 rl.Vector2, v3 rl.Vector2) rl.Vector2 {
-	return rl.NewVector2(
+	return vector2.NewFloat32(
 		(v1.X+v2.X+v3.X)/3,
 		(v1.Y+v2.Y+v3.Y)/3,
 	)
@@ -1579,7 +1579,7 @@ func getCurrentTime() float32 {
 // normalize - Returns the normalized values of a vector
 func normalize(vector *rl.Vector2) {
 	aux := *vector
-	length := mathex.Sqrt(aux.X*aux.X + aux.Y*aux.Y)
+	length := rm.Sqrt(aux.X*aux.X + aux.Y*aux.Y)
 	if length == 0 {
 		length = 1.0
 	}

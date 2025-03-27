@@ -8,6 +8,8 @@ package rl
 import "C"
 import (
 	"unsafe"
+
+	"github.com/igadmg/goex/image/colorex"
 )
 
 // SetMatrixProjection - Set a custom projection matrix (replaces internal projection matrix)
@@ -480,6 +482,14 @@ func SetBlendFactorsSeparate(glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha BlendFac
 	cglEqRGB := C.int(glEqRGB)
 	cglEqAlpha := C.int(glEqAlpha)
 	C.rlSetBlendFactorsSeparate(cglSrcRGB, cglDstRGB, cglSrcAlpha, cglDstAlpha, cglEqRGB, cglEqAlpha)
+}
+
+func SetBlendColor(c colorex.RGBA) {
+	cr := C.uchar(c.R)
+	cg := C.uchar(c.G)
+	cb := C.uchar(c.B)
+	ca := C.uchar(c.A)
+	C.rlSetBlendColor(cr, cg, cb, ca)
 }
 
 // GlInit - Initialize rlgl (buffers, shaders, textures, states)

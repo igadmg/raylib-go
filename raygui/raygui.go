@@ -10,11 +10,15 @@ package raygui
 import "C"
 
 import (
+	"slices"
 	"strings"
 	"unsafe"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
+
+type BoundsFn func(bounds rl.Rectangle)
 
 const (
 	SCROLLBAR_LEFT_SIDE = iota
@@ -28,30 +32,32 @@ type GuiStyleProp struct {
 	propertyValue uint32
 }
 
-// Gui control state
+// GuiState .
+type GuiState int32
+
 const (
-	STATE_NORMAL int32 = iota
+	STATE_NORMAL GuiState = iota
 	STATE_FOCUSED
 	STATE_PRESSED
 	STATE_DISABLED
 )
 
-// GuiState .
-type GuiState = int32
+// GuiTextAlignment .
+type GuiTextAlignment = int32
 
 // Gui control text alignment
 const (
-	TEXT_ALIGN_LEFT int32 = iota
+	TEXT_ALIGN_LEFT GuiTextAlignment = iota
 	TEXT_ALIGN_CENTER
 	TEXT_ALIGN_RIGHT
 )
 
-// GuiTextAlignment .
-type GuiTextAlignment = int32
+// GuiTextAlignmentVertical .
+type GuiTextAlignmentVertical = int32
 
 // Gui control text alignment vertical
 const (
-	TEXT_ALIGN_TOP int32 = iota
+	TEXT_ALIGN_TOP GuiTextAlignmentVertical = iota
 	TEXT_ALIGN_MIDDLE
 	TEXT_ALIGN_BOTTOM
 )
@@ -62,17 +68,17 @@ type GuiTextWrapMode = int32
 // Gui control text wrap mode
 // NOTE: Useful for multiline text
 const (
-	TEXT_WRAP_NONE int32 = iota
+	TEXT_WRAP_NONE GuiTextWrapMode = iota
 	TEXT_WRAP_CHAR
 	TEXT_WRAP_WORD
 )
 
-// GuiTextAlignmentVertical .
-type GuiTextAlignmentVertical = int32
+// GuiControl .
+type GuiControl = int32
 
 // DEFAULT - Gui controls
 const (
-	DEFAULT int32 = iota
+	DEFAULT GuiControl = iota
 	LABEL
 	BUTTON
 	TOGGLE
@@ -90,13 +96,13 @@ const (
 	STATUSBAR
 )
 
-// GuiControl .
-type GuiControl = int32
+// GuiControlProperty .
+type GuiControlProperty = int32
 
 // Gui base properties for every control
 // NOTE: RAYGUI_MAX_PROPS_BASE properties (by default 16 properties)
 const (
-	BORDER_COLOR_NORMAL int32 = iota
+	BORDER_COLOR_NORMAL GuiControlProperty = iota
 	BASE_COLOR_NORMAL
 	TEXT_COLOR_NORMAL
 	BORDER_COLOR_FOCUSED
@@ -113,13 +119,13 @@ const (
 	TEXT_ALIGNMENT
 )
 
-// GuiControlProperty .
-type GuiControlProperty = int32
+// GuiDefaultProperty .
+type GuiDefaultProperty = int32
 
 // DEFAULT extended properties
 // NOTE: Those properties are common to all controls or global
 const (
-	TEXT_SIZE int32 = iota + 16
+	TEXT_SIZE GuiDefaultProperty = iota + 16
 	TEXT_SPACING
 	LINE_COLOR
 	BACKGROUND_COLOR
@@ -127,9 +133,6 @@ const (
 	TEXT_ALIGNMENT_VERTICAL
 	TEXT_WRAP_MODE
 )
-
-// GuiDefaultProperty .
-type GuiDefaultProperty = int32
 
 // GROUP_PADDING .
 const (
@@ -232,13 +235,13 @@ type GuiListViewProperty = int32
 
 const (
 	COLOR_SELECTOR_SIZE int32 = 16
-	// rl.ColorPicker right hue bar width
+	// colorex.RGBA right hue bar width
 	HUEBAR_WIDTH = 17
-	// rl.ColorPicker right hue bar separation from panel
+	// colorex.RGBA right hue bar separation from panel
 	HUEBAR_PADDING = 18
-	// rl.ColorPicker right hue bar selector height
+	// colorex.RGBA right hue bar selector height
 	HUEBAR_SELECTOR_HEIGHT = 19
-	// rl.ColorPicker right hue bar selector overflow
+	// colorex.RGBA right hue bar selector overflow
 	HUEBAR_SELECTOR_OVERFLOW = 20
 )
 
@@ -277,21 +280,21 @@ func IsLocked() bool {
 }
 
 // GuiFade - Set gui controls alpha (global state), alpha goes from 0.0f to 1.0f
-func Fade(color rl.Color, alpha float32) {
+func Fade(color colorex.RGBA, alpha float32) {
 	ccolor := (*C.Color)(unsafe.Pointer(&color))
 	calpha := C.float(alpha)
 	C.GuiFade(*ccolor, calpha)
 }
 
 // GuiSetState - Set gui state (global state)
-func SetState(state int32) {
+func SetState(state GuiState) {
 	cstate := C.int(state)
 	C.GuiSetState(cstate)
 }
 
 // GuiGetState - Get gui state (global state)
-func GetState() int32 {
-	return int32(C.GuiGetState())
+func GetState() GuiState {
+	return GuiState(C.GuiGetState())
 }
 
 // GuiSetStyle .
@@ -323,6 +326,11 @@ func GroupBox(bounds rl.Rectangle, text string) {
 	C.GuiGroupBox(*cbounds, ctext)
 }
 
+func GroupBoxEx(bounds rl.Rectangle, text string, fn BoundsFn) {
+	GroupBox(bounds, text)
+	fn(bounds.ShrinkXYWH(8, 8, 8, 8))
+}
+
 // GuiLine - Line separator control, could contain text
 func Line(bounds rl.Rectangle, text string) {
 	cbounds := crect2ptr(&bounds)
@@ -337,9 +345,9 @@ func Panel(bounds rl.Rectangle, text string) {
 	C.GuiPanel(*cbounds, ctext)
 }
 
-func PanelEx(bounds rl.Rectangle, text string, fn func(bounds rl.Rectangle)) {
+func PanelEx(bounds rl.Rectangle, text string, fn BoundsFn) {
 	Panel(bounds, text)
-	fn(bounds.DeltaXYWH(0, 24, 0, -24))
+	fn(bounds.ShrinkXYWH(0, 24, 0, 0))
 }
 
 // ScrollPanel control - Scroll Panel control
@@ -429,6 +437,51 @@ func ComboBox(bounds rl.Rectangle, text string, active int32) int32 {
 	cactive := C.int(active)
 	C.GuiComboBox(*cbounds, ctext, &cactive)
 	return int32(cactive)
+}
+
+type ComboBoxState[T any] struct {
+	items           []T
+	citemNames      *C.char
+	activeItemIndex int32
+}
+
+func (s *ComboBoxState[T]) Free() {
+	if s.citemNames != nil {
+		C.free(unsafe.Pointer(s.citemNames))
+	}
+}
+
+func (s *ComboBoxState[T]) SetItems(items []T, nameFn func(i T) string) {
+	s.items = items
+	itemNames := ""
+	for i, v := range s.items {
+		if i != 0 {
+			itemNames += ";"
+		}
+		itemNames += nameFn(v)
+	}
+
+	s.Free()
+	s.citemNames = C.CString(itemNames)
+}
+
+func (s *ComboBoxState[T]) IsActiveItem() bool {
+	return s.activeItemIndex != -1
+}
+
+func (s *ComboBoxState[T]) ActiveItem() T {
+	return s.items[s.activeItemIndex]
+}
+
+func (s *ComboBoxState[T]) SetActiveItemIndex(i int32) {
+	s.activeItemIndex = i
+}
+
+func (s *ComboBoxState[T]) ComboBox(bounds rl.Rectangle) {
+	cbounds := crect2ptr(&bounds)
+	cactive := (*C.int)(&s.activeItemIndex)
+
+	C.GuiComboBox(*cbounds, s.citemNames, cactive)
 }
 
 // Spinner control, returns selected value
@@ -542,7 +595,7 @@ func MessageBox(bounds rl.Rectangle, title string, message string, buttons strin
 }
 
 // ColorPicker control (multiple color controls)
-func ColorPicker(bounds rl.Rectangle, text string, color rl.Color) rl.Color {
+func ColorPicker(bounds rl.Rectangle, text string, color colorex.RGBA) colorex.RGBA {
 	cbounds := crect2ptr(&bounds)
 	ctext := textAlloc(text)
 	var ccolor C.struct_Color
@@ -551,7 +604,7 @@ func ColorPicker(bounds rl.Rectangle, text string, color rl.Color) rl.Color {
 	ccolor.b = C.uchar(color.B)
 	ccolor.a = C.uchar(color.A)
 	C.GuiColorPicker(*cbounds, ctext, &ccolor)
-	var goRes rl.Color
+	var goRes colorex.RGBA
 	goRes.A = byte(ccolor.a)
 	goRes.R = byte(ccolor.r)
 	goRes.G = byte(ccolor.g)
@@ -560,7 +613,7 @@ func ColorPicker(bounds rl.Rectangle, text string, color rl.Color) rl.Color {
 }
 
 // ColorPanel control
-func ColorPanel(bounds rl.Rectangle, text string, color rl.Color) rl.Color {
+func ColorPanel(bounds rl.Rectangle, text string, color colorex.RGBA) colorex.RGBA {
 	cbounds := crect2ptr(&bounds)
 	ctext := textAlloc(text)
 	var ccolor C.struct_Color
@@ -569,7 +622,7 @@ func ColorPanel(bounds rl.Rectangle, text string, color rl.Color) rl.Color {
 	ccolor.r = C.uchar(color.R)
 	ccolor.g = C.uchar(color.G)
 	C.GuiColorPanel(*cbounds, ctext, &ccolor)
-	var goRes rl.Color
+	var goRes colorex.RGBA
 	goRes.A = byte(ccolor.a)
 	goRes.R = byte(ccolor.r)
 	goRes.G = byte(ccolor.g)
@@ -629,6 +682,63 @@ func DropdownBox(bounds rl.Rectangle, text string, active *int32, editMode bool)
 	ceditMode := C.bool(editMode)
 
 	return C.GuiDropdownBox(*cbounds, ctext, &cactive, ceditMode) != 0
+}
+
+type DropdownBoxState[T any] struct {
+	items           []T
+	citemNames      *C.char
+	activeItemIndex int32
+	edit            bool
+}
+
+func (s *DropdownBoxState[T]) Free() {
+	if s.citemNames != nil {
+		C.free(unsafe.Pointer(s.citemNames))
+	}
+}
+
+func (s *DropdownBoxState[T]) SetItems(items []T, nameFn func(i T) string) {
+	s.items = items
+	itemNames := ""
+	for i, v := range s.items {
+		if i != 0 {
+			itemNames += ";"
+		}
+		itemNames += nameFn(v)
+	}
+
+	s.Free()
+	s.citemNames = C.CString(itemNames)
+}
+
+func (s *DropdownBoxState[T]) IsActiveItem() bool {
+	return s.activeItemIndex != -1
+}
+
+func (s *DropdownBoxState[T]) ActiveItem() T {
+	return s.items[s.activeItemIndex]
+}
+
+func (s *DropdownBoxState[T]) SetActiveItem(fn func(T) bool) {
+	s.activeItemIndex = (int32)(slices.IndexFunc(s.items, fn))
+}
+
+func (s *DropdownBoxState[T]) SetActiveItemIndex(i int32) {
+	s.activeItemIndex = i
+}
+
+func (s *DropdownBoxState[T]) DropdownBox(bounds rl.Rectangle) bool {
+	cbounds := crect2ptr(&bounds)
+	cactive := (*C.int)(&s.activeItemIndex)
+	cedit := (C.bool)(s.edit)
+
+	if C.GuiDropdownBox(*cbounds, s.citemNames, cactive, cedit) != 0 {
+		s.edit = !s.edit
+
+		return !s.edit
+	}
+
+	return false
 }
 
 // ValueBox control, updates input text with numbers
@@ -1039,10 +1149,13 @@ func (s *ListViewState[T]) SetItems(items []T, nameFn func(i T) string) {
 	for i, v := range s.items {
 		itemNames[i] = nameFn(v)
 	}
-	if !s.citemNames.IsNil() {
-		s.citemNames.Free()
-	}
+
+	s.Free()
 	s.citemNames = NewCStringArrayFromSlice(itemNames)
+}
+
+func (s *ListViewState[T]) IsActiveItem() bool {
+	return s.activeItemIndex != -1
 }
 
 func (s *ListViewState[T]) ActiveItem() T {
@@ -1089,4 +1202,14 @@ func GetFont() rl.Font {
 	ret := C.GuiGetFont()
 	ptr := unsafe.Pointer(&ret)
 	return *(*rl.Font)(ptr)
+}
+
+// SetAlpha - set alpha (global state)
+func SetAlpha(alpha float32) {
+	C.GuiSetAlpha((C.float)(alpha))
+}
+
+// SetScale - set scale (global state)
+func SetScale(alpha float32) {
+	C.GuiSetScale((C.float)(alpha))
 }

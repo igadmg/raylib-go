@@ -8,13 +8,16 @@ package rl
 import "C"
 
 import (
-	"image/color"
 	"unsafe"
+
+	"github.com/igadmg/goex/image/colorex"
+	"github.com/igadmg/raylib-go/raymath/vector2"
+	"github.com/igadmg/raylib-go/raymath/vector4"
 )
 
 // AutomationEvent - Automation event
-type AutomationEvent = C.AutomationEvent
-type AutomationEventList = C.AutomationEventList
+type AutomationEvent C.AutomationEvent
+type AutomationEventList C.AutomationEventList
 
 // WindowShouldClose - Check if KeyEscape pressed or Close icon pressed
 func WindowShouldClose() bool {
@@ -196,6 +199,13 @@ func GetScreenHeight() int {
 	return v
 }
 
+func GetScreenSize() Vector2Int {
+	return vector2.NewInt(
+		GetScreenWidth(),
+		GetScreenHeight(),
+	)
+}
+
 // GetRenderWidth - Get current render width (it considers HiDPI)
 func GetRenderWidth() int {
 	ret := C.GetRenderWidth()
@@ -208,6 +218,13 @@ func GetRenderHeight() int {
 	ret := C.GetRenderHeight()
 	v := (int)(ret)
 	return v
+}
+
+func GetRenderSize() Vector2Int {
+	return vector2.NewInt(
+		GetRenderWidth(),
+		GetRenderHeight(),
+	)
 }
 
 // GetMonitorCount - Get number of connected monitors
@@ -315,7 +332,7 @@ func DisableEventWaiting() {
 }
 
 // ClearBackground - Sets Background Color
-func ClearBackground(col color.RGBA) {
+func ClearBackground(col colorex.RGBA) {
 	ccolor := ccolorptr(&col)
 	C.ClearBackground(*ccolor)
 }
@@ -352,8 +369,10 @@ func EndMode3D() {
 	C.EndMode3D()
 }
 
+// #cgo noescape BeginTextureMode
+// #cgo nocallback BeginTextureMode
 // BeginTextureMode - Initializes render texture for drawing
-func BeginTextureMode(target *RenderTexture2D) {
+func BeginTextureMode(target RenderTexture2D) {
 	ctarget := target.cptr()
 	C.BeginTextureMode(*ctarget)
 }
@@ -421,10 +440,10 @@ func LoadShaderFromMemory(vsCode string, fsCode string) Shader {
 	return *newShaderFromPointer(&ret)
 }
 
-// IsShaderReady - Check if a shader is ready
-func IsShaderReady(shader *Shader) bool {
+// IsShaderValid - Check if a shader is valid
+func IsShaderValid(shader *Shader) bool {
 	cshader := shader.cptr()
-	ret := C.IsShaderReady(cshader)
+	ret := C.IsShaderValid(*cshader)
 	v := bool(ret)
 	return v
 }
@@ -574,7 +593,7 @@ func GetTime() float64 {
 }
 
 // Fade - Returns color with alpha applied, alpha goes from 0.0f to 1.0f
-func Fade(col color.RGBA, alpha float32) color.RGBA {
+func Fade(col colorex.RGBA, alpha float32) colorex.RGBA {
 	ccolor := ccolorptr(&col)
 	calpha := (C.float)(alpha)
 	ret := C.Fade(*ccolor, calpha)
@@ -582,7 +601,7 @@ func Fade(col color.RGBA, alpha float32) color.RGBA {
 }
 
 // ColorToInt - Returns hexadecimal value for a Color
-func ColorToInt(col color.RGBA) int32 {
+func ColorToInt(col colorex.RGBA) int32 {
 	ccolor := ccolorptr(&col)
 	ret := C.ColorToInt(*ccolor)
 	v := (int32)(ret)
@@ -590,8 +609,8 @@ func ColorToInt(col color.RGBA) int32 {
 }
 
 // ColorNormalize - Returns color normalized as float [0..1]
-func ColorNormalize(col color.RGBA) Vector4 {
-	return NewVector4(
+func ColorNormalize(col colorex.RGBA) Vector4 {
+	return vector4.NewFloat32(
 		float32(col.R)/255,
 		float32(col.G)/255,
 		float32(col.B)/255,
@@ -599,21 +618,21 @@ func ColorNormalize(col color.RGBA) Vector4 {
 }
 
 // ColorFromNormalized - Returns Color from normalized values [0..1]
-func ColorFromNormalized(normalized Vector4) color.RGBA {
+func ColorFromNormalized(normalized Vector4) colorex.RGBA {
 	cnormalized := cvec4ptr(&normalized)
 	ret := C.ColorFromNormalized(*cnormalized)
 	return *gocolorptr(&ret)
 }
 
 // ColorToHSV - Returns HSV values for a Color, hue [0..360], saturation/value [0..1]
-func ColorToHSV(col color.RGBA) Vector3 {
+func ColorToHSV(col colorex.RGBA) Vector3 {
 	ccolor := ccolorptr(&col)
 	ret := C.ColorToHSV(*ccolor)
 	return *govec3ptr(&ret)
 }
 
 // ColorFromHSV - Returns a Color from HSV values, hue [0..360], saturation/value [0..1]
-func ColorFromHSV(hue, saturation, value float32) color.RGBA {
+func ColorFromHSV(hue, saturation, value float32) colorex.RGBA {
 	chue := (C.float)(hue)
 	csaturation := (C.float)(saturation)
 	cvalue := (C.float)(value)
@@ -622,7 +641,7 @@ func ColorFromHSV(hue, saturation, value float32) color.RGBA {
 }
 
 // ColorTint - Get color multiplied with another color
-func ColorTint(col color.RGBA, tint color.RGBA) color.RGBA {
+func ColorTint(col colorex.RGBA, tint colorex.RGBA) colorex.RGBA {
 	ccolor := ccolorptr(&col)
 	ctint := ccolorptr(&tint)
 	ret := C.ColorTint(*ccolor, *ctint)
@@ -630,7 +649,7 @@ func ColorTint(col color.RGBA, tint color.RGBA) color.RGBA {
 }
 
 // ColorBrightness - Get color with brightness correction, brightness factor goes from -1.0f to 1.0f
-func ColorBrightness(col color.RGBA, factor float32) color.RGBA {
+func ColorBrightness(col colorex.RGBA, factor float32) colorex.RGBA {
 	ccolor := ccolorptr(&col)
 	cfactor := C.float(factor)
 	ret := C.ColorBrightness(*ccolor, cfactor)
@@ -638,7 +657,7 @@ func ColorBrightness(col color.RGBA, factor float32) color.RGBA {
 }
 
 // ColorContrast - Get color with contrast correction, contrast values between -1.0f and 1.0f
-func ColorContrast(col color.RGBA, contrast float32) color.RGBA {
+func ColorContrast(col colorex.RGBA, contrast float32) colorex.RGBA {
 	ccolor := ccolorptr(&col)
 	ccontrast := C.float(contrast)
 	ret := C.ColorContrast(*ccolor, ccontrast)
@@ -646,12 +665,12 @@ func ColorContrast(col color.RGBA, contrast float32) color.RGBA {
 }
 
 // ColorAlpha - Returns color with alpha applied, alpha goes from 0.0f to 1.0f
-func ColorAlpha(col color.RGBA, alpha float32) color.RGBA {
+func ColorAlpha(col colorex.RGBA, alpha float32) colorex.RGBA {
 	return Fade(col, alpha)
 }
 
 // ColorAlphaBlend - Returns src alpha-blended into dst color with tint
-func ColorAlphaBlend(src, dst, tint color.RGBA) color.RGBA {
+func ColorAlphaBlend(src, dst, tint colorex.RGBA) colorex.RGBA {
 	csrc := ccolorptr(&src)
 	cdst := ccolorptr(&dst)
 	ctint := ccolorptr(&tint)
@@ -660,7 +679,7 @@ func ColorAlphaBlend(src, dst, tint color.RGBA) color.RGBA {
 }
 
 // GetColor - Returns a Color struct from hexadecimal value
-func GetColor(hexValue uint) color.RGBA {
+func GetColor(hexValue uint) colorex.RGBA {
 	chexValue := (C.uint)(hexValue)
 	ret := C.GetColor(chexValue)
 	return *gocolorptr(&ret)
@@ -679,9 +698,9 @@ func GetPixelDataSize(width, height, format int32) int32 {
 // Vector3ToFloat - Converts Vector3 to float32 slice
 func Vector3ToFloat(vec Vector3) []float32 {
 	data := make([]float32, 0)
-	data[0] = vec.X()
-	data[1] = vec.Y()
-	data[2] = vec.Z()
+	data[0] = vec.X
+	data[1] = vec.Y
+	data[2] = vec.Z
 
 	return data
 }
@@ -726,7 +745,7 @@ func OpenURL(url string) {
 }
 
 // SetConfigFlags - Setup some window configuration flags
-func SetConfigFlags(flags uint32) {
+func SetConfigFlags(flags ConfigFlags) {
 	cflags := (C.uint)(flags)
 	C.SetConfigFlags(cflags)
 }
@@ -747,7 +766,7 @@ func LoadAutomationEventList(fileName string) AutomationEventList {
 
 // UnloadAutomationEventList - Unload automation events list from file
 func UnloadAutomationEventList(list *AutomationEventList) {
-	C.UnloadAutomationEventList(list)
+	C.UnloadAutomationEventList((*C.AutomationEventList)(list))
 }
 
 // ExportAutomationEventList - Export automation events list as text file

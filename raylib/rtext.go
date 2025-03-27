@@ -6,20 +6,21 @@ package rl
 */
 import "C"
 import (
-	"image/color"
 	"unsafe"
+
+	"github.com/igadmg/goex/image/colorex"
 )
 
 var defaultFont Font
 
 // GetFontDefault - Get the default Font
-func GetFontDefault() *Font {
+func GetFontDefault() Font {
 	if !defaultFont.IsReady() {
 		ret := C.GetFontDefault()
 		defaultFont = *newFontFromPointer(&ret)
 	}
 
-	return &defaultFont
+	return defaultFont
 }
 
 // LoadFont - Load a Font image into GPU memory (VRAM)
@@ -50,7 +51,7 @@ func LoadFontEx(fileName string, fontSize int32, fontChars []rune, runesNumber .
 }
 
 // LoadFontFromImage - Loads an Image font file (XNA style)
-func LoadFontFromImage(image Image, key color.RGBA, firstChar int32) Font {
+func LoadFontFromImage(image Image, key colorex.RGBA, firstChar int32) Font {
 	cimage := image.cptr()
 	ckey := ccolorptr(&key)
 	cfirstChar := (C.int)(firstChar)
@@ -70,10 +71,10 @@ func LoadFontFromMemory(fileType string, fileData []byte, fontSize int32, codepo
 	return *newFontFromPointer(&ret)
 }
 
-// IsFontReady - Check if a font is ready
-func IsFontReady(font *Font) bool {
+// IsFontValid - Check if a font is valid
+func IsFontValid(font Font) bool {
 	cfont := font.cptr()
-	ret := C.IsFontReady(cfont)
+	ret := C.IsFontValid(*cfont)
 	v := bool(ret)
 	return v
 }
@@ -111,7 +112,7 @@ func DrawFPS[XT, YT CoordinateT](posX XT, posY YT) {
 }
 
 // DrawText - Draw text (using default font)
-func DrawText[XT, YT CoordinateT](text string, posX XT, posY YT, fontSize int32, col color.RGBA) {
+func DrawText[XT, YT CoordinateT](text string, posX XT, posY YT, fontSize int32, col colorex.RGBA) {
 	ctext := textAlloc(text)
 	cposX := (C.int)(posX)
 	cposY := (C.int)(posY)
@@ -121,7 +122,7 @@ func DrawText[XT, YT CoordinateT](text string, posX XT, posY YT, fontSize int32,
 }
 
 // DrawTextEx - Draw text using Font and additional parameters
-func DrawTextEx(font *Font, text string, position Vector2, fontSize float32, spacing float32, tint color.RGBA) {
+func DrawTextEx(font Font, text string, position Vector2, fontSize float32, spacing float32, tint colorex.RGBA) {
 	cfont := font.cptr()
 	ctext := textAlloc(text)
 	cposition := cvec2ptr(&position)
@@ -131,9 +132,9 @@ func DrawTextEx(font *Font, text string, position Vector2, fontSize float32, spa
 	C.DrawTextEx(*cfont, ctext, *cposition, cfontSize, cspacing, *ctint)
 }
 
-func DrawTextLayout(font *Font, text string, fontSize float32, spacing float32, tint color.RGBA, layoutFn func(wh Vector2) Rectangle) {
+func DrawTextLayout(font Font, text string, fontSize float32, spacing float32, tint colorex.RGBA, layoutFn func(wh Vector2) Rectangle) {
 	rect := layoutFn(MeasureTextEx(font, text, fontSize, spacing))
-	DrawTextEx(font, text, rect.XY(), fontSize, spacing, tint)
+	DrawTextEx(font, text, rect.Position, fontSize, spacing, tint)
 }
 
 // SetTextLineSpacing - Set vertical line spacing when drawing with line-breaks
@@ -152,7 +153,7 @@ func MeasureText(text string, fontSize int32) int32 {
 }
 
 // MeasureTextEx - Measure string size for Font
-func MeasureTextEx(font *Font, text string, fontSize float32, spacing float32) Vector2 {
+func MeasureTextEx(font Font, text string, fontSize float32, spacing float32) Vector2 {
 	cfont := font.cptr()
 	ctext := textAlloc(text)
 	cfontSize := (C.float)(fontSize)

@@ -10,7 +10,7 @@ import "C"
 import (
 	"unsafe"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 // govec2ptr - Returns new Vector2 from pointer

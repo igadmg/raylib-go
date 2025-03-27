@@ -5,13 +5,17 @@ package rl
 
 /*
 #include "raylib.h"
+#include "platforms/raylib_android.h"
 #include <stdlib.h>
 #include <android/asset_manager.h>
 
-extern void android_init();
+static AAssetManager* GetAssetManager() {
+	return GetAndroidApp()->activity->assetManager;
+}
 
-static AAssetManager* asset_manager;
-static const char* internal_storage_path;
+static const char* GetInternalDataPath() {
+	return GetAndroidApp()->activity->internalDataPath;
+}
 */
 import "C"
 
@@ -31,19 +35,43 @@ func InitWindow[WT, HT IntegerT](width WT, height HT, title string) {
 	ctitle := textAlloc(title)
 
 	C.InitWindow(cwidth, cheight, ctitle)
-	C.android_init()
+
+	SetLoadFileDataCallback(func(fileName string) []byte {
+		asset, err := OpenAsset(fileName)
+		if err != nil {
+			return nil
+		}
+		data, err := ReadAll(asset)
+		if err != nil {
+			return nil
+		}
+
+		return data
+	})
+	SetLoadFileTextCallback(func(fileName string) string {
+		asset, err := OpenAsset(fileName)
+		if err != nil {
+			return ""
+		}
+		data, err := ReadAll(asset)
+		if err != nil {
+			return ""
+		}
+
+		return string(data)
+	})
 }
 
-// SetCallbackFunc - Sets callback function
-func SetCallbackFunc(callback func()) {
-	callbackHolder = callback
+var androidMainFn func()
+
+func RayLibANativeActivity_onCreate(activity unsafe.Pointer, savedState unsafe.Pointer, savedStateSize uint, mainFn func()) {
+	androidMainFn = mainFn
+	C.RayLibANativeActivity_onCreate((*C.ANativeActivity)(activity), savedState, (C.size_t)(savedStateSize))
 }
 
 //export android_run
 func android_run() {
-	if callbackHolder != nil {
-		callbackHolder()
-	}
+	androidMainFn()
 }
 
 // ShowCursor - Shows cursor
@@ -95,7 +123,7 @@ func UnloadDroppedFiles() {
 func OpenAsset(name string) (Asset, error) {
 	cname := textAlloc(name)
 
-	a := &asset{C.AAssetManager_open(C.asset_manager, cname, C.AASSET_MODE_UNKNOWN)}
+	a := &asset{C.AAssetManager_open(C.GetAssetManager(), cname, C.AASSET_MODE_UNKNOWN)}
 
 	if a.ptr == nil {
 		return nil, fmt.Errorf("asset file could not be opened")
@@ -129,6 +157,10 @@ func (a *asset) Close() error {
 	return nil
 }
 
+func (a *asset) Size() int64 {
+	return (int64)(C.AAsset_getLength64(a.ptr))
+}
+
 func getInternalStoragePath() string {
-	return C.GoString(C.internal_storage_path)
+	return C.GoString(C.GetInternalDataPath())
 }

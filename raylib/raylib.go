@@ -9,16 +9,16 @@ NOTE for ADVENTURERS: raylib is a programming library to learn videogames progra
 package rl
 
 import (
-	"image/color"
 	"io"
 	"runtime"
 	"unsafe"
 
-	"github.com/EliCDavis/vector"
-	"github.com/EliCDavis/vector/rect2"
-	"github.com/EliCDavis/vector/vector2"
-	"github.com/EliCDavis/vector/vector3"
-	"github.com/EliCDavis/vector/vector4"
+	"github.com/igadmg/goex/image/colorex"
+	rm "github.com/igadmg/raylib-go/raymath"
+	"github.com/igadmg/raylib-go/raymath/rect2"
+	"github.com/igadmg/raylib-go/raymath/vector2"
+	"github.com/igadmg/raylib-go/raymath/vector3"
+	"github.com/igadmg/raylib-go/raymath/vector4"
 )
 
 func init() {
@@ -217,41 +217,29 @@ const (
 	Pi      = 3.1415927
 	Deg2rad = 0.017453292
 	Rad2deg = 57.295776
+)
 
-	// Raylib Config Flags
+// Raylib Config Flags
 
-	// Set to try enabling V-Sync on GPU
-	FlagVsyncHint = 0x00000040
-	// Set to run program in fullscreen
-	FlagFullscreenMode = 0x00000002
-	// Set to allow resizable window
-	FlagWindowResizable = 0x00000004
-	// Set to disable window decoration (frame and buttons)
-	FlagWindowUndecorated = 0x00000008
-	// Set to hide window
-	FlagWindowHidden = 0x00000080
-	// Set to minimize window (iconify)
-	FlagWindowMinimized = 0x00000200
-	// Set to maximize window (expanded to monitor)
-	FlagWindowMaximized = 0x00000400
-	// Set to window non focused
-	FlagWindowUnfocused = 0x00000800
-	// Set to window always on top
-	FlagWindowTopmost = 0x00001000
-	// Set to allow windows running while minimized
-	FlagWindowAlwaysRun = 0x00000100
-	// Set to allow transparent window
-	FlagWindowTransparent = 0x00000010
-	// Set to support HighDPI
-	FlagWindowHighdpi = 0x00002000
-	// Set to support mouse passthrough, only supported when FLAG_WINDOW_UNDECORATED
-	FlagWindowMousePassthrough = 0x00004000
-	// Set to run program in borderless windowed mode
-	FlagBorderlessWindowedMode = 0x00008000
-	// Set to try enabling MSAA 4X
-	FlagMsaa4xHint = 0x00000020
-	// Set to try enabling interlaced video format (for V3D)
-	FlagInterlacedHint = 0x00010000
+type ConfigFlags = uint32
+
+const (
+	FlagVsyncHint              ConfigFlags = 0x00000040 // Set to try enabling V-Sync on GPU
+	FlagFullscreenMode         ConfigFlags = 0x00000002 // Set to run program in fullscreen
+	FlagWindowResizable        ConfigFlags = 0x00000004 // Set to allow resizable window
+	FlagWindowUndecorated      ConfigFlags = 0x00000008 // Set to disable window decoration (frame and buttons)
+	FlagWindowHidden           ConfigFlags = 0x00000080 // Set to hide window
+	FlagWindowMinimized        ConfigFlags = 0x00000200 // Set to minimize window (iconify)
+	FlagWindowMaximized        ConfigFlags = 0x00000400 // Set to maximize window (expanded to monitor)
+	FlagWindowUnfocused        ConfigFlags = 0x00000800 // Set to window non focused
+	FlagWindowTopmost          ConfigFlags = 0x00001000 // Set to window always on top
+	FlagWindowAlwaysRun        ConfigFlags = 0x00000100 // Set to allow windows running while minimized
+	FlagWindowTransparent      ConfigFlags = 0x00000010 // Set to allow transparent window
+	FlagWindowHighdpi          ConfigFlags = 0x00002000 // Set to support HighDPI
+	FlagWindowMousePassthrough ConfigFlags = 0x00004000 // Set to support mouse passthrough, only supported when FLAG_WINDOW_UNDECORATED
+	FlagBorderlessWindowedMode ConfigFlags = 0x00008000 // Set to run program in borderless windowed mode
+	FlagMsaa4xHint             ConfigFlags = 0x00000020 // Set to try enabling MSAA 4X
+	FlagInterlacedHint         ConfigFlags = 0x00010000 // Set to try enabling interlaced video format (for V3D)
 )
 
 type KeyType int32
@@ -509,62 +497,19 @@ var (
 // Vector2 type
 type Vector2 = vector2.Float32
 type Vector2Int = vector2.Int
-
-var (
-	AnchorTopLeft      = NewVector2(0, 0)
-	AnchorTopRight     = NewVector2(1, 0)
-	AnchorTopCenter    = NewVector2(0.5, 0)
-	AnchorCenter       = NewVector2(0.5, 0.5)
-	AnchorBottomCenter = NewVector2(0.5, 1)
-	AnchorBottomLeft   = NewVector2(0, 1)
-	AnchorBottomRight  = NewVector2(1, 1)
-)
-
-// NewVector2 - Returns new Vector2
-func NewVector2[XT, YT CoordinateT](x XT, y YT) Vector2 {
-	return vector2.New(float32(x), float32(y))
-}
-
-// Vector2Zero - Vector with components value 0.0
-func Vector2Zero() Vector2 {
-	return NewVector2(0.0, 0.0)
-}
-
-// Vector2One - Vector with components value 1.0
-func Vector2One() Vector2 {
-	return NewVector2(1.0, 1.0)
-}
-
-// NewVector2 - Returns new Vector2
-func NewVector2Int[XT, YT CoordinateT](x XT, y YT) Vector2Int {
-	return vector2.New(int(x), int(y))
-}
-
-func Vector2IntZero() Vector2Int {
-	return NewVector2Int(0, 0)
-}
-
-// Vector2One - Vector with components value 1.0
-func Vector2IntOne() Vector2Int {
-	return NewVector2Int(1, 1)
-}
-
-// Vector3 type
 type Vector3 = vector3.Float32
 type Vector3Int = vector3.Int
-
-// NewVector3 - Returns new Vector3
-func NewVector3[XT, YT, ZT CoordinateT](x XT, y YT, z ZT) Vector3 {
-	return vector3.New(float32(x), float32(y), float32(z))
-}
-
-// Vector4 type
 type Vector4 = vector4.Float32
 
-// NewVector4 - Returns new Vector4
-func NewVector4[XT, YT, ZT, WT CoordinateT](x XT, y YT, z ZT, w WT) Vector4 {
-	return vector4.New(float32(x), float32(y), float32(z), float32(w))
-}
+var (
+	AnchorTopLeft      = vector2.NewFloat32(0, 0)
+	AnchorTopRight     = vector2.NewFloat32(1, 0)
+	AnchorTopCenter    = vector2.NewFloat32(0.5, 0)
+	AnchorCenter       = vector2.NewFloat32(0.5, 0.5)
+	AnchorBottomCenter = vector2.NewFloat32(0.5, 1)
+	AnchorBottomLeft   = vector2.NewFloat32(0, 1)
+	AnchorBottomRight  = vector2.NewFloat32(1, 1)
+)
 
 // Matrix type (OpenGL style 4x4 - right handed, column major)
 type Matrix struct {
@@ -597,39 +542,24 @@ type Quaternion = Vector4
 
 // NewQuaternion - Returns new Quaternion
 func NewQuaternion(x, y, z, w float32) Quaternion {
-	return NewVector4(x, y, z, w)
+	return vector4.NewFloat32(x, y, z, w)
 }
 
-// Color type, RGBA (32bit)
-// TODO remove later, keep type for now to not break code
-type Color = color.RGBA
-
 // NewColor - Returns new Color
-func NewColor(r, g, b, a uint8) color.RGBA {
-	return color.RGBA{r, g, b, a}
+func NewColor(r, g, b, a uint8) colorex.RGBA {
+	return colorex.RGBA{R: r, G: g, B: b, A: a}
 }
 
 // Rectangle type
 type Rectangle = rect2.Float32
 type RectangleInt32 = rect2.Int32
 
-//type Rectangle struct {
-//	X      float32
-//	Y      float32
-//	Width  float32
-//	Height float32
-//}
-
 // NewRectangle - Returns new Rectangle
 func NewRectangle[XT, YT, WT, HT CoordinateT](x XT, y YT, width WT, height HT) Rectangle {
-	return rect2.New(vector2.New(float32(x), float32(y)), vector2.New(float32(width), float32(height)))
+	return rect2.New(vector2.NewFloat32(x, y), vector2.NewFloat32(width, height))
 }
 
-func NewRectangleV[XYT, WHT vector.Number](xy vector2.Vector[XYT], wh vector2.Vector[WHT]) Rectangle {
-	return rect2.New(xy.ToFloat32(), wh.ToFloat32())
-}
-
-func NewRectangleWHV[WHT vector.Number](wh vector2.Vector[WHT]) Rectangle {
+func NewRectangleWHV[WHT rm.SignedNumber](wh vector2.Vector[WHT]) Rectangle {
 	return rect2.New(vector2.Zero[float32](), wh.ToFloat32())
 }
 
@@ -689,17 +619,28 @@ func NewBoundingBox(min, max Vector3) BoundingBox {
 type Asset interface {
 	io.ReadSeeker
 	io.Closer
+
+	Size() int64
+}
+
+func ReadAll(a Asset) ([]byte, error) {
+	b := make([]byte, a.Size())
+	if _, err := a.Read(b); err != nil {
+		return nil, err
+	}
+
+	return b, nil
 }
 
 // Gestures type
-type Gestures int32
+type Gestures uint32
 
 // Gestures types
 // NOTE: It could be used as flags to enable only some gestures
 const (
 	GestureNone       Gestures = 0
 	GestureTap        Gestures = 1
-	GestureDoubletap  Gestures = 2
+	GestureDoubleTap  Gestures = 2
 	GestureHold       Gestures = 4
 	GestureDrag       Gestures = 8
 	GestureSwipeRight Gestures = 16
@@ -840,7 +781,7 @@ type MaterialMap struct {
 	// Texture
 	Texture Texture2D
 	// Color
-	Color color.RGBA
+	Color colorex.RGBA
 	// Value
 	Value float32
 }
@@ -1023,7 +964,7 @@ type Font struct {
 	Glyphs *GlyphInfo
 }
 
-func (f *Font) IsReady() bool {
+func (f Font) IsReady() bool {
 	return f.Texture.IsReady() && // Validate OpenGL id fot font texture atlas
 		f.BaseSize != 0 && // Validate font size
 		f.GlyphCount != 0 && // Validate font contains some glyph
@@ -1032,17 +973,38 @@ func (f *Font) IsReady() bool {
 }
 
 // DrawTextEx - Draw text using Font and additional parameters
-func (f *Font) DrawEx(text string, position Vector2, fontSize float32, spacing float32, tint color.RGBA) {
+func (f Font) DrawEx(text string, position Vector2, fontSize float32, spacing float32, tint colorex.RGBA) {
 	DrawTextEx(f, text, position, fontSize, spacing, tint)
 }
 
-func (f *Font) DrawLayout(text string, fontSize float32, spacing float32, tint color.RGBA, layoutFn func(wh Vector2) Rectangle) {
+func (f Font) DrawLayout(text string, fontSize float32, spacing float32, tint colorex.RGBA, layoutFn func(wh Vector2) Rectangle) {
 	DrawTextLayout(f, text, fontSize, spacing, tint, layoutFn)
 }
 
 // MeasureTextEx - Measure string size for Font
-func (f *Font) MeasureEx(text string, fontSize float32, spacing float32) Vector2 {
+func (f Font) MeasureEx(text string, fontSize float32, spacing float32) Vector2 {
 	return MeasureTextEx(f, text, fontSize, spacing)
+}
+
+// Font type, includes texture and charSet array data
+type FontPreset struct {
+	Font
+
+	FontSize float32
+	Spacing  float32
+}
+
+func (f FontPreset) DrawEx(text string, position Vector2, tint colorex.RGBA) {
+	DrawTextEx(f.Font, text, position, f.FontSize, f.Spacing, tint)
+}
+
+func (f FontPreset) DrawLayout(text string, tint colorex.RGBA, layoutFn func(wh Vector2) Rectangle) {
+	DrawTextLayout(f.Font, text, f.FontSize, f.Spacing, tint, layoutFn)
+}
+
+// MeasureTextEx - Measure string size for Font
+func (f FontPreset) MeasureEx(text string) Vector2 {
+	return MeasureTextEx(f.Font, text, f.FontSize, f.Spacing)
 }
 
 // PixelFormat - Texture format
@@ -1163,11 +1125,19 @@ func (i *Image) Unload() {
 	UnloadImage(i)
 }
 
-func (i *Image) GetSize() Vector2 {
-	return NewVector2(i.Width, i.Height)
+func (t Image) IsNull() bool {
+	return t.cptr().data == nil
 }
 
-func (i *Image) GetRect() Rectangle {
+func (t Image) IsReady() bool {
+	return !t.IsNull()
+}
+
+func (i Image) GetSize() Vector2 {
+	return vector2.NewFloat32(i.Width, i.Height)
+}
+
+func (i Image) GetRect() Rectangle {
 	return NewRectangle(0, 0, i.Width, i.Height)
 }
 
@@ -1199,7 +1169,15 @@ func (t *Texture2D) Unload() {
 	UnloadTexture(t)
 }
 
-func (t *Texture2D) IsReady() bool {
+func (t Texture2D) IsNull() bool {
+	return t.ID == 0 || // Validate OpenGL id
+		t.Width == 0 ||
+		t.Height == 0 || // Validate texture size
+		t.Format == 0 || // Validate texture pixel format
+		t.Mipmaps == 0
+}
+
+func (t Texture2D) IsReady() bool {
 	return t.ID > 0 && // Validate OpenGL id
 		t.Width > 0 &&
 		t.Height > 0 && // Validate texture size
@@ -1207,15 +1185,15 @@ func (t *Texture2D) IsReady() bool {
 		t.Mipmaps > 0
 }
 
-func (t *Texture2D) GetSize() Vector2 {
-	return NewVector2(t.Width, t.Height)
+func (t Texture2D) GetSize() Vector2 {
+	return vector2.NewFloat32(t.Width, t.Height)
 }
 
-func (t *Texture2D) GetRect() Rectangle {
+func (t Texture2D) GetRect() Rectangle {
 	return NewRectangle(0, 0, t.Width, t.Height)
 }
 
-func (t *Texture2D) Draw(posX int, posY int, tint color.RGBA) {
+func (t *Texture2D) Draw(posX int, posY int, tint colorex.RGBA) {
 	DrawTexture(t, posX, posY, tint)
 }
 
@@ -1223,7 +1201,7 @@ func (t *Texture2D) DrawDef(posX int, posY int) {
 	DrawTexture(t, posX, posY, White)
 }
 
-func (t *Texture2D) DrawV(position Vector2, tint color.RGBA) {
+func (t *Texture2D) DrawV(position Vector2, tint colorex.RGBA) {
 	DrawTextureV(t, position, tint)
 }
 
@@ -1231,7 +1209,7 @@ func (t *Texture2D) DrawVDef(position Vector2) {
 	DrawTextureV(t, position, White)
 }
 
-func (t *Texture2D) DrawEx(position Vector2, rotation, scale float32, tint color.RGBA) {
+func (t *Texture2D) DrawEx(position Vector2, rotation, scale float32, tint colorex.RGBA) {
 	DrawTextureEx(t, position, rotation, scale, tint)
 }
 
@@ -1239,29 +1217,29 @@ func (t *Texture2D) DrawExDef(position Vector2) {
 	DrawTextureEx(t, position, 0, 1, White)
 }
 
-func (t *Texture2D) DrawRec(sourceRec Rectangle, position Vector2, tint color.RGBA) {
+func (t *Texture2D) DrawRec(sourceRec Rectangle, position Vector2, tint colorex.RGBA) {
 	DrawTextureRec(t, sourceRec, position, tint)
 }
 
-func (t *Texture2D) DrawPro(sourceRec, destRec Rectangle, origin Vector2, rotation float32, tint color.RGBA) {
+func (t *Texture2D) DrawPro(sourceRec, destRec Rectangle, origin Vector2, rotation float32, tint colorex.RGBA) {
 	DrawTexturePro(t, sourceRec, destRec, origin, rotation, tint)
 }
 
-func (t *Texture2D) DrawFlippedPro(sourceRec, destRec Rectangle, origin Vector2, rotation float32, tint color.RGBA) {
-	sourceRec = sourceRec.ScaleByVectorF(NewVector2(1, -1))
+func (t *Texture2D) DrawFlippedPro(sourceRec, destRec Rectangle, origin Vector2, rotation float32, tint colorex.RGBA) {
+	sourceRec = sourceRec.ScaleByVectorF(vector2.NewFloat32(1, -1))
 	sourceRec = sourceRec.SetY(float32(t.Height) + sourceRec.Height())
 	DrawTexturePro(t, sourceRec, destRec, origin, rotation, tint)
 }
 
 func (t *Texture2D) DrawProDef(destRec Rectangle) {
-	DrawTexturePro(t, t.GetRect(), destRec, Vector2Zero(), 0, White)
+	DrawTexturePro(t, t.GetRect(), destRec, vector2.Zero[float32](), 0, White)
 }
 
 func (t *Texture2D) DrawProFlippedDef(destRec Rectangle) {
-	DrawTexturePro(t, t.GetRect().ScaleByVectorF(NewVector2(1, -1)), destRec, Vector2Zero(), 0, White)
+	DrawTexturePro(t, t.GetRect().ScaleByVectorF(vector2.NewFloat32(1, -1)), destRec, vector2.Zero[float32](), 0, White)
 }
 
-func (t *Texture2D) DrawTiled(source, dest Rectangle, origin Vector2, rotation, scale float32, tint color.RGBA) {
+func (t *Texture2D) DrawTiled(source, dest Rectangle, origin Vector2, rotation, scale float32, tint colorex.RGBA) {
 	DrawTextureTiled(t, source, dest, origin, rotation, scale, tint)
 }
 
@@ -1282,6 +1260,12 @@ type RenderTexture2D struct {
 // NewRenderTexture2D - Returns new RenderTexture2D
 func NewRenderTexture2D(id uint32, texture, depth Texture2D) *RenderTexture2D {
 	return &RenderTexture2D{id, texture, depth}
+}
+
+func (r RenderTexture2D) IsNull() bool {
+	return r.ID == 0 ||
+		r.Texture.IsNull() ||
+		r.Depth.IsNull()
 }
 
 func (r *RenderTexture2D) Unload() {
