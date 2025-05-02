@@ -546,7 +546,7 @@ func ImageDrawLineV(dst *Image, start, end Vector2, col colorex.RGBA) {
 }
 
 // ImageDrawLineEx - Draw a line defining thickness within an image
-func ImageDrawLineEx(dst *Image, start, end Vector2, thick int32, col color.RGBA) {
+func ImageDrawLineEx(dst *Image, start, end Vector2, thick int32, col colorex.RGBA) {
 	cdst := dst.cptr()
 	cstart := start.cptr()
 	cend := end.cptr()
