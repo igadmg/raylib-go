@@ -2,7 +2,7 @@ module github.com/igadmg/raylib-go/rres
 
 go 1.24
 
-require github.com/igadmg/raylib-go/raylib v0.0.0-20250327112125-46827dd07487
+require github.com/igadmg/raylib-go/raylib v0.0.0-20250502131645-69dfc6d44b22
 
 require (
 	github.com/chewxy/math32 v1.11.1 // indirect
