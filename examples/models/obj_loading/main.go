@@ -34,7 +34,7 @@ func main() {
 	obj := rl.LoadModel("castle.obj")               // Load OBJ model
 	texture := rl.LoadTexture("castle_diffuse.png") // Load model texture
 
-	rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, &texture) // Set map diffuse texture
+	rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, texture) // Set map diffuse texture
 
 	position := rl.NewVector3(0.0, 0.0, 0.0) // Set model position
 
@@ -56,7 +56,7 @@ func main() {
 
 			if len(droppedFiles) == 1 { // Only support one file dropped
 				if slices.Contains(supportedFileTypes, filepath.Ext(droppedFiles[0])) { // Model file formats supported
-					rl.UnloadModel(obj)                                          // Unload previous model
+					rl.UnloadModel(&obj)                                         // Unload previous model
 					obj = rl.LoadModel(droppedFiles[0])                          // Load new model
 					rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, texture) // Set current map diffuse texture
 
@@ -66,7 +66,7 @@ func main() {
 					// TODO: Move camera position from target enough distance to visualize model properly
 				} else if filepath.Ext(droppedFiles[0]) == ".png" { // Texture file formats supported
 					// Unload current model texture and load new one
-					rl.UnloadTexture(texture)
+					rl.UnloadTexture(&texture)
 					texture = rl.LoadTexture(droppedFiles[0])
 					rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, texture) // Set current map diffuse texture
 				}

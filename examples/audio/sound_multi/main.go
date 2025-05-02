@@ -58,8 +58,8 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadSound(soundArray[0]) // Unload source sound data
-	rl.CloseAudioDevice()         // Close audio device
+	rl.UnloadSound(&soundArray[0]) // Unload source sound data
+	rl.CloseAudioDevice()          // Close audio device
 
 	rl.CloseWindow() // Close window and OpenGL context
 }

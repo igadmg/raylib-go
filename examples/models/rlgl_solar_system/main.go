@@ -17,6 +17,8 @@ package main
 import (
 	"math"
 
+	"github.com/igadmg/gamemath/vector3"
+	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -41,15 +43,15 @@ func main() {
 
 	// Define the camera to look into our 3d world
 	camera := rl.Camera{
-		Position: rl.Vector3{
+		Position: vector3.Float32{
 			X: 16.0,
 			Y: 16.0,
 			Z: 16.0,
 		}, // Camera position
-		Target:     rl.Vector3{},         // Camera looking at point
-		Up:         rl.Vector3{Y: 1.0},   // Camera up vector (rotation towards target)
-		Fovy:       45.0,                 // Camera field-of-view Y
-		Projection: rl.CameraPerspective, // Camera projection type
+		Target:     vector3.Float32{},       // Camera looking at point
+		Up:         vector3.Float32{Y: 1.0}, // Camera up vector (rotation towards target)
+		Fovy:       45.0,                    // Camera field-of-view Y
+		Projection: rl.CameraPerspective,    // Camera projection type
 	}
 
 	var rotationSpeed float32 = 0.2 // General system rotation speed
@@ -100,7 +102,7 @@ func main() {
 		rl.PopMatrix()
 
 		// Some reference elements (not affected by previous matrix transformations)
-		rl.DrawCircle3D(rl.Vector3{}, earthOrbitRadius, rl.NewVector3(1, 0, 0), 90.0, rl.Fade(rl.Red, 0.5))
+		rl.DrawCircle3D(vector3.Float32{}, earthOrbitRadius, vector3.NewFloat32(1, 0, 0), 90.0, rl.Fade(rl.Red, 0.5))
 		rl.DrawGrid(20, 1.0)
 
 		rl.EndMode3D()
@@ -117,13 +119,13 @@ func main() {
 
 // DrawSphereBasic draws a sphere without any matrix transformation
 // NOTE: Sphere is drawn in world position ( 0, 0, 0 ) with radius 1.0f
-func DrawSphereBasic(color rl.Color) {
+func DrawSphereBasic(color colorex.RGBA) {
 	// Make sure there is enough space in the internal render batch
 	// buffer to store all required vertex, batch is reset if required
 	rl.CheckRenderBatchLimit((rings + 2) * slices * 6)
 
 	rl.Begin(rl.Triangles)
-	rl.Color4ub(color.R, color.G, color.B, color.A)
+	colorex.RGBA4ub(color.R, color.G, color.B, color.A)
 
 	for ring := int32(0); ring < (rings + 2); ring++ {
 		for slice := int32(0); slice < slices; slice++ {

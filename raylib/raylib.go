@@ -597,7 +597,6 @@ func NewColor(r, g, b, a uint8) colorex.RGBA {
 }
 
 // Rectangle type
-type Rectangle = rect2.Float32
 type RectangleInt32 = rect2.Int32
 
 // NewRectangle - Returns new Rectangle

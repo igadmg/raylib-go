@@ -15,6 +15,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -80,20 +83,20 @@ func main() {
 	target := rl.LoadRenderTexture(device.HResolution, device.VResolution)
 
 	// The target's height is flipped (in the source Rectangle), due to OpenGL reasons
-	sourceRec := rl.Rectangle{Width: float32(target.Texture.Width), Height: float32(-target.Texture.Height)}
-	destRec := rl.Rectangle{Width: float32(rl.GetScreenWidth()), Height: float32(rl.GetScreenHeight())}
+	sourceRec := rect2.Float32{Width: float32(target.Texture.Width), Height: float32(-target.Texture.Height)}
+	destRec := rect2.Float32{Width: float32(rl.GetScreenWidth()), Height: float32(rl.GetScreenHeight())}
 
 	// Define the camera to look into our 3d world
 
 	camera := rl.Camera{
-		Position:   rl.Vector3{X: 5, Y: 2, Z: 5},
-		Target:     rl.Vector3{Y: 2},
-		Up:         rl.Vector3{Y: 1},
+		Position:   vector3.Float32{X: 5, Y: 2, Z: 5},
+		Target:     vector3.Float32{Y: 2},
+		Up:         vector3.Float32{Y: 1},
 		Fovy:       60.0,
 		Projection: rl.CameraPerspective,
 	}
 
-	cubePosition := rl.Vector3{}
+	cubePosition := vector3.Float32{}
 
 	rl.DisableCursor()  // Limit cursor to relative movement inside the window
 	rl.SetTargetFPS(60) // Set our game to run at 60 frames-per-second
@@ -121,7 +124,7 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 		rl.BeginShaderMode(distortion)
-		rl.DrawTexturePro(target.Texture, sourceRec, destRec, rl.Vector2{}, 0.0, rl.White)
+		rl.DrawTexturePro(target.Texture, sourceRec, destRec, vector2.Float32{}, 0.0, rl.White)
 		rl.EndShaderMode()
 		rl.DrawFPS(10, 10)
 		rl.EndDrawing()
@@ -130,8 +133,8 @@ func main() {
 	// De-Initialization
 	rl.UnloadVrStereoConfig(config) // Unload stereo config
 
-	rl.UnloadRenderTexture(target) // Unload stereo render fbo
-	rl.UnloadShader(distortion)    // Unload distortion shader
+	rl.UnloadRenderTexture(&target) // Unload stereo render fbo
+	rl.UnloadShader(&distortion)    // Unload distortion shader
 
 	rl.CloseWindow() // Close window and OpenGL context
 }

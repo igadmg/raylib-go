@@ -70,8 +70,8 @@ func main() {
 
 		for x := -count * spacing; x <= count*spacing; x += spacing {
 			for z := -count * spacing; z <= count*spacing; z += spacing {
-				rl.DrawCube(rl.NewVector3(x-0.5, 1.5, z), 1, 1, 1, rl.Lime)
-				rl.DrawCube(rl.NewVector3(x-0.5, 0.5, z), 0.25, 1, 0.25, rl.Brown)
+				rl.DrawCube(vector3.NewFloat32(x-0.5, 1.5, z), 1, 1, 1, rl.Lime)
+				rl.DrawCube(vector3.NewFloat32(x-0.5, 0.5, z), 0.25, 1, 0.25, rl.Brown)
 			}
 		}
 
@@ -85,7 +85,7 @@ func main() {
 		rl.EndTextureMode()
 
 		// Draw Player2 view to the render texture
-		rl.BeginTextureMode(&screenCam2)
+		rl.BeginTextureMode(screenCam2)
 		rl.ClearBackground(rl.SkyBlue)
 		rl.BeginMode3D(cam2)
 
@@ -93,8 +93,8 @@ func main() {
 
 		for x := -count * spacing; x <= count*spacing; x += spacing {
 			for z := -count * spacing; z <= count*spacing; z += spacing {
-				rl.DrawCube(rl.NewVector3(x, 1.5, z), 1, 1, 1, rl.Lime)
-				rl.DrawCube(rl.NewVector3(x, 0.5, z), 0.25, 1, 0.25, rl.Brown)
+				rl.DrawCube(vector3.NewFloat32(x, 1.5, z), 1, 1, 1, rl.Lime)
+				rl.DrawCube(vector3.NewFloat32(x, 0.5, z), 0.25, 1, 0.25, rl.Brown)
 			}
 		}
 

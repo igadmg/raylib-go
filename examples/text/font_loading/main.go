@@ -21,7 +21,10 @@
 ********************************************************************************************/
 package main
 
-import rl "github.com/igadmg/raylib-go/raylib"
+import (
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
+)
 
 const (
 	screenWidth  = 800
@@ -62,10 +65,10 @@ func main() {
 		rl.DrawText("Hold SPACE to use TTF generated font", 20, 20, 20, rl.LightGray)
 
 		if !useTtf {
-			rl.DrawTextEx(fontBm, msg, rl.Vector2{X: 20.0, Y: 100.0}, float32(fontBm.BaseSize), 2, rl.Maroon)
+			rl.DrawTextEx(fontBm, msg, vector2.Float32{X: 20.0, Y: 100.0}, float32(fontBm.BaseSize), 2, rl.Maroon)
 			rl.DrawText("Using BMFont (Angelcode) imported", 20, int32(rl.GetScreenHeight())-30, 20, rl.Gray)
 		} else {
-			rl.DrawTextEx(fontTtf, msg, rl.Vector2{X: 20.0, Y: 100.0}, float32(fontTtf.BaseSize), 2, rl.Lime)
+			rl.DrawTextEx(fontTtf, msg, vector2.Float32{X: 20.0, Y: 100.0}, float32(fontTtf.BaseSize), 2, rl.Lime)
 			rl.DrawText("Using TTF font generated", 20, int32(rl.GetScreenHeight())-30, 20, rl.Gray)
 		}
 
@@ -73,7 +76,7 @@ func main() {
 	}
 
 	// De-Initialization
-	rl.UnloadFont(fontBm)  // AngelCode Font unloading
-	rl.UnloadFont(fontTtf) // TTF Font unloading
-	rl.CloseWindow()       // Close window and OpenGL context
+	rl.UnloadFont(&fontBm)  // AngelCode Font unloading
+	rl.UnloadFont(&fontTtf) // TTF Font unloading
+	rl.CloseWindow()        // Close window and OpenGL context
 }

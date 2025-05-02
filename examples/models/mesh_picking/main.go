@@ -19,6 +19,7 @@ import (
 	"math"
 	"unsafe"
 
+	"github.com/igadmg/gamemath/vector3"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -33,15 +34,15 @@ func main() {
 
 	// Define the camera to look into our 3d world
 	camera := rl.Camera{
-		Position: rl.Vector3{
+		Position: vector3.Float32{
 			X: 20.0,
 			Y: 20.0,
 			Z: 20.0,
 		}, // Camera position
-		Target:     rl.Vector3{Y: 8.0},   // Camera looking at point
-		Up:         rl.Vector3{Y: 1.6},   // Camera up vector (rotation towards target)
-		Fovy:       45.0,                 // Camera field-of-view Y
-		Projection: rl.CameraPerspective, // Camera projection type
+		Target:     vector3.Float32{Y: 8.0}, // Camera looking at point
+		Up:         vector3.Float32{Y: 1.6}, // Camera up vector (rotation towards target)
+		Fovy:       45.0,                    // Camera field-of-view Y
+		Projection: rl.CameraPerspective,    // Camera projection type
 	}
 	var ray rl.Ray // Picking ray
 
@@ -50,47 +51,47 @@ func main() {
 	materials := unsafe.Slice(tower.Materials, tower.MaterialCount)
 	materials[0].GetMap(rl.MapDiffuse).Texture = texture // Set model diffuse texture
 
-	towerPos := rl.Vector3{} // Set model position
+	towerPos := vector3.Float32{} // Set model position
 	meshes := unsafe.Slice(tower.Meshes, tower.MeshCount)
 	towerBBox := rl.GetMeshBoundingBox(meshes[0]) // Get mesh bounding box
 
 	// Ground quad
-	g0 := rl.Vector3{
+	g0 := vector3.Float32{
 		X: -50.0,
 		Z: -50.0,
 	}
-	g1 := rl.Vector3{
+	g1 := vector3.Float32{
 		X: -50.0,
 		Z: 50.0,
 	}
-	g2 := rl.Vector3{
+	g2 := vector3.Float32{
 		X: 50.0,
 		Z: 50.0,
 	}
-	g3 := rl.Vector3{
+	g3 := vector3.Float32{
 		X: 50.0,
 		Z: -50.0,
 	}
 
 	// Test triangle
-	ta := rl.Vector3{
+	ta := vector3.Float32{
 		X: -25.0,
 		Y: 0.5,
 	}
-	tb := rl.Vector3{
+	tb := vector3.Float32{
 		X: -4.0,
 		Y: 2.5,
 		Z: 1.0,
 	}
-	tc := rl.Vector3{
+	tc := vector3.Float32{
 		X: -8.0,
 		Y: 6.5,
 	}
 
-	bary := rl.Vector3{}
+	bary := vector3.Float32{}
 
 	// Test sphere
-	sp := rl.Vector3{
+	sp := vector3.Float32{
 		X: -30.0,
 		Y: 5.0,
 		Z: 5.0,
@@ -143,7 +144,7 @@ func main() {
 			cursorColor = rl.Purple
 			hitObjectName = "Triangle"
 
-			bary = rl.Vector3Barycenter(collision.Point, ta, tb, tc)
+			bary = vector3.Float32Barycenter(collision.Point, ta, tb, tc)
 		}
 
 		// Check ray collision against test sphere
@@ -215,7 +216,7 @@ func main() {
 			rl.DrawCube(collision.Point, 0.3, 0.3, 0.3, cursorColor)
 			rl.DrawCubeWires(collision.Point, 0.3, 0.3, 0.3, rl.Red)
 
-			normalEnd := rl.Vector3{}
+			normalEnd := vector3.Float32{}
 			normalEnd.X = collision.Point.X + collision.Normal.X
 			normalEnd.Y = collision.Point.Y + collision.Normal.Y
 			normalEnd.Z = collision.Point.Z + collision.Normal.Z
@@ -250,12 +251,12 @@ func main() {
 	}
 
 	// De-Initialization
-	rl.UnloadModel(tower)     // Unload model
-	rl.UnloadTexture(texture) // Unload texture
+	rl.UnloadModel(&tower)     // Unload model
+	rl.UnloadTexture(&texture) // Unload texture
 
 	rl.CloseWindow() // Close window and OpenGL context
 }
 
-func Vec2Str(format string, vec rl.Vector3) string {
+func Vec2Str(format string, vec vector3.Float32) string {
 	return fmt.Sprintf(format, vec.X, vec.Y, vec.Z)
 }

@@ -79,8 +79,8 @@ const (
 	BlendEquationAlpha  = 0x883D        // GL_BLEND_EQUATION_ALPHA
 	BlendDstRgb         = 0x80C8        // GL_BLEND_DST_RGB
 	BlendSrcRgb         = 0x80C9        // GL_BLEND_SRC_RGB
-	BlendDstAlpha       = 0x80CA        // GL_BLEND_DST_ALPHA
-	BlendSrcAlpha       = 0x80CB        // GL_BLEND_SRC_ALPHA
+	BlendFuncDstAlpha   = 0x80CA        // GL_BLEND_DST_ALPHA
+	BlendFuncSrcAlpha   = 0x80CB        // GL_BLEND_SRC_ALPHA
 	BlendColor          = 0x8005        // GL_BLEND_COLOR
 
 	ReadFramebuffer = 0x8CA8 // GL_READ_FRAMEBUFFER

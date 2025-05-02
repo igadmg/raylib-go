@@ -18,7 +18,7 @@ const (
 
 func main() {
 	rl.InitWindow(800, 450, "raylib [audio] example - raw audio streaming")
-	position := rl.NewVector2(0, 0)
+	position := vector2.NewFloat32(0, 0)
 
 	rl.SetAudioStreamBufferSizeDefault(bufferSize)
 

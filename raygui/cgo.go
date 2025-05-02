@@ -10,9 +10,9 @@ import "C"
 import (
 	"unsafe"
 
+	"github.com/igadmg/gamemath/rect2"
 	"github.com/igadmg/gamemath/vector2"
 	"github.com/igadmg/gamemath/vector3"
-	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 // govec2ptr - Returns new Vector2 from pointer
@@ -48,12 +48,12 @@ func cvec4ptr(v *rl.Vector4) *C.Vector4 {
 */
 
 // gorec2ptr - Returns new Rectangle from pointer
-func gorec2ptr(ptr *C.Rectangle) *rl.Rectangle {
-	return (*rl.Rectangle)(unsafe.Pointer(ptr))
+func gorec2ptr(ptr *C.Rectangle) *rect2.Float32 {
+	return (*rect2.Float32)(unsafe.Pointer(ptr))
 }
 
 // cptr returns C pointer
-func crect2ptr(r *rl.Rectangle) *C.Rectangle {
+func crect2ptr(r *rect2.Float32) *C.Rectangle {
 	return (*C.Rectangle)(unsafe.Pointer(r))
 }
 

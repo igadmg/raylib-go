@@ -15,7 +15,10 @@
 
 package main
 
-import rl "github.com/igadmg/raylib-go/raylib"
+import (
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
+)
 
 const (
 	screenWidth  = 800
@@ -28,14 +31,14 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, title)
 
 	camera := rl.Camera{
-		Position: rl.Vector3{
+		Position: vector3.Float32{
 			Y: 50.0,
 			Z: -120.0,
 		}, // Camera position perspective
-		Target:     rl.Vector3{},         // Camera looking at point
-		Up:         rl.Vector3{Y: 1.0},   // Camera up vector (rotation towards target)
-		Fovy:       30.0,                 // Camera field-of-view Y
-		Projection: rl.CameraPerspective, // Camera type
+		Target:     vector3.Float32{},       // Camera looking at point
+		Up:         vector3.Float32{Y: 1.0}, // Camera up vector (rotation towards target)
+		Fovy:       30.0,                    // Camera field-of-view Y
+		Projection: rl.CameraPerspective,    // Camera type
 	}
 	model := rl.LoadModel("plane.obj")                             // Load model
 	texture := rl.LoadTexture("plane_diffuse.png")                 // Load model texture
@@ -57,7 +60,7 @@ func main() {
 		yaw = controlPlane(yaw, 1.0, rl.KeyA, rl.KeyS)
 
 		// Transformation matrix for rotations
-		rotationV := rl.Vector3{
+		rotationV := vector3.Float32{
 			X: rl.Deg2rad * pitch,
 			Y: rl.Deg2rad * yaw,
 			Z: rl.Deg2rad * roll,
@@ -73,7 +76,7 @@ func main() {
 		rl.BeginMode3D(camera)
 
 		// Draw 3d model with texture
-		rl.DrawModel(model, rl.Vector3{Y: -8.0}, 1.0, rl.White)
+		rl.DrawModel(model, vector3.Float32{Y: -8.0}, 1.0, rl.White)
 		rl.DrawGrid(10, 10.0)
 
 		rl.EndMode3D()
@@ -91,13 +94,13 @@ func main() {
 	}
 
 	// De-Initialization
-	rl.UnloadModel(model)     // Unload model data
-	rl.UnloadTexture(texture) // Unload texture data
+	rl.UnloadModel(&model)     // Unload model data
+	rl.UnloadTexture(&texture) // Unload texture data
 
 	rl.CloseWindow() // Close window and OpenGL context
 }
 
-func controlPlane(ctrl, value float32, key1, key2 int32) float32 {
+func controlPlane(ctrl, value float32, key1, key2 rl.KeyType) float32 {
 	if rl.IsKeyDown(key1) {
 		ctrl -= value
 	} else if rl.IsKeyDown(key2) {

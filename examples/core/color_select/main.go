@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/igadmg/gamemath/rect2"
 	"github.com/igadmg/gamemath/vector2"
 	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
@@ -15,11 +16,11 @@ func main() {
 		rl.LightGray, rl.Pink, rl.Yellow, rl.Green, rl.SkyBlue, rl.Purple, rl.Beige,
 	}
 
-	colorsRecs := make([]rl.Rectangle, 21) // Rectangles array
+	colorsRecs := make([]rect2.Float32, 21) // Rectangles array
 
 	// Fills colorsRecs data (for every rectangle)
 	for i := 0; i < 21; i++ {
-		r := rl.Rectangle{}
+		r := rect2.Float32{}
 		r.Position.X = float32(20 + 100*(i%7) + 10*(i%7))
 		r.Position.Y = float32(60 + 100*(i/7) + 10*(i/7))
 		r.Size.X = 100

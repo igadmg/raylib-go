@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/igadmg/gamemath/rect2"
 	"github.com/igadmg/gamemath/vector2"
 	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
@@ -23,7 +24,7 @@ func main() {
 	}
 
 	// Define colorsRecs data (for every rectangle)
-	var colorRecs = [colorCount]rl.Rectangle{}
+	var colorRecs = [colorCount]rect2.Float32{}
 
 	for i := 0; i < colorCount; i++ {
 		colorRecs[i].Position.X = float32(10 + 30*i + 2*i)

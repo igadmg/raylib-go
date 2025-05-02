@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/igadmg/gamemath/vector2"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -20,7 +21,7 @@ func main() {
 	// NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
 	scarfy := rl.LoadTexture("scarfy.png") // Texture loading
 
-	position := rl.NewVector2(350.0, 280.0)
+	position := vector2.NewFloat32(350.0, 280.0)
 	frameRec := rl.NewRectangle(0, 0, float32(scarfy.Width/6), float32(scarfy.Height))
 	currentFrame := float32(0)
 
@@ -40,7 +41,7 @@ func main() {
 				currentFrame = 0
 			}
 
-			frameRec.XY.X = currentFrame * float32(scarfy.Width) / 6
+			frameRec.Position.X = currentFrame * float32(scarfy.Width) / 6
 		}
 
 		if rl.IsKeyPressed(rl.KeyRight) {
@@ -59,9 +60,9 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTexture(&scarfy, 15, 40, rl.White)
+		rl.DrawTexture(scarfy, 15, 40, rl.White)
 		rl.DrawRectangleLines(15, 40, scarfy.Width, scarfy.Height, rl.Lime)
-		rl.DrawRectangleLines(15+int32(frameRec.XY.X), 40+int32(frameRec.XY.Y), int32(frameRec.WH.X), int32(frameRec.WH.Y), rl.Red)
+		rl.DrawRectangleLines(15+int32(frameRec.Position.X), 40+int32(frameRec.Position.Y), int32(frameRec.Size.X), int32(frameRec.Size.Y), rl.Red)
 
 		rl.DrawText("FRAME SPEED: ", 165, 210, 10, rl.DarkGray)
 		rl.DrawText(fmt.Sprintf("%02d FPS", framesSpeed), 575, 210, 10, rl.DarkGray)
@@ -74,7 +75,7 @@ func main() {
 			rl.DrawRectangleLines(int32(250+21*i), 205, 20, 20, rl.Maroon)
 		}
 
-		rl.DrawTextureRec(&scarfy, frameRec, position, rl.White) // Draw part of the texture
+		rl.DrawTextureRec(scarfy, frameRec, position, rl.White) // Draw part of the texture
 
 		rl.DrawText("(c) Scarfy sprite by Eiden Marsal", screenWidth-200, screenHeight-20, 10, rl.Gray)
 

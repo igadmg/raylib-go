@@ -34,6 +34,9 @@ import (
 	"unicode/utf8"
 	"unsafe"
 
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector3"
+	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -53,7 +56,7 @@ var showLetterBoundary, showTextBoundary = false, false
 
 // WaveTextConfig is a configuration structure for waving the text
 type WaveTextConfig struct {
-	waveRange, waveSpeed, waveOffset rl.Vector3
+	waveRange, waveSpeed, waveOffset vector3.Float32
 }
 
 // Program main entry point
@@ -67,21 +70,21 @@ func main() {
 
 	// Define the camera to look into our 3d world
 	camera := rl.Camera3D{
-		Position: rl.Vector3{
+		Position: vector3.Float32{
 			X: -10.0,
 			Y: 15.0,
 			Z: -10.0,
 		}, // Camera position
-		Target:     rl.Vector3{},         // Camera looking at point
-		Up:         rl.Vector3{Y: 1.0},   // Camera up vector (rotation towards target)
-		Fovy:       45.0,                 // Camera field-of-view Y
-		Projection: rl.CameraPerspective, // Camera projection type
+		Target:     vector3.Float32{},       // Camera looking at point
+		Up:         vector3.Float32{Y: 1.0}, // Camera up vector (rotation towards target)
+		Fovy:       45.0,                    // Camera field-of-view Y
+		Projection: rl.CameraPerspective,    // Camera projection type
 	}
 
 	cameraMode := rl.CameraOrbital
 
-	cubePosition := rl.Vector3{Y: 1.0}
-	cubeSize := rl.Vector3{
+	cubePosition := vector3.Float32{Y: 1.0}
+	cubeSize := vector3.Float32{
 		X: 2.0,
 		Y: 2.0,
 		Z: 2.0,
@@ -93,22 +96,22 @@ func main() {
 
 	// Set the text (using markdown!)
 	text := "Hello ~~World~~ in 3D!"
-	tbox := rl.Vector3{}
+	tbox := vector3.Float32{}
 	var layers, quads int32 = 1, 0
 	var layerDistance float32 = 0.01
 
 	wcfg := WaveTextConfig{
-		waveSpeed: rl.Vector3{
+		waveSpeed: vector3.Float32{
 			X: 3,
 			Y: 3,
 			Z: 0.5,
 		},
-		waveOffset: rl.Vector3{
+		waveOffset: vector3.Float32{
 			X: 0.35,
 			Y: 0.35,
 			Z: 0.35,
 		},
-		waveRange: rl.Vector3{
+		waveRange: vector3.Float32{
 			X: 0.45,
 			Y: 0.45,
 			Z: 0.45,
@@ -124,7 +127,7 @@ func main() {
 	alphaDiscard := rl.LoadShader("", "alpha_discard.fs")
 
 	// Array filled with multiple random colors (when multicolor mode is set)
-	var multi [textMaxLayers]rl.Color
+	var multi [textMaxLayers]colorex.RGBA
 
 	rl.DisableCursor() // Limit cursor to relative movement inside the window
 
@@ -140,7 +143,7 @@ func main() {
 			droppedFiles := rl.LoadDroppedFiles()
 
 			// NOTE: We only support first ttf file dropped
-			rl.UnloadFont(font)
+			rl.UnloadFont(&font)
 			if filepath.Ext(droppedFiles[0]) == ".ttf" {
 				font = rl.LoadFontEx(droppedFiles[0], int32(fontSize), nil, 0)
 			} else if filepath.Ext(droppedFiles[0]) == ".fnt" {
@@ -163,21 +166,21 @@ func main() {
 			spin = !spin
 			// we need to reset the camera when changing modes
 			camera = rl.Camera3D{
-				Target:     rl.Vector3{},         // Camera looking at point
-				Up:         rl.Vector3{Y: 1.0},   // Camera up vector (rotation towards target)
-				Fovy:       45.0,                 // Camera field-of-view Y
-				Projection: rl.CameraPerspective, // Camera projection type
+				Target:     vector3.Float32{},       // Camera looking at point
+				Up:         vector3.Float32{Y: 1.0}, // Camera up vector (rotation towards target)
+				Fovy:       45.0,                    // Camera field-of-view Y
+				Projection: rl.CameraPerspective,    // Camera projection type
 			}
 
 			if spin {
-				camera.Position = rl.Vector3{
+				camera.Position = vector3.Float32{
 					X: -10.0,
 					Y: 15.0,
 					Z: -10.0,
 				} // Camera position
 				cameraMode = rl.CameraOrbital
 			} else {
-				camera.Position = rl.Vector3{
+				camera.Position = vector3.Float32{
 					X: 10.0,
 					Y: 10.0,
 					Z: -10.0,
@@ -193,12 +196,12 @@ func main() {
 			ray := rl.GetMouseRay(rl.GetMousePosition(), camera)
 
 			// Check collision between ray and box
-			v1 := rl.Vector3{
+			v1 := vector3.Float32{
 				X: cubePosition.X - cubeSize.X/2,
 				Y: cubePosition.Y - cubeSize.Y/2,
 				Z: cubePosition.Z - cubeSize.Z/2,
 			}
-			v2 := rl.Vector3{
+			v2 := vector3.Float32{
 				X: cubePosition.X + cubeSize.X/2,
 				Y: cubePosition.Y + cubeSize.Y/2,
 				Z: cubePosition.Z + cubeSize.Z/2,
@@ -296,7 +299,7 @@ func main() {
 				clr = multi[i]
 			}
 
-			vec := rl.Vector3{
+			vec := vector3.Float32{
 				X: -tbox.X / 2.0,
 				Y: layerDistance * float32(i),
 				Z: -4.5,
@@ -306,7 +309,7 @@ func main() {
 
 		// Draw the text boundary if set
 		if showTextBoundary {
-			rl.DrawCubeWiresV(rl.Vector3{Z: -4.5 + tbox.Z/2}, tbox, dark)
+			rl.DrawCubeWiresV(vector3.Float32{Z: -4.5 + tbox.Z/2}, tbox, dark)
 		}
 		rl.PopMatrix()
 
@@ -320,7 +323,7 @@ func main() {
 		opt := fmt.Sprintf("< SIZE: %2.1f >", fontSize)
 		quads += int32(len(opt))
 		m := measureText3D(rl.GetFontDefault(), opt, 8.0, 1.0, 0.0)
-		pos := rl.Vector3{
+		pos := vector3.Float32{
 			X: -m.X / 2.0,
 			Y: 0.01,
 			Z: 2.0,
@@ -375,7 +378,7 @@ func main() {
 		opt = "All the text displayed here is in 3D"
 		quads += 36
 		m = measureText3D(rl.GetFontDefault(), opt, 10.0, 0.5, 0.0)
-		pos = rl.Vector3{
+		pos = vector3.Float32{
 			X: -m.X / 2.0,
 			Y: 0.01,
 			Z: 2.0,
@@ -460,7 +463,7 @@ Press [F3] to toggle the camera`
 	}
 
 	// De-Initialization
-	rl.UnloadFont(font)
+	rl.UnloadFont(&font)
 	rl.CloseWindow() // Close window and OpenGL context
 
 }
@@ -468,8 +471,8 @@ Press [F3] to toggle the camera`
 // Module Functions Definitions
 
 // drawTextCodepoint3D draws codepoint at specified position in 3D space
-func drawTextCodepoint3D(font rl.Font, codepoint rune, position rl.Vector3, fontSize float32, backface bool,
-	tint rl.Color) {
+func drawTextCodepoint3D(font rl.Font, codepoint rune, position vector3.Float32, fontSize float32, backface bool,
+	tint colorex.RGBA) {
 	// Character index position in sprite font
 	// NOTE: In case a codepoint is not available in the font, index returned points to '?'
 	index := rl.GetGlyphIndex(font, codepoint)
@@ -477,39 +480,39 @@ func drawTextCodepoint3D(font rl.Font, codepoint rune, position rl.Vector3, font
 
 	// Character destination rectangle on screen
 	// NOTE: We consider charsPadding on drawing
-	glyphs := unsafe.Slice(font.Chars, font.CharsCount)
-	position.X += float32(glyphs[index].OffsetX-font.CharsPadding) / float32(font.BaseSize) * scale
-	position.Z += float32(glyphs[index].OffsetY-font.CharsPadding) / float32(font.BaseSize) * scale
+	glyphs := unsafe.Slice(font.Glyphs, font.GlyphCount)
+	position.X += float32(glyphs[index].OffsetX-font.GlyphPadding) / float32(font.BaseSize) * scale
+	position.Z += float32(glyphs[index].OffsetY-font.GlyphPadding) / float32(font.BaseSize) * scale
 
 	// Character source rectangle from font texture atlas
 	// NOTE: We consider chars padding when drawing, it could be required for outline/glow shader effects
-	recs := unsafe.Slice(font.Recs, font.CharsCount)
-	srcRec := rl.Rectangle{
-		X:      recs[index].X - float32(font.CharsPadding),
-		Y:      recs[index].Y - float32(font.CharsPadding),
-		Width:  recs[index].Width + 2.0*float32(font.CharsPadding),
-		Height: recs[index].Height + 2.0*float32(font.CharsPadding),
+	recs := unsafe.Slice(font.Recs, font.GlyphCount)
+	srcRec := rect2.Float32{
+		X:      recs[index].X() - float32(font.GlyphPadding),
+		Y:      recs[index].Y() - float32(font.GlyphPadding),
+		Width:  recs[index].Width() + 2.0*float32(font.GlyphPadding),
+		Height: recs[index].Height() + 2.0*float32(font.GlyphPadding),
 	}
 
-	width := (recs[index].Width + 2.0*float32(font.CharsPadding)) / float32(font.BaseSize) * scale
-	height := (recs[index].Height + 2.0*float32(font.CharsPadding)) / float32(font.BaseSize) * scale
+	width := (recs[index].Width() + 2.0*float32(font.GlyphPadding)) / float32(font.BaseSize) * scale
+	height := (recs[index].Height() + 2.0*float32(font.GlyphPadding)) / float32(font.BaseSize) * scale
 
 	if font.Texture.ID > 0 {
 		var x, y, z float32
 
 		// normalized texture coordinates of the glyph inside the font texture (0.0f -> 1.0f)
-		tx := srcRec.X / float32(font.Texture.Width)
-		ty := srcRec.Y / float32(font.Texture.Height)
-		tw := (srcRec.X + srcRec.Width) / float32(font.Texture.Width)
-		th := (srcRec.Y + srcRec.Height) / float32(font.Texture.Height)
+		tx := srcRec.X() / float32(font.Texture.Width)
+		ty := srcRec.Y() / float32(font.Texture.Height)
+		tw := (srcRec.X() + srcRec.Width()) / float32(font.Texture.Width)
+		th := (srcRec.Y() + srcRec.Height()) / float32(font.Texture.Height)
 
 		if showLetterBoundary {
-			pos := rl.Vector3{
+			pos := vector3.Float32{
 				X: position.X + width/2,
 				Y: position.Y,
 				Z: position.Z + height/2,
 			}
-			size := rl.Vector3{
+			size := vector3.Float32{
 				X: width,
 				Y: letterBoundarySize,
 				Z: height,
@@ -528,7 +531,7 @@ func drawTextCodepoint3D(font rl.Font, codepoint rune, position rl.Vector3, font
 		rl.Translatef(position.X, position.Y, position.Z)
 
 		rl.Begin(rl.Quads)
-		rl.Color4ub(tint.R, tint.G, tint.B, tint.A)
+		colorex.RGBA4ub(tint.R, tint.G, tint.B, tint.A)
 
 		// Front Face
 		rl.Normal3f(0.0, 1.0, 0.0) // Normal Pointing Up
@@ -560,8 +563,8 @@ func drawTextCodepoint3D(font rl.Font, codepoint rune, position rl.Vector3, font
 }
 
 // drawText3D draws a 2D text in 3D space
-func drawText3D(font rl.Font, text string, position rl.Vector3, fontSize, fontSpacing,
-	lineSpacing float32, backface bool, tint rl.Color) {
+func drawText3D(font rl.Font, text string, position vector3.Float32, fontSize, fontSpacing,
+	lineSpacing float32, backface bool, tint colorex.RGBA) {
 	length := int32(len(text)) // Total length in bytes of the text,
 	// scanned by codepoints in loop
 
@@ -589,7 +592,7 @@ func drawText3D(font rl.Font, text string, position rl.Vector3, fontSize, fontSp
 			textOffsetX = 0.0
 		} else {
 			if (codepoint != ' ') && (codepoint != '\t') {
-				vec := rl.Vector3{
+				vec := vector3.Float32{
 					X: position.X + textOffsetX,
 					Y: position.Y,
 					Z: position.Z + textOffsetY,
@@ -606,7 +609,7 @@ func drawText3D(font rl.Font, text string, position rl.Vector3, fontSize, fontSp
 
 // measureText3D measures a text in 3D. For some reason `MeasureTextEx()`
 // just doesn't seem to work, so I had to use this instead.
-func measureText3D(font rl.Font, text string, fontSize, fontSpacing, lineSpacing float32) rl.Vector3 {
+func measureText3D(font rl.Font, text string, fontSize, fontSpacing, lineSpacing float32) vector3.Float32 {
 	length := int32(len(text))
 	var tempLen, lenCounter int32 // Used to count longer text line num chars
 
@@ -657,7 +660,7 @@ func measureText3D(font rl.Font, text string, fontSize, fontSpacing, lineSpacing
 	}
 
 	// Adds chars spacing to measure
-	vec := rl.Vector3{
+	vec := vector3.Float32{
 		X: tempTextWidth + float32(tempLen-1)*fontSpacing/float32(font.BaseSize)*scale,
 		Y: 0.25,
 		Z: textHeight,
@@ -667,8 +670,8 @@ func measureText3D(font rl.Font, text string, fontSize, fontSpacing, lineSpacing
 
 // drawTextWave3D draws a 2D text in 3D space and wave the parts that start with `~~` and end with `~~`.
 // This is a modified version of the original code by @Nighten found here https://github.com/NightenDushi/Raylib_DrawTextStyle
-func drawTextWave3D(font rl.Font, text string, position rl.Vector3, fontSize, fontSpacing,
-	lineSpacing float32, backface bool, config *WaveTextConfig, time float32, tint rl.Color) {
+func drawTextWave3D(font rl.Font, text string, position vector3.Float32, fontSize, fontSpacing,
+	lineSpacing float32, backface bool, config *WaveTextConfig, time float32, tint colorex.RGBA) {
 	length := int32(len(text)) // Total length in bytes of the text, scanned by codepoints in loop
 
 	// TextOffsetY : Offset between lines (on line break '\n')
@@ -712,7 +715,7 @@ func drawTextWave3D(font rl.Font, text string, position rl.Vector3, fontSize, fo
 					pos.Z += sin(time*config.waveSpeed.Z-kk*config.waveOffset.Z) * config.waveRange.Z
 				}
 
-				vec := rl.Vector3{
+				vec := vector3.Float32{
 					X: pos.X + textOffsetX,
 					Y: pos.Y,
 					Z: pos.Z + textOffsetY,
@@ -728,7 +731,7 @@ func drawTextWave3D(font rl.Font, text string, position rl.Vector3, fontSize, fo
 }
 
 // measureTextWave3D measures a text in 3D ignoring the `~~` chars.
-func measureTextWave3D(font rl.Font, text string, fontSize, fontSpacing, lineSpacing float32) rl.Vector3 {
+func measureTextWave3D(font rl.Font, text string, fontSize, fontSpacing, lineSpacing float32) vector3.Float32 {
 	length := int32(len(text))
 	var tempLen, lenCounter int32 // Used to count longer text line num chars
 
@@ -780,7 +783,7 @@ func measureTextWave3D(font rl.Font, text string, fontSize, fontSpacing, lineSpa
 		tempTextWidth = textWidth
 	}
 
-	vec := rl.Vector3{
+	vec := vector3.Float32{
 		X: tempTextWidth + float32(tempLen-1)*fontSpacing/float32(font.BaseSize)*scale, // Adds chars spacing to measure
 		Y: 0.25,
 		Z: textHeight,
@@ -790,11 +793,11 @@ func measureTextWave3D(font rl.Font, text string, fontSize, fontSpacing, lineSpa
 }
 
 // generateRandomColor generates a nice color with a random hue
-func generateRandomColor(s, v float32) rl.Color {
+func generateRandomColor(s, v float32) colorex.RGBA {
 	const Phi = float64(0.618033988749895) // Golden ratio conjugate
 	h := float64(rl.GetRandomValue(0, 360))
 	h = math.Mod(h+h*Phi, 360.0)
-	return rl.ColorFromHSV(float32(h), s, v)
+	return colorex.RGBAFromHSV(float32(h), s, v)
 }
 
 // getCodepoint returns the rune starting at index, plus the length of that rune in bytes
@@ -812,10 +815,10 @@ func sin(value float32) float32 {
 }
 
 func getTextWidth(font rl.Font, index int32, spacing, scale float32) float32 {
-	glyphs := unsafe.Slice(font.Chars, font.CharsCount)
+	glyphs := unsafe.Slice(font.Glyphs, font.GlyphCount)
 	if glyphs[index].AdvanceX == 0 {
-		recs := unsafe.Slice(font.Recs, font.CharsCount)
-		return (recs[index].Width + spacing) / float32(font.BaseSize) * scale
+		recs := unsafe.Slice(font.Recs, font.GlyphCount)
+		return (recs[index].Width() + spacing) / float32(font.BaseSize) * scale
 	} else {
 		return (float32(glyphs[index].AdvanceX) + spacing) / float32(font.BaseSize) * scale
 	}

@@ -54,7 +54,7 @@ func main() {
 
 	obj := rl.LoadModel("church.obj")                             // Load OBJ model
 	texture := rl.LoadTexture("church_diffuse.png")               // Load model texture
-	rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, &texture) // Set obj model diffuse texture
+	rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, texture) // Set obj model diffuse texture
 
 	position := vector3.NewFloat32(0.0, 0.0, 0.0) // Set model position
 

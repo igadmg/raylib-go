@@ -12,7 +12,10 @@
 ********************************************************************************************/
 package main
 
-import rl "github.com/igadmg/raylib-go/raylib"
+import (
+	"github.com/igadmg/gamemath/rect2"
+	rl "github.com/igadmg/raylib-go/raylib"
+)
 
 const (
 	screenWidth  = 800
@@ -30,10 +33,10 @@ func main() {
 
 	// Define frame rectangle for drawing
 	frameHeight := float32(button.Height) / numFrames
-	sourceRec := rl.Rectangle{Width: float32(button.Width), Height: frameHeight}
+	sourceRec := rect2.Float32{Width: float32(button.Width), Height: frameHeight}
 
 	// Define button bounds on screen
-	btnBounds := rl.Rectangle{
+	btnBounds := rect2.Float32{
 		X:      float32(screenWidth/2.0 - button.Width/2.0),
 		Y:      float32(screenHeight/2.0 - button.Height/numFrames/2.0),
 		Width:  float32(button.Width),
@@ -73,20 +76,20 @@ func main() {
 		}
 
 		// Calculate button frame rectangle to draw depending on button state
-		sourceRec.Y = float32(btnState) * frameHeight
+		sourceRec.SetY(float32(btnState) * frameHeight)
 
 		// Draw
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTextureRec(button, sourceRec, rl.Vector2{X: btnBounds.X, Y: btnBounds.Y}, rl.White) // Draw button frame
+		rl.DrawTextureRec(button, sourceRec, btnBounds.Position, rl.White) // Draw button frame
 
 		rl.EndDrawing()
 	}
 
 	// De-Initialization
-	rl.UnloadTexture(button) // Unload button texture
-	rl.UnloadSound(fxButton) // Unload sound
+	rl.UnloadTexture(&button) // Unload button texture
+	rl.UnloadSound(&fxButton) // Unload sound
 
 	rl.CloseAudioDevice() // Close audio device
 

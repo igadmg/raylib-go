@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/igadmg/gamemath/rect2"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -13,7 +14,7 @@ var (
 	pause     = false
 	collision = false
 
-	boxCollision     = rl.Rectangle{}
+	boxCollision     = rect2.Float32{}
 	screenUpperLimit = float32(40)
 	boxAspeedX       = float32(4)
 )

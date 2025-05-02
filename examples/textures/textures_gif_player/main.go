@@ -24,7 +24,7 @@ func main() {
 	// Load all GIF animation frames into a single Image
 	// NOTE: GIF data is always loaded as RGBA (32bit) by default
 	// NOTE: Frames are just appended one after another in image.data memory
-	var imScarfyAnim *rl.Image = rl.LoadImageAnim("scarfy_run.gif", &animFrames)
+	var imScarfyAnim rl.Image = rl.LoadImageAnim("scarfy_run.gif", &animFrames)
 
 	// Load texture from image
 	// NOTE: We will update this texture when required with next frame data
@@ -58,7 +58,7 @@ func main() {
 			// Update GPU texture data with next frame image data
 			// WARNING: Data size (frame size) and pixel format must match already created texture
 			// here we needed to make the Data as public
-			rl.UpdateTexture(texScarfyAnim,
+			rl.UpdateTexture(&texScarfyAnim,
 				unsafe.Slice((*color.RGBA)(unsafe.Pointer(uintptr(imScarfyAnim.Data)+uintptr(nextFrameDataOffset))), texScarfyAnimSize))
 
 			frameCounter = 0
@@ -105,8 +105,8 @@ func main() {
 	}
 
 	// De-Initialization
-	defer rl.UnloadTexture(texScarfyAnim) // Unload texture
-	defer rl.UnloadImage(imScarfyAnim)    // Unload image (contains all frames)
+	defer rl.UnloadTexture(&texScarfyAnim) // Unload texture
+	defer rl.UnloadImage(&imScarfyAnim)    // Unload image (contains all frames)
 
 	defer rl.CloseWindow() // Close window and OpenGL context
 

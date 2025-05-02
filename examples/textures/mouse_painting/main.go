@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/igadmg/gamemath/rect2"
 	"github.com/igadmg/gamemath/vector2"
 	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
@@ -12,7 +13,7 @@ var (
 
 	colors = []colorex.RGBA{rl.RayWhite, rl.Yellow, rl.Gold, rl.Pink, rl.Red, rl.Maroon, rl.Green, rl.Lime, rl.DarkGreen, rl.SkyBlue, rl.Blue, rl.DarkBlue, rl.Purple, rl.Violet, rl.DarkPurple, rl.Beige, rl.Brown, rl.DarkBrown, rl.LightGray, rl.Gray, rl.DarkGray, rl.Black}
 
-	colorRecs []rl.Rectangle
+	colorRecs []rect2.Float32
 )
 
 func main() {

@@ -52,7 +52,7 @@ func main() {
 		x = float32(rl.GetRandomValue(0, 360))
 		y = float32(rl.GetRandomValue(0, 360))
 		z = float32(rl.GetRandomValue(0, 360))
-		axis := rl.Vector3Normalize(vector3.NewFloat32(x, y, z))
+		axis := vector3.NewFloat32(x, y, z).Normalized()
 		angle := float32(rl.GetRandomValue(0, 10)) * rl.Deg2rad
 
 		rotationsInc[i] = rl.MatrixRotate(axis, angle)

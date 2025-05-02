@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
 	gui "github.com/igadmg/raylib-go/raygui"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
@@ -30,7 +32,7 @@ const (
 func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [shapes] example - draw ring")
 
-	center := rl.Vector2{X: (float32(rl.GetScreenWidth()) - 300) / 2.0, Y: float32(rl.GetScreenHeight()) / 2.0}
+	center := vector2.Float32{X: (float32(rl.GetScreenWidth()) - 300) / 2.0, Y: float32(rl.GetScreenHeight()) / 2.0}
 
 	var innerRadius, outerRadius float32 = 80.0, 190.0
 	var startAngle, endAngle float32 = 0.0, 360
@@ -69,31 +71,31 @@ func main() {
 
 		// Draw GUI controls
 		//------------------------------------------------------------------------------
-		startAngle = gui.Slider(rl.Rectangle{
+		startAngle = gui.Slider(rect2.Float32{
 			X: 600, Y: 40, Width: 120, Height: 20,
 		}, "StartAngle", fmt.Sprintf("%.2f", startAngle), startAngle, -450, 450)
-		endAngle = gui.Slider(rl.Rectangle{
+		endAngle = gui.Slider(rect2.Float32{
 			X: 600, Y: 70, Width: 120, Height: 20,
 		}, "EndAngle", fmt.Sprintf("%.2f", endAngle), endAngle, -450, 450)
 
-		innerRadius = gui.Slider(rl.Rectangle{
+		innerRadius = gui.Slider(rect2.Float32{
 			X: 600, Y: 140, Width: 120, Height: 20,
 		}, "InnerRadius", fmt.Sprintf("%.2f", innerRadius), innerRadius, 0, 100)
-		outerRadius = gui.Slider(rl.Rectangle{
+		outerRadius = gui.Slider(rect2.Float32{
 			X: 600, Y: 170, Width: 120, Height: 20,
 		}, "OuterRadius", fmt.Sprintf("%.2f", outerRadius), outerRadius, 0, 200)
 
-		segments = gui.Slider(rl.Rectangle{
+		segments = gui.Slider(rect2.Float32{
 			X: 600, Y: 240, Width: 120, Height: 20,
 		}, "Segments", fmt.Sprintf("%.2f", segments), segments, 0, 100)
 
-		drawRing = gui.CheckBox(rl.Rectangle{
+		drawRing = gui.CheckBox(rect2.Float32{
 			X: 600, Y: 320, Width: 20, Height: 20,
 		}, "Draw Ring", drawRing)
-		drawRingLines = gui.CheckBox(rl.Rectangle{
+		drawRingLines = gui.CheckBox(rect2.Float32{
 			X: 600, Y: 350, Width: 20, Height: 20,
 		}, "Draw Ring Lines", drawRingLines)
-		drawSectorLines = gui.CheckBox(rl.Rectangle{
+		drawSectorLines = gui.CheckBox(rect2.Float32{
 			X: 600, Y: 380, Width: 20, Height: 20,
 		}, "Draw Sector Lines", drawSectorLines)
 

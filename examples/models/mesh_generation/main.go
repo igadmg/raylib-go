@@ -39,7 +39,7 @@ func main() {
 	models[8] = rl.LoadModelFromMesh(GenMeshCustom())
 
 	for i := 0; i < numModels; i++ {
-		rl.SetMaterialTexture(models[i].Materials, rl.MapDiffuse, &texture)
+		rl.SetMaterialTexture(models[i].Materials, rl.MapDiffuse, texture)
 	}
 
 	position := vector3.Zero[float32]()

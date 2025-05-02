@@ -11,7 +11,6 @@ import "C"
 
 import (
 	"runtime"
-	"slices"
 )
 
 // List of VaoIDs of meshes created by calling UploadMesh()
@@ -74,25 +73,4 @@ func UploadMesh(mesh *Mesh, dynamic bool) {
 	goManagedMeshIDs = append(goManagedMeshIDs, mesh.VaoID)
 
 	pinner.Unpin()
-}
-
-// UnloadMesh - Unload mesh from memory (RAM and/or VRAM)
-func UnloadMesh(mesh *Mesh) {
-	// Check list of go-managed mesh IDs
-	if slices.Contains(goManagedMeshIDs, mesh.VaoID) {
-		// C.UnloadMesh() only needs to read the VaoID & VboID
-		// passing a temporary struct with all other fields nil makes it safe for the C code to call free()
-		tempMesh := Mesh{
-			VaoID: mesh.VaoID,
-			VboID: mesh.VboID,
-		}
-		cmesh := tempMesh.cptr()
-		C.UnloadMesh(cmesh)
-
-		// remove mesh VaoID from list
-		goManagedMeshIDs = slices.DeleteFunc(goManagedMeshIDs, func(id uint32) bool { return id == mesh.VaoID })
-	} else {
-		cmesh := mesh.cptr()
-		C.UnloadMesh(cmesh)
-	}
 }

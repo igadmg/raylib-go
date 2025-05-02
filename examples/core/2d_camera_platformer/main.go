@@ -1,6 +1,11 @@
 package main
 
-import rl "github.com/igadmg/raylib-go/raylib"
+import (
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
+)
 
 const (
 	screenWidth     = 800
@@ -11,15 +16,15 @@ const (
 )
 
 type Player struct {
-	position rl.Vector2
+	position vector2.Float32
 	speed    float32
 	canJump  bool
 }
 
 type EnvironmentItem struct {
-	rect     rl.Rectangle
+	rect     rect2.Float32
 	blocking bool
-	color    rl.Color
+	color    colorex.RGBA
 }
 
 type cameraUpdater func(*rl.Camera2D, *Player, []EnvironmentItem, float32)
@@ -35,21 +40,21 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [core] example - 2d camera platformer")
 
 	player := Player{
-		position: rl.NewVector2(400, 280),
+		position: vector2.NewFloat32(400, 280),
 		speed:    0,
 		canJump:  false,
 	}
 
 	envItems := []EnvironmentItem{
-		{rect: rl.Rectangle{Width: 1000, Height: 400}, blocking: false, color: rl.LightGray},
-		{rect: rl.Rectangle{Y: 400, Width: 1000, Height: 200}, blocking: true, color: rl.Gray},
-		{rect: rl.Rectangle{X: 300, Y: 200, Width: 400, Height: 10}, blocking: true, color: rl.Gray},
-		{rect: rl.Rectangle{X: 250, Y: 300, Width: 100, Height: 10}, blocking: true, color: rl.Gray},
-		{rect: rl.Rectangle{X: 650, Y: 300, Width: 100, Height: 10}, blocking: true, color: rl.Gray},
+		{rect: rect2.Float32{Width: 1000, Height: 400}, blocking: false, color: rl.LightGray},
+		{rect: rect2.Float32{Y: 400, Width: 1000, Height: 200}, blocking: true, color: rl.Gray},
+		{rect: rect2.Float32{X: 300, Y: 200, Width: 400, Height: 10}, blocking: true, color: rl.Gray},
+		{rect: rect2.Float32{X: 250, Y: 300, Width: 100, Height: 10}, blocking: true, color: rl.Gray},
+		{rect: rect2.Float32{X: 650, Y: 300, Width: 100, Height: 10}, blocking: true, color: rl.Gray},
 	}
 
 	camera := rl.Camera2D{
-		Offset:   rl.Vector2{X: screenWidth / 2, Y: screenHeight / 2},
+		Offset:   vector2.Float32{X: screenWidth / 2, Y: screenHeight / 2},
 		Target:   player.position,
 		Rotation: 0,
 		Zoom:     1,
@@ -98,12 +103,10 @@ func main() {
 			rl.DrawRectangleRec(item.rect, item.color)
 		}
 
-		playerRect := rl.Rectangle{
-			X:      player.position.X - 20,
-			Y:      player.position.Y - 40,
-			Width:  40,
-			Height: 40,
-		}
+		playerRect := rect2.NewFloat32(
+			player.position.SubXY(20, 40),
+			vector2.NewFloat32(40, 40),
+		)
 		rl.DrawRectangleRec(playerRect, rl.Red)
 		rl.DrawCircleV(player.position, 5, rl.Gold)
 
@@ -137,11 +140,11 @@ func updatePlayer(player *Player, envItems []EnvironmentItem, delta float32) {
 	hitObstacle := false
 	for _, item := range envItems {
 		if item.blocking &&
-			item.rect.X <= player.position.X && item.rect.X+item.rect.Width >= player.position.X &&
-			item.rect.Y >= player.position.Y && item.rect.Y <= player.position.Y+player.speed*delta {
+			item.rect.X() <= player.position.X && item.rect.X()+item.rect.Width() >= player.position.X &&
+			item.rect.Y() >= player.position.Y && item.rect.Y() <= player.position.Y+player.speed*delta {
 			hitObstacle = true
 			player.speed = 0
-			player.position.Y = item.rect.Y
+			player.position.Y = item.rect.Y()
 			break
 		}
 	}
@@ -156,25 +159,25 @@ func updatePlayer(player *Player, envItems []EnvironmentItem, delta float32) {
 }
 
 func updateCameraCenter(camera *rl.Camera2D, player *Player, _ []EnvironmentItem, _ float32) {
-	camera.Offset = rl.Vector2{X: screenWidth / 2, Y: screenHeight / 2}
+	camera.Offset = vector2.Float32{X: screenWidth / 2, Y: screenHeight / 2}
 	camera.Target = player.position
 }
 
 func updateCameraCenterInsideMap(camera *rl.Camera2D, player *Player, envItems []EnvironmentItem, _ float32) {
-	camera.Offset = rl.Vector2{X: screenWidth / 2, Y: screenHeight / 2}
+	camera.Offset = vector2.Float32{X: screenWidth / 2, Y: screenHeight / 2}
 	camera.Target = player.position
 
 	var minX, minY, maxX, maxY float32 = 1000, 1000, -1000, -10000
 
 	for _, item := range envItems {
-		minX = min(item.rect.X, minX)
-		maxX = max(item.rect.X+item.rect.Width, maxX)
-		minY = min(item.rect.Y, minY)
-		maxY = max(item.rect.Y+item.rect.Height, maxY)
+		minX = min(item.rect.X(), minX)
+		maxX = max(item.rect.X()+item.rect.Width(), maxX)
+		minY = min(item.rect.Y(), minY)
+		maxY = max(item.rect.Y()+item.rect.Height(), maxY)
 	}
 
-	maxV := rl.GetWorldToScreen2D(rl.Vector2{X: maxX, Y: maxY}, *camera)
-	minV := rl.GetWorldToScreen2D(rl.Vector2{X: minX, Y: minY}, *camera)
+	maxV := rl.GetWorldToScreen2D(vector2.Float32{X: maxX, Y: maxY}, *camera)
+	minV := rl.GetWorldToScreen2D(vector2.Float32{X: minX, Y: minY}, *camera)
 
 	if maxV.X < screenWidth {
 		camera.Offset.X = screenWidth - (maxV.X - screenWidth/2)
@@ -193,18 +196,18 @@ func updateCameraCenterInsideMap(camera *rl.Camera2D, player *Player, envItems [
 func updateCameraCenterSmoothFollow(camera *rl.Camera2D, player *Player, _ []EnvironmentItem, delta float32) {
 	var minSpeed, minEffectLength, fractionSpeed float32 = 30.0, 10.0, 0.8
 
-	camera.Offset = rl.Vector2{X: screenWidth / 2, Y: screenHeight / 2}
-	diff := rl.Vector2Subtract(player.position, camera.Target)
-	length := rl.Vector2Length(diff)
+	camera.Offset = vector2.Float32{X: screenWidth / 2, Y: screenHeight / 2}
+	diff := player.position.Sub(camera.Target)
+	length := diff.LengthF()
 
 	if length > minEffectLength {
 		speed := max(fractionSpeed*length, minSpeed)
-		camera.Target = rl.Vector2Add(camera.Target, rl.Vector2Scale(diff, speed*delta/length))
+		camera.Target = camera.Target.Add(diff.ScaleF(speed * delta / length))
 	}
 }
 
 func updateCameraEvenOutOnLanding(camera *rl.Camera2D, player *Player, _ []EnvironmentItem, delta float32) {
-	camera.Offset = rl.Vector2{X: screenWidth / 2, Y: screenHeight / 2}
+	camera.Offset = vector2.Float32{X: screenWidth / 2, Y: screenHeight / 2}
 	camera.Target.X = player.position.X
 
 	if eveningOut {
@@ -230,11 +233,11 @@ func updateCameraEvenOutOnLanding(camera *rl.Camera2D, player *Player, _ []Envir
 }
 
 func updateCameraPlayerBoundsPush(camera *rl.Camera2D, player *Player, _ []EnvironmentItem, _ float32) {
-	bbox := rl.Vector2{X: 0.2, Y: 0.2}
+	bbox := vector2.Float32{X: 0.2, Y: 0.2}
 
-	bboxWorldMin := rl.GetScreenToWorld2D(rl.Vector2{X: (1 - bbox.X) * 0.5 * screenWidth, Y: (1 - bbox.Y) * 0.5 * screenHeight}, *camera)
-	bboxWorldMax := rl.GetScreenToWorld2D(rl.Vector2{X: (1 + bbox.X) * 0.5 * screenWidth, Y: (1 + bbox.Y) * 0.5 * screenHeight}, *camera)
-	camera.Offset = rl.Vector2{X: (1 - bbox.X) * 0.5 * screenWidth, Y: (1 - bbox.Y) * 0.5 * screenHeight}
+	bboxWorldMin := rl.GetScreenToWorld2D(vector2.Float32{X: (1 - bbox.X) * 0.5 * screenWidth, Y: (1 - bbox.Y) * 0.5 * screenHeight}, *camera)
+	bboxWorldMax := rl.GetScreenToWorld2D(vector2.Float32{X: (1 + bbox.X) * 0.5 * screenWidth, Y: (1 + bbox.Y) * 0.5 * screenHeight}, *camera)
+	camera.Offset = vector2.Float32{X: (1 - bbox.X) * 0.5 * screenWidth, Y: (1 - bbox.Y) * 0.5 * screenHeight}
 
 	if player.position.X < bboxWorldMin.X {
 		camera.Target.X = player.position.X

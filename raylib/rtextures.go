@@ -184,7 +184,7 @@ func LoadRenderTextureV[T IntegerT](wh vector2.Vector[T]) RenderTexture2D {
 }
 
 // LoadTextureCubemap - Loads a texture for a cubemap using given layout
-func LoadTextureCubemap(image *Image, layout int32) Texture2D {
+func LoadTextureCubemap(image Image, layout int32) Texture2D {
 	cimage := image.cptr()
 	clayout := (C.int)(layout)
 	ret := C.LoadTextureCubemap(*cimage, clayout)

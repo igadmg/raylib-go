@@ -16,7 +16,11 @@
 ********************************************************************************************/
 package main
 
-import rl "github.com/igadmg/raylib-go/raylib"
+import (
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
+)
 
 const (
 	screenWidth  = 800
@@ -29,18 +33,18 @@ func main() {
 	// NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
 	nPatchTexture := rl.LoadTexture("ninepatch_button.png")
 
-	var mousePosition rl.Vector2
-	var origin rl.Vector2
+	var mousePosition vector2.Float32
+	var origin vector2.Float32
 
 	// Position and size of the n-patches
-	dstRec1 := rl.Rectangle{X: 480.0, Y: 160.0, Width: 32.0, Height: 32.0}
-	dstRec2 := rl.Rectangle{X: 160.0, Y: 160.0, Width: 32.0, Height: 32.0}
-	dstRecH := rl.Rectangle{X: 160.0, Y: 93.0, Width: 32.0, Height: 32.0}
-	dstRecV := rl.Rectangle{X: 92.0, Y: 160.0, Width: 32.0, Height: 32.0}
+	dstRec1 := rect2.Float32{X: 480.0, Y: 160.0, Width: 32.0, Height: 32.0}
+	dstRec2 := rect2.Float32{X: 160.0, Y: 160.0, Width: 32.0, Height: 32.0}
+	dstRecH := rect2.Float32{X: 160.0, Y: 93.0, Width: 32.0, Height: 32.0}
+	dstRecV := rect2.Float32{X: 92.0, Y: 160.0, Width: 32.0, Height: 32.0}
 
 	// A 9-patch (NPatchNinePatch) changes its sizes in both axis
 	ninePatchInfo1 := rl.NPatchInfo{
-		Source: rl.Rectangle{Width: 64.0, Height: 64.0},
+		Source: rect2.Float32{Width: 64.0, Height: 64.0},
 		Left:   12,
 		Top:    40,
 		Right:  12,
@@ -48,7 +52,7 @@ func main() {
 		Layout: rl.NPatchNinePatch,
 	}
 	ninePatchInfo2 := rl.NPatchInfo{
-		Source: rl.Rectangle{Y: 128.0, Width: 64.0, Height: 64.0},
+		Source: rect2.Float32{Y: 128.0, Width: 64.0, Height: 64.0},
 		Left:   16,
 		Top:    16,
 		Right:  16,
@@ -58,7 +62,7 @@ func main() {
 
 	// A horizontal 3-patch (NPatchThreePatchHorizontal) changes its sizes along the x-axis only
 	h3PatchInfo := rl.NPatchInfo{
-		Source: rl.Rectangle{Y: 64.0, Width: 64.0, Height: 64.0},
+		Source: rect2.Float32{Y: 64.0, Width: 64.0, Height: 64.0},
 		Left:   8,
 		Top:    8,
 		Right:  8,
@@ -68,7 +72,7 @@ func main() {
 
 	// A vertical 3-patch (NPatchThreePatchVertical) changes its sizes along the y-axis only
 	v3PatchInfo := rl.NPatchInfo{
-		Source: rl.Rectangle{Y: 192.0, Width: 64.0, Height: 64.0},
+		Source: rect2.Float32{Y: 192.0, Width: 64.0, Height: 64.0},
 		Left:   6,
 		Top:    6,
 		Right:  6,
@@ -119,8 +123,8 @@ func main() {
 	}
 
 	// De-Initialization
-	rl.UnloadTexture(nPatchTexture) // Texture unloading
-	rl.CloseWindow()                // Close window and OpenGL context
+	rl.UnloadTexture(&nPatchTexture) // Texture unloading
+	rl.CloseWindow()                 // Close window and OpenGL context
 }
 
 func clamp(value, min, max float32) float32 {

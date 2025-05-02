@@ -19,6 +19,9 @@ import (
 	"unicode/utf8"
 	"unsafe"
 
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -37,9 +40,9 @@ type Messages struct {
 }
 
 type Emoji struct {
-	index   int32    // Index inside `emojiCodepoints`
-	message int32    // Message index
-	color   rl.Color // Emoji color
+	index   int32        // Index inside `emojiCodepoints`
+	message int32        // Message index
+	color   colorex.RGBA // Emoji color
 }
 
 // Arrays that holds the random emojis
@@ -57,8 +60,8 @@ func main() {
 	fontAsian := rl.LoadFont("resources/noto_cjk.fnt")
 	fontEmoji := rl.LoadFont("resources/symbola.fnt")
 
-	hoveredPos := rl.Vector2{}
-	selectedPos := rl.Vector2{}
+	hoveredPos := vector2.Float32{}
+	selectedPos := vector2.Float32{}
 
 	RandomizeEmoji()
 
@@ -80,7 +83,7 @@ func main() {
 		}
 
 		mouse := rl.GetMousePosition()
-		position := rl.Vector2{
+		position := vector2.Float32{
 			X: 28.8,
 			Y: 10.0,
 		}
@@ -93,7 +96,7 @@ func main() {
 		// Draw random emojis in the background
 		for i := int32(0); i < emojiPerWidth*emojiPerHeight; i++ {
 			txt := emojiCodepoints[emoji[i].index : emoji[i].index+4]
-			emojiRect := rl.Rectangle{
+			emojiRect := rect2.Float32{
 				X:      position.X,
 				Y:      position.Y,
 				Width:  float32(fontEmoji.BaseSize),
@@ -143,24 +146,24 @@ func main() {
 				sz.X = 160
 			}
 
-			msgRect := rl.Rectangle{
+			msgRect := rect2.Float32{
 				X:      selectedPos.X - 38.8,
 				Y:      selectedPos.Y,
 				Width:  float32(2*horizontalPadding) + sz.X,
 				Height: float32(2*verticalPadding) + sz.Y,
 			}
-			msgRect.Y -= msgRect.Height
+			msgRect.Y() -= msgRect.Height()
 
 			// Coordinates for the chat bubble triangle
-			a := rl.Vector2{
+			a := vector2.Float32{
 				X: selectedPos.X,
-				Y: msgRect.Y + msgRect.Height,
+				Y: msgRect.Y() + msgRect.Height,()
 			}
-			b := rl.Vector2{
+			b := vector2.Float32{
 				X: a.X + 8,
 				Y: a.Y + 10,
 			}
-			c := rl.Vector2{
+			c := vector2.Float32{
 				X: a.X + 10,
 				Y: a.Y,
 			}
@@ -169,9 +172,9 @@ func main() {
 			if msgRect.X < 10 {
 				msgRect.X += 28
 			}
-			if msgRect.Y < 10 {
-				msgRect.Y = selectedPos.Y + 84
-				a.Y = msgRect.Y
+			if msgRect.Y() < 10 {
+				msgRect.Y() = selectedPos.Y + 84
+				a.Y = msgRect.Y()
 				c.Y = a.Y
 				b.Y = a.Y - 10
 
@@ -188,11 +191,11 @@ func main() {
 			rl.DrawTriangle(a, b, c, emoji[selected].color)
 
 			// Draw the main text message
-			textRect := rl.Rectangle{
+			textRect := rect2.Float32{
 				X:      msgRect.X + float32(horizontalPadding)/2,
-				Y:      msgRect.Y + float32(verticalPadding)/2,
+				Y:      msgRect.Y() + float32(verticalPadding)/2,
 				Width:  msgRect.Width - float32(horizontalPadding),
-				Height: msgRect.Height,
+				Height: msgRect.Height,()
 			}
 			DrawTextBoxed(font, messages[message].text, textRect, float32(font.BaseSize), 1.0, true, rl.White)
 
@@ -202,7 +205,7 @@ func main() {
 			info := fmt.Sprintf("%s %d characters %d bytes", messages[message].language, length, size)
 			sz = rl.MeasureTextEx(rl.GetFontDefault(), info, 10, 1.0)
 
-			rl.DrawText(info, int32(textRect.X+textRect.Width-sz.X), int32(msgRect.Y+msgRect.Height-sz.Y-2), 10,
+			rl.DrawText(info, int32(textRect.X+textRect.Width-sz.X), int32(msgRect.Y()+msgRect.Height-sz.Y-2), 10,()
 				rl.RayWhite)
 
 		}
@@ -234,7 +237,7 @@ func RandomizeEmoji() {
 		emoji[i].index = rl.GetRandomValue(0, 179) * 5
 
 		// Generate a random color for this emoji
-		emoji[i].color = rl.Fade(rl.ColorFromHSV(float32((start*(i+1))%360), 0.6, 0.85), 0.8)
+		emoji[i].color = rl.Fade(colorex.RGBAFromHSV(float32((start*(i+1))%360), 0.6, 0.85), 0.8)
 
 		// Set a random message for this emoji
 		emoji[i].message = rl.GetRandomValue(0, int32(len(messages)-1))
@@ -242,13 +245,13 @@ func RandomizeEmoji() {
 }
 
 // DrawTextBoxed draws text using font inside rectangle limits
-func DrawTextBoxed(font rl.Font, text string, rec rl.Rectangle, fontSize, spacing float32, wordWrap bool, tint rl.Color) {
+func DrawTextBoxed(font rl.Font, text string, rec rect2.Float32, fontSize, spacing float32, wordWrap bool, tint colorex.RGBA) {
 	DrawTextBoxedSelectable(font, text, rec, fontSize, spacing, wordWrap, tint, 0, 0, rl.White, rl.White)
 }
 
 // DrawTextBoxedSelectable draws text using font inside rectangle limits with support for text selection
-func DrawTextBoxedSelectable(font rl.Font, text string, rec rl.Rectangle, fontSize, spacing float32,
-	wordWrap bool, tint rl.Color, selectStart, selectLength int32, selectTint, selectBackTint rl.Color) {
+func DrawTextBoxedSelectable(font rl.Font, text string, rec rect2.Float32, fontSize, spacing float32,
+	wordWrap bool, tint colorex.RGBA, selectStart, selectLength int32, selectTint, selectBackTint colorex.RGBA) {
 
 	length := int32(len(text)) // Total length in bytes of the text, scanned by codepoints in loop
 
@@ -283,9 +286,9 @@ func DrawTextBoxedSelectable(font rl.Font, text string, rec rl.Rectangle, fontSi
 
 		var glyphWidth float32
 		if codepoint != '\n' {
-			chars := unsafe.Slice(font.Chars, font.CharsCount)
+			chars := unsafe.Slice(font.Glyphs, font.GlyphCount)
 			if chars[index].AdvanceX == 0 {
-				glyphWidth = unsafe.Slice(font.Recs, font.CharsCount)[index].Width * scaleFactor
+				glyphWidth = unsafe.Slice(font.Recs, font.GlyphCount)[index].Width() * scaleFactor
 			} else {
 				glyphWidth = float32(chars[index].AdvanceX) * scaleFactor
 			}
@@ -355,7 +358,7 @@ func DrawTextBoxedSelectable(font rl.Font, text string, rec rl.Rectangle, fontSi
 				// Draw selection background
 				isGlyphSelected := false
 				if (selectStart >= 0) && (k >= selectStart) && (k < (selectStart + selectLength)) {
-					rl.DrawRectangleRec(rl.Rectangle{
+					rl.DrawRectangleRec(rect2.Float32{
 						X:      rec.X + textOffsetX - 1,
 						Y:      rec.Y + textOffsetY,
 						Width:  glyphWidth,
@@ -370,7 +373,7 @@ func DrawTextBoxedSelectable(font rl.Font, text string, rec rl.Rectangle, fontSi
 					if isGlyphSelected {
 						col = selectTint
 					}
-					pos := rl.Vector2{
+					pos := vector2.Float32{
 						X: rec.X + textOffsetX,
 						Y: rec.Y + textOffsetY,
 					}

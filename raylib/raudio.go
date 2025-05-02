@@ -203,13 +203,13 @@ func ExportWave(wave Wave, fileName string) {
 }
 
 // PlaySound - Play a sound
-func PlaySound(sound *Sound) {
+func PlaySound(sound Sound) {
 	csound := sound.cptr()
 	C.PlaySound(*csound)
 }
 
 // StopSound - Stop playing a sound
-func StopSound(sound *Sound) {
+func StopSound(sound Sound) {
 	csound := sound.cptr()
 	C.StopSound(*csound)
 }

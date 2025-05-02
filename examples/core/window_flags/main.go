@@ -16,6 +16,8 @@ package main
 import (
 	"fmt"
 
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -46,8 +48,8 @@ func main() {
 	//SetConfigFlags(FLAG_VSYNC_HINT | FLAG_MSAA_4X_HINT | FLAG_WINDOW_HIGHDPI);
 	rl.InitWindow(screenWidth, screenHeight, "raylib [core] example - Window Flags")
 
-	ballPosition := rl.Vector2{X: float32(rl.GetScreenWidth()) / 2.0, Y: float32(rl.GetScreenHeight()) / 2.0}
-	ballSpeed := rl.Vector2{X: 5.0, Y: 4.0}
+	ballPosition := vector2.Float32{X: float32(rl.GetScreenWidth()) / 2.0, Y: float32(rl.GetScreenHeight()) / 2.0}
+	ballSpeed := vector2.Float32{X: 5.0, Y: 4.0}
 	ballRadius := float32(20.0)
 	framesCounter := 0
 
@@ -164,7 +166,7 @@ func main() {
 
 		rl.DrawCircleV(ballPosition, ballRadius, rl.Maroon)
 		rl.DrawRectangleLinesEx(
-			rl.Rectangle{
+			rect2.Float32{
 				Width:  float32(rl.GetScreenWidth()),
 				Height: float32(rl.GetScreenHeight()),
 			},

@@ -1232,8 +1232,8 @@ func initializeManifolds(manifold *Manifold) {
 		radiusA := manifold.Contacts[i].Sub(bodyA.Position)
 		radiusB := manifold.Contacts[i].Sub(bodyB.Position)
 
-		crossA := rl.Vector2Cross(bodyA.AngularVelocity, radiusA)
-		crossB := rl.Vector2Cross(bodyB.AngularVelocity, radiusB)
+		crossA := vector2.Float32Cross(bodyA.AngularVelocity, radiusA)
+		crossB := vector2.Float32Cross(bodyB.AngularVelocity, radiusB)
 		radiusV := vector2.NewFloat32(
 			bodyB.Velocity.X+crossB.X-bodyA.Velocity.X-crossA.X,
 			bodyB.Velocity.Y+crossB.Y-bodyA.Velocity.Y-crossA.Y,
@@ -1271,10 +1271,10 @@ func integrateImpulses(manifold *Manifold) {
 
 		// Calculate relative velocity
 		radiusV := vector2.NewFloat32(
-			bodyB.Velocity.X+rl.Vector2Cross(bodyB.AngularVelocity, radiusB).X-
-				bodyA.Velocity.X-rl.Vector2Cross(bodyA.AngularVelocity, radiusA).X,
-			bodyB.Velocity.Y+rl.Vector2Cross(bodyB.AngularVelocity, radiusB).Y-
-				bodyA.Velocity.Y-rl.Vector2Cross(bodyA.AngularVelocity, radiusA).Y,
+			bodyB.Velocity.X+vector2.Float32Cross(bodyB.AngularVelocity, radiusB).X-
+				bodyA.Velocity.X-vector2.Float32Cross(bodyA.AngularVelocity, radiusA).X,
+			bodyB.Velocity.Y+vector2.Float32Cross(bodyB.AngularVelocity, radiusB).Y-
+				bodyA.Velocity.Y-vector2.Float32Cross(bodyA.AngularVelocity, radiusA).Y,
 		)
 
 		// Relative velocity along the normal
@@ -1320,11 +1320,11 @@ func integrateImpulses(manifold *Manifold) {
 
 		// Apply friction impulse to each physics body
 		radiusV.X = 0 +
-			bodyB.Velocity.X + rl.Vector2Cross(bodyB.AngularVelocity, radiusB).X -
-			bodyA.Velocity.X - rl.Vector2Cross(bodyA.AngularVelocity, radiusA).X
+			bodyB.Velocity.X + vector2.Float32Cross(bodyB.AngularVelocity, radiusB).X -
+			bodyA.Velocity.X - vector2.Float32Cross(bodyA.AngularVelocity, radiusA).X
 		radiusV.Y = 0 +
-			bodyB.Velocity.Y + rl.Vector2Cross(bodyB.AngularVelocity, radiusB).Y -
-			bodyA.Velocity.Y - rl.Vector2Cross(bodyA.AngularVelocity, radiusA).Y
+			bodyB.Velocity.Y + vector2.Float32Cross(bodyB.AngularVelocity, radiusB).Y -
+			bodyA.Velocity.Y - vector2.Float32Cross(bodyA.AngularVelocity, radiusA).Y
 
 		tangent := vector2.NewFloat32(
 			radiusV.X-manifold.Normal.X*radiusV.Dot(manifold.Normal),

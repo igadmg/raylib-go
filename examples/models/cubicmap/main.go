@@ -26,7 +26,7 @@ func main() {
 
 	// NOTE: By default each cube is mapped to one part of texture atlas
 	texture := rl.LoadTexture("cubicmap_atlas.png")                 // Load map texture
-	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, &texture) // Set map diffuse texture
+	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, texture) // Set map diffuse texture
 
 	mapPosition := vector3.NewFloat32(-16.0, 0.0, -8.0) // Set model position
 

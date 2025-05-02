@@ -103,10 +103,10 @@ func Scalef(x float32, y float32, z float32) {
 }
 
 // MultMatrix - Multiply the current matrix by another matrix
-func MultMatrix(m Matrix) {
-	f := MatrixToFloat(m)
-	C.rlMultMatrixf((*C.float)(&f[0]))
-}
+//func MultMatrix(m Matrix) {
+//	f := MatrixToFloat(m)
+//	C.rlMultMatrixf((*C.float)(&f[0]))
+//}
 
 // Frustum .
 func Frustum(left float64, right float64, bottom float64, top float64, znear float64, zfar float64) {

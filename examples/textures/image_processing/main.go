@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/igadmg/gamemath/rect2"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -42,7 +43,7 @@ func main() {
 	currentProcess := None
 	textureReload := false
 
-	selectRecs := make([]rl.Rectangle, numProcesses)
+	selectRecs := make([]rect2.Float32, numProcesses)
 
 	for i := 0; i < numProcesses; i++ {
 		selectRecs[i] = rl.NewRectangle(40, 50+32*float32(i), 150, 30)

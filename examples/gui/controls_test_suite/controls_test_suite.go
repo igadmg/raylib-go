@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/igadmg/gamemath/rect2"
 	"github.com/igadmg/gamemath/vector2"
 	gui "github.com/igadmg/raylib-go/raygui"
 	rl "github.com/igadmg/raylib-go/raylib"
@@ -227,7 +228,7 @@ func main() {
 		progressValue = gui.ProgressBar(rl.NewRectangle(320, 460, 200, 20), "", "", progressValue, 0, 1)
 
 		// NOTE: View rectangle could be used to perform some scissor test
-		var view rl.Rectangle
+		var view rect2.Float32
 		gui.ScrollPanel(rl.NewRectangle(560, 25, 102, 354), "", rl.NewRectangle(560, 25, 300, 1200), &viewScroll, &view)
 
 		var mouseCell vector2.Float32

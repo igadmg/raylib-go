@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
 	gui "github.com/igadmg/raylib-go/raygui"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
@@ -30,7 +32,7 @@ const (
 func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [shapes] example - draw circle sector")
 
-	center := rl.Vector2{X: (float32(screenWidth) - 300) / 2.0, Y: float32(screenHeight / 2.0)}
+	center := vector2.Float32{X: (float32(screenWidth) - 300) / 2.0, Y: float32(screenHeight / 2.0)}
 	var outerRadius, startAngle, endAngle, segments, minSegments float32 = 180.0, 0.0, 180.0, 10.0, 4
 
 	rl.SetTargetFPS(60) // Set our game to run at 60 frames-per-second
@@ -49,19 +51,19 @@ func main() {
 		rl.DrawCircleSectorLines(center, outerRadius, startAngle, endAngle, int32(segments), rl.Fade(rl.Maroon, 0.6))
 
 		// Draw GUI controls
-		r := rl.Rectangle{X: 600, Y: 40, Width: 120, Height: 20}
+		r := rect2.Float32{X: 600, Y: 40, Width: 120, Height: 20}
 		msg := fmt.Sprintf("%.2f", startAngle)
 		startAngle = gui.Slider(r, "StartAngle", msg, startAngle, 0, 720)
 
-		r = rl.Rectangle{X: 600, Y: 70, Width: 120, Height: 20}
+		r = rect2.Float32{X: 600, Y: 70, Width: 120, Height: 20}
 		msg = fmt.Sprintf("%.2f", endAngle)
 		endAngle = gui.Slider(r, "EndAngle", msg, endAngle, 0, 720)
 
-		r = rl.Rectangle{X: 600, Y: 140, Width: 120, Height: 20}
+		r = rect2.Float32{X: 600, Y: 140, Width: 120, Height: 20}
 		msg = fmt.Sprintf("%.2f", outerRadius)
 		outerRadius = gui.Slider(r, "Radius", msg, outerRadius, 0, 200)
 
-		r = rl.Rectangle{X: 600, Y: 170, Width: 120, Height: 20}
+		r = rect2.Float32{X: 600, Y: 170, Width: 120, Height: 20}
 		msg = fmt.Sprintf("%.2f", segments)
 		segments = gui.Slider(r, "Segments", msg, segments, 0, 100)
 

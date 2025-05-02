@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -68,7 +69,7 @@ func upCurve() {
 		curveSelectedPoint = &vector2.Float32{}
 	}
 
-	*curveSelectedPoint = rl.Vector2Add(*curveSelectedPoint, rl.GetMouseDelta())
+	*curveSelectedPoint = vector2.Float32Add(*curveSelectedPoint, rl.GetMouseDelta())
 
 	mouse := rl.GetMousePosition()
 
@@ -129,8 +130,8 @@ func drawTexturedCurve() {
 		current.X = a*curveStartPos.X + b*curveStartPosTangent.X + c*curveEndPosTangent.X + d*curveEndPos.X
 
 		delta := vector2.NewFloat32(current.X-previous.X, current.Y-previous.Y)
-		normal := rl.Vector2Normalize(vector2.NewFloat32(-delta.Y, delta.X))
-		v := previousV + rl.Vector2Length(delta)
+		normal := vector2.Float32Normalize(vector2.NewFloat32(-delta.Y, delta.X))
+		v := previousV + vector2.Float32Length(delta)
 
 		if !tangentSet {
 			previousTangent = normal
@@ -146,7 +147,7 @@ func drawTexturedCurve() {
 		rl.SetTexture(texRoad.ID)
 		rl.Begin(rl.Quads)
 
-		rl.Color4ub(255, 255, 255, 255)
+		colorex.RGBA4ub(255, 255, 255, 255)
 		rl.Normal3f(0, 0, 1)
 
 		rl.TexCoord2f(0, previousV)

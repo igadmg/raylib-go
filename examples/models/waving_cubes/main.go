@@ -55,7 +55,7 @@ func main() {
 
 					cubePos := vector3.NewFloat32(float32((x-numBloks/2))*(scale*3)+float32(scatter), float32((y-numBloks/2))*(scale*2)+float32(scatter), float32((z-numBloks/2))*(scale*3)+float32(scatter))
 
-					cubeColor := rl.ColorFromHSV(float32(((x+y+z)*18)%360), 0.75, 0.9)
+					cubeColor := colorex.RGBAFromHSV(float32(((x+y+z)*18)%360), 0.75, 0.9)
 
 					cubeSize := (2.4 - scale) * blockScale
 

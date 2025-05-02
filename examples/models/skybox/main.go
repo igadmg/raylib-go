@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"unsafe"
 
+	"github.com/igadmg/gamemath/vector3"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -14,9 +15,9 @@ func main() {
 	rl.InitWindow(800, 450, "raylib [models] example - skybox loading and drawing")
 
 	camera := rl.NewCamera3D(
-		rl.NewVector3(1.0, 1.0, 1.0),
-		rl.NewVector3(4.0, 1.0, 4.0),
-		rl.NewVector3(0.0, 1.0, 0.0),
+		vector3.NewFloat32(1.0, 1.0, 1.0),
+		vector3.NewFloat32(4.0, 1.0, 4.0),
+		vector3.NewFloat32(0.0, 1.0, 0.0),
 		45.0,
 		rl.CameraPerspective,
 	)
@@ -37,7 +38,7 @@ func main() {
 
 	skyboxTexture := rl.LoadTextureCubemap(skyboxImg, rl.CubemapLayoutAutoDetect)
 
-	rl.UnloadImage(skyboxImg)
+	rl.UnloadImage(&skyboxImg)
 
 	rl.SetMaterialTexture(skybox.Materials, rl.MapCubemap, skyboxTexture)
 
@@ -60,13 +61,13 @@ func main() {
 				case ".png", ".jpg", ".bmp", ".tga":
 					skyboxFilename = droppedFiles[0]
 
-					rl.UnloadTexture(skyboxTexture)
+					rl.UnloadTexture(&skyboxTexture)
 
 					img := rl.LoadImage(skyboxFilename)
 
 					skyboxTexture = rl.LoadTextureCubemap(img, rl.CubemapLayoutAutoDetect)
 
-					rl.UnloadImage(img)
+					rl.UnloadImage(&img)
 
 					rl.SetMaterialTexture(skybox.Materials, rl.MapCubemap, skyboxTexture)
 				}
@@ -85,7 +86,7 @@ func main() {
 		rl.DisableBackfaceCulling()
 		rl.DisableDepthMask()
 
-		rl.DrawModel(skybox, rl.NewVector3(0, 0, 0), 1.0, rl.White)
+		rl.DrawModel(skybox, vector3.NewFloat32(0, 0, 0), 1.0, rl.White)
 
 		// restore depth and backface culling
 		rl.EnableBackfaceCulling()
@@ -108,9 +109,9 @@ func main() {
 		rl.EndDrawing()
 	}
 
-	rl.UnloadModel(skybox)
-	rl.UnloadTexture(skyboxTexture)
-	rl.UnloadShader(skyboxShader)
+	rl.UnloadModel(&skybox)
+	rl.UnloadTexture(&skyboxTexture)
+	rl.UnloadShader(&skyboxShader)
 
 	rl.CloseWindow()
 }

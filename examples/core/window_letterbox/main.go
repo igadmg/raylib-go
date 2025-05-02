@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
-	"image/color"
 
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -40,14 +42,14 @@ func main() {
 
 		// Update virtual mouse (clamped mouse value behind game screen)
 		mouse := rl.GetMousePosition()
-		virtualMouse := rl.Vector2{
+		virtualMouse := vector2.Float32{
 			X: (mouse.X - (float32(rl.GetScreenWidth())-(float32(gameScreenWidth)*scale))*0.5) / scale,
 			Y: (mouse.Y - (float32(rl.GetScreenHeight())-(float32(gameScreenHeight)*scale))*0.5) / scale,
 		}
-		virtualMouse = rl.Vector2Clamp(
+		virtualMouse = vector2.Float32Clamp(
 			virtualMouse,
-			rl.Vector2{},
-			rl.Vector2{X: float32(gameScreenWidth), Y: float32(gameScreenHeight)},
+			vector2.Float32{},
+			vector2.Float32{X: float32(gameScreenWidth), Y: float32(gameScreenHeight)},
 		)
 
 		// Apply the same transformation as the virtual mouse to the real mouse (i.e. to work with raygui)
@@ -79,26 +81,26 @@ func main() {
 		// Draw render texture to screen, properly scaled
 		rl.DrawTexturePro(
 			target.Texture,
-			rl.Rectangle{Width: float32(target.Texture.Width), Height: float32(-target.Texture.Height)},
-			rl.Rectangle{
+			rect2.Float32{Width: float32(target.Texture.Width), Height: float32(-target.Texture.Height)},
+			rect2.Float32{
 				X:      (float32(rl.GetScreenWidth()) - float32(gameScreenWidth)*scale) * 0.5,
 				Y:      (float32(rl.GetScreenHeight()) - float32(gameScreenHeight)*scale) * 0.5,
 				Width:  float32(gameScreenWidth) * scale,
 				Height: float32(gameScreenHeight) * scale,
 			},
-			rl.Vector2{X: 0, Y: 0}, 0, rl.White,
+			vector2.Float32{X: 0, Y: 0}, 0, rl.White,
 		)
 		rl.EndDrawing()
 	}
-	rl.UnloadRenderTexture(target)
+	rl.UnloadRenderTexture(&target)
 	rl.CloseWindow() // Close window and OpenGL context
 }
 
-func getRandomColors() []color.RGBA {
-	var colors []color.RGBA
+func getRandomColors() []colorex.RGBA {
+	var colors []colorex.RGBA
 
 	for i := 0; i < 10; i++ {
-		randomColor := color.RGBA{
+		randomColor := colorex.RGBA{
 			R: rndUint8(100, 250),
 			G: rndUint8(50, 150),
 			B: rndUint8(10, 100),

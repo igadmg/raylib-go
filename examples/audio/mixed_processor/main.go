@@ -89,7 +89,7 @@ func main() {
 	}
 
 	// De-Initialization
-	rl.UnloadMusicStream(music)                // Unload music stream buffers from RAM
+	rl.UnloadMusicStream(&music)               // Unload music stream buffers from RAM
 	rl.DetachAudioMixedProcessor(ProcessAudio) // Disconnect audio processor
 	rl.CloseAudioDevice()                      // Close audio device (music streaming is automatically stopped)
 

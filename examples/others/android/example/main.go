@@ -61,21 +61,21 @@ func main() {
 		case Title:
 			// Press enter to change to GamePlay screen
 			if rl.IsGestureDetected(rl.GestureTap) {
-				rl.PlaySound(&fx)
+				rl.PlaySound(fx)
 				currentScreen = GamePlay
 			}
 			break
 		case GamePlay:
 			// Press enter to change to Ending screen
 			if rl.IsGestureDetected(rl.GestureTap) {
-				rl.PlaySound(&fx)
+				rl.PlaySound(fx)
 				currentScreen = Ending
 			}
 			break
 		case Ending:
 			// Press enter to return to Title screen
 			if rl.IsGestureDetected(rl.GestureTap) {
-				rl.PlaySound(&fx)
+				rl.PlaySound(fx)
 				currentScreen = Title
 			}
 			break

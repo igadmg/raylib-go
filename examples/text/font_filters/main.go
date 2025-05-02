@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/igadmg/gamemath/vector2"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -42,8 +43,8 @@ func main() {
 	rl.GenTextureMipmaps(&font.Texture)
 
 	fontSize := float32(font.BaseSize)
-	fontPosition := rl.Vector2{X: 40.0, Y: screenHeight/2.0 - 80.0}
-	textSize := rl.Vector2{}
+	fontPosition := vector2.Float32{X: 40.0, Y: screenHeight/2.0 - 80.0}
+	textSize := vector2.Float32{}
 
 	// Setup texture scaling filter
 	rl.SetTextureFilter(font.Texture, rl.FilterPoint)
@@ -80,7 +81,7 @@ func main() {
 
 			// NOTE: We only support first ttf file dropped
 			if filepath.Ext(droppedFiles[0]) == ".ttf" {
-				rl.UnloadFont(font)
+				rl.UnloadFont(&font)
 				font = rl.LoadFontEx(droppedFiles[0], int32(fontSize), nil, 0)
 			}
 
@@ -120,6 +121,6 @@ func main() {
 	}
 
 	// De-Initialization
-	rl.UnloadFont(font) // Font unloading
-	rl.CloseWindow()    // Close window and OpenGL context
+	rl.UnloadFont(&font) // Font unloading
+	rl.CloseWindow()     // Close window and OpenGL context
 }

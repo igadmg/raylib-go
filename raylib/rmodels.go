@@ -13,6 +13,7 @@ import (
 	"github.com/igadmg/gamemath/vector2"
 	"github.com/igadmg/gamemath/vector3"
 	"github.com/igadmg/goex/image/colorex"
+	"golang.org/x/exp/slices"
 )
 
 // DrawLine3D - Draw a line in 3D world space
@@ -531,7 +532,7 @@ func UnloadMaterial(material *Material) {
 }
 
 // SetMaterialTexture - Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)
-func SetMaterialTexture(material *Material, mapType int32, texture *Texture2D) {
+func SetMaterialTexture(material *Material, mapType int32, texture Texture2D) {
 	cmaterial := material.cptr()
 	cmapType := (C.int)(mapType)
 	ctexture := texture.cptr()

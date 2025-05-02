@@ -19,6 +19,7 @@
 package main
 
 import (
+	"github.com/igadmg/gamemath/vector3"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -33,14 +34,14 @@ func main() {
 
 	// Define the camera to look into our 3d world
 	camera := rl.Camera{
-		Position:   rl.NewVector3(1.5, 1.5, 1.5),
-		Target:     rl.NewVector3(0.0, 0.4, 0.0),
-		Up:         rl.NewVector3(0.0, 1.0, 0.0),
+		Position:   vector3.NewFloat32(1.5, 1.5, 1.5),
+		Target:     vector3.NewFloat32(0.0, 0.4, 0.0),
+		Up:         vector3.NewFloat32(0.0, 1.0, 0.0),
 		Fovy:       45.0,
 		Projection: rl.CameraPerspective,
 	}
 
-	position := rl.NewVector3(0.0, 0.0, 0.0)
+	position := vector3.NewFloat32(0.0, 0.0, 0.0)
 
 	modelFileName := "cesium_man.m3d"
 	drawMesh := true
@@ -150,6 +151,6 @@ func main() {
 
 	// De-Initialization
 	rl.UnloadModelAnimations(anims)
-	rl.UnloadModel(model)
+	rl.UnloadModel(&model)
 	rl.CloseWindow()
 }

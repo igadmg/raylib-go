@@ -12,7 +12,12 @@
 ********************************************************************************************/
 package main
 
-import rl "github.com/igadmg/raylib-go/raylib"
+import (
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector3"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
+)
 
 const (
 	screenWidth  = 800
@@ -24,12 +29,12 @@ func main() {
 
 	// Define the camera to look into our 3d world
 	camera := rl.Camera{
-		Position: rl.Vector3{
+		Position: vector3.Float32{
 			Y: 10.0,
 			Z: 10.0,
 		},
-		Target:     rl.Vector3{},
-		Up:         rl.Vector3{Y: 1.0},
+		Target:     vector3.Float32{},
+		Up:         vector3.Float32{Y: 1.0},
 		Fovy:       45.0,
 		Projection: rl.CameraPerspective,
 	}
@@ -50,19 +55,19 @@ func main() {
 		rl.BeginMode3D(camera)
 
 		// Draw cube with an applied texture
-		vec := rl.Vector3{
+		vec := vector3.Float32{
 			X: -2.0,
 			Y: 2.0,
 		}
 		DrawCubeTexture(texture, vec, 2.0, 4.0, 2.0, rl.White)
 
 		// Draw cube with an applied texture, but only a defined rectangle piece of the texture
-		rec := rl.Rectangle{
+		rec := rect2.Float32{
 			Y:      float32(texture.Height) / 2.0,
 			Width:  float32(texture.Width) / 2.0,
 			Height: float32(texture.Height) / 2.0,
 		}
-		vec = rl.Vector3{
+		vec = vector3.Float32{
 			X: 2.0,
 			Y: 1.0,
 		}
@@ -75,13 +80,13 @@ func main() {
 	}
 
 	// De-Initialization
-	rl.UnloadTexture(texture) // Unload texture
-	rl.CloseWindow()          // Close window and OpenGL context
+	rl.UnloadTexture(&texture) // Unload texture
+	rl.CloseWindow()           // Close window and OpenGL context
 }
 
 // DrawCubeTexture draws a textured cube
 // NOTE: Cube position is the center position
-func DrawCubeTexture(texture rl.Texture2D, position rl.Vector3, width, height, length float32, color rl.Color) {
+func DrawCubeTexture(texture rl.Texture2D, position vector3.Float32, width, height, length float32, color colorex.RGBA) {
 	x := position.X
 	y := position.Y
 	z := position.Z
@@ -98,7 +103,7 @@ func DrawCubeTexture(texture rl.Texture2D, position rl.Vector3, width, height, l
 	//rl.Scalef(2.0, 2.0, 2.0)
 
 	rl.Begin(rl.Quads)
-	rl.Color4ub(color.R, color.G, color.B, color.A)
+	colorex.RGBA4ub(color.R, color.G, color.B, color.A)
 	// Front Face
 	rl.Normal3f(0.0, 0.0, 1.0) // Normal Pointing Towards Viewer
 	rl.TexCoord2f(0.0, 0.0)
@@ -166,8 +171,8 @@ func DrawCubeTexture(texture rl.Texture2D, position rl.Vector3, width, height, l
 }
 
 // DrawCubeTextureRec draws a cube with texture piece applied to all faces
-func DrawCubeTextureRec(texture rl.Texture2D, source rl.Rectangle, position rl.Vector3, width, height,
-	length float32, color rl.Color) {
+func DrawCubeTextureRec(texture rl.Texture2D, source rect2.Float32, position vector3.Float32, width, height,
+	length float32, color colorex.RGBA) {
 
 	x := position.X
 	y := position.Y
@@ -182,72 +187,72 @@ func DrawCubeTextureRec(texture rl.Texture2D, source rl.Rectangle, position rl.V
 	// We calculate the normalized texture coordinates for the desired texture-source-rectangle
 	// It means converting from (tex.width, tex.height) coordinates to [0.0f, 1.0f] equivalent
 	rl.Begin(rl.Quads)
-	rl.Color4ub(color.R, color.G, color.B, color.A)
+	colorex.RGBA4ub(color.R, color.G, color.B, color.A)
 
 	// Front face
 	rl.Normal3f(0.0, 0.0, 1.0)
-	rl.TexCoord2f(source.X/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x-width/2, y-height/2, z+length/2)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x+width/2, y-height/2, z+length/2)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, source.Y/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x+width/2, y+height/2, z+length/2)
-	rl.TexCoord2f(source.X/texWidth, source.Y/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x-width/2, y+height/2, z+length/2)
 
 	// Back face
 	rl.Normal3f(0.0, 0.0, -1.0)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x-width/2, y-height/2, z-length/2)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, source.Y/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x-width/2, y+height/2, z-length/2)
-	rl.TexCoord2f(source.X/texWidth, source.Y/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x+width/2, y+height/2, z-length/2)
-	rl.TexCoord2f(source.X/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x+width/2, y-height/2, z-length/2)
 
 	// Top face
 	rl.Normal3f(0.0, 1.0, 0.0)
-	rl.TexCoord2f(source.X/texWidth, source.Y/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x-width/2, y+height/2, z-length/2)
-	rl.TexCoord2f(source.X/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x-width/2, y+height/2, z+length/2)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x+width/2, y+height/2, z+length/2)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, source.Y/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x+width/2, y+height/2, z-length/2)
 
 	// Bottom face
 	rl.Normal3f(0.0, -1.0, 0.0)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, source.Y/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x-width/2, y-height/2, z-length/2)
-	rl.TexCoord2f(source.X/texWidth, source.Y/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x+width/2, y-height/2, z-length/2)
-	rl.TexCoord2f(source.X/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x+width/2, y-height/2, z+length/2)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x-width/2, y-height/2, z+length/2)
 
 	// Right face
 	rl.Normal3f(1.0, 0.0, 0.0)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x+width/2, y-height/2, z-length/2)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, source.Y/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x+width/2, y+height/2, z-length/2)
-	rl.TexCoord2f(source.X/texWidth, source.Y/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x+width/2, y+height/2, z+length/2)
-	rl.TexCoord2f(source.X/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x+width/2, y-height/2, z+length/2)
 
 	// Left face
 	rl.Normal3f(-1.0, 0.0, 0.0)
-	rl.TexCoord2f(source.X/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x-width/2, y-height/2, z-length/2)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, (source.Y+source.Height)/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, (source.Y()+source.Height())/texHeight)
 	rl.Vertex3f(x-width/2, y-height/2, z+length/2)
-	rl.TexCoord2f((source.X+source.Width)/texWidth, source.Y/texHeight)
+	rl.TexCoord2f((source.X()+source.Width())/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x-width/2, y+height/2, z+length/2)
-	rl.TexCoord2f(source.X/texWidth, source.Y/texHeight)
+	rl.TexCoord2f(source.X()/texWidth, source.Y()/texHeight)
 	rl.Vertex3f(x-width/2, y+height/2, z-length/2)
 
 	rl.End()

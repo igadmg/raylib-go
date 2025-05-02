@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/igadmg/gamemath/vector2"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -22,38 +23,38 @@ func main() {
 	const msg = "Signed Distance Fields"
 
 	// Default font generation from TTF font
-	fontDefault := rl.Font{BaseSize: 16, CharsCount: 95}
-	defer rl.UnloadFont(fontDefault) // Default font unloading
+	fontDefault := rl.Font{BaseSize: 16, GlyphCount: 95}
+	defer rl.UnloadFont(&fontDefault) // Default font unloading
 
 	// Loading font data from memory data
 	// Parameters > font size: 16, no glyphs array provided (nil), glyphs count: 95 (autogenerate chars array)
 	glyphs := rl.LoadFontData(fileData, 16, nil, 95, rl.FontDefault)
-	fontDefault.Chars = &glyphs[0]
+	fontDefault.Glyphs = &glyphs[0]
 
 	// Parameters >  font size: 16, glyphs padding in image: 4 px, pack method: 0 (default)
-	atlas := rl.GenImageFontAtlas(unsafe.Slice(fontDefault.Chars, fontDefault.CharsCount), unsafe.Slice(&fontDefault.Recs, fontDefault.CharsCount), 16, 4, 0)
-	fontDefault.Texture = rl.LoadTextureFromImage(&atlas)
+	atlas := rl.GenImageFontAtlas(unsafe.Slice(fontDefault.Glyphs, fontDefault.GlyphCount), unsafe.Slice(&fontDefault.Recs, fontDefault.GlyphCount), 16, 4, 0)
+	fontDefault.Texture = rl.LoadTextureFromImage(atlas)
 	rl.UnloadImage(&atlas)
 
 	// SDF font generation from TTF font
-	fontSDF := rl.Font{BaseSize: 16, CharsCount: 95}
-	defer rl.UnloadFont(fontSDF) // SDF font unloading
+	fontSDF := rl.Font{BaseSize: 16, GlyphCount: 95}
+	defer rl.UnloadFont(&fontSDF) // SDF font unloading
 
 	// Parameters > font size: 16, no glyphs array provided (nil), glyphs count: 0 (defaults to 95)
 	glyphsSDF := rl.LoadFontData(fileData, 16, nil, 0, rl.FontSdf)
-	fontSDF.Chars = &glyphsSDF[0]
+	fontSDF.Glyphs = &glyphsSDF[0]
 	// Parameters > font size: 16, glyphs padding in image: 0 px, pack method: 1 (Skyline algorithm)
-	atlas = rl.GenImageFontAtlas(unsafe.Slice(fontSDF.Chars, fontSDF.CharsCount), unsafe.Slice(&fontSDF.Recs, fontSDF.CharsCount), 16, 0, 1)
-	fontSDF.Texture = rl.LoadTextureFromImage(&atlas)
+	atlas = rl.GenImageFontAtlas(unsafe.Slice(fontSDF.Glyphs, fontSDF.GlyphCount), unsafe.Slice(&fontSDF.Recs, fontSDF.GlyphCount), 16, 0, 1)
+	fontSDF.Texture = rl.LoadTextureFromImage(atlas)
 	rl.UnloadImage(&atlas)
 
 	// Load SDF required shader (we use default vertex shader)
 	shader := rl.LoadShader("", "sdf.fs")
-	defer rl.UnloadShader(shader)                           // Unload SDF shader
+	defer rl.UnloadShader(&shader)                          // Unload SDF shader
 	rl.SetTextureFilter(fontSDF.Texture, rl.FilterBilinear) // Required for SDF font
 
-	fontPosition := rl.NewVector2(40, screenHeight/2.0-50)
-	textSize := rl.Vector2Zero()
+	fontPosition := vector2.NewFloat32(40, screenHeight/2.0-50)
+	textSize := vector2.Zero[float32]()
 	fontSize := float32(16)
 	currentFont := 0 // 0 - fontDefault, 1 - fontSDF
 

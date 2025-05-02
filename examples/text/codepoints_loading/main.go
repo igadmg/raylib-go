@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/igadmg/gamemath/vector2"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -76,7 +77,7 @@ func main() {
 			rl.DrawRectangleLines(150, 100, font.Texture.Width, font.Texture.Height, rl.Black)
 		} else {
 			// Draw provided text with loaded font, containing all required codepoint glyphs
-			pos := rl.Vector2{
+			pos := vector2.Float32{
 				X: 160,
 				Y: 110,
 			}
@@ -90,6 +91,6 @@ func main() {
 	}
 
 	// De-Initialization
-	rl.UnloadFont(font) // Unload font
-	rl.CloseWindow()    // Close window and OpenGL context
+	rl.UnloadFont(&font) // Unload font
+	rl.CloseWindow()     // Close window and OpenGL context
 }

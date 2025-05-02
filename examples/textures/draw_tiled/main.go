@@ -17,6 +17,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -37,7 +40,7 @@ func main() {
 	rl.SetTextureFilter(texPattern, rl.FilterTrilinear) // Makes the texture smoother when upscaled
 
 	// Coordinates for all patterns inside the texture
-	recPattern := []rl.Rectangle{
+	recPattern := []rect2.Float32{
 		{3, 3, 66, 66},
 		{75, 3, 100, 100},
 		{3, 75, 66, 66},
@@ -47,10 +50,10 @@ func main() {
 	}
 
 	// Setup colors
-	colors := []rl.Color{rl.Black, rl.Maroon, rl.Orange, rl.Blue, rl.Purple,
+	colors := []colorex.RGBA{rl.Black, rl.Maroon, rl.Orange, rl.Blue, rl.Purple,
 		rl.Beige, rl.Lime, rl.Red, rl.DarkGray, rl.SkyBlue}
 	var maxColors = len(colors)
-	colorRec := make([]rl.Rectangle, maxColors)
+	colorRec := make([]rect2.Float32, maxColors)
 
 	// Calculate rectangle for each color
 	var x, y float32
@@ -83,7 +86,7 @@ func main() {
 
 			// Check which pattern was clicked and set it as the active pattern
 			for i := 0; i < len(recPattern); i++ {
-				r := rl.Rectangle{
+				r := rect2.Float32{
 					X:      2 + marginSize + recPattern[i].X,
 					Y:      40 + marginSize + recPattern[i].Y,
 					Width:  recPattern[i].Width,
@@ -134,30 +137,30 @@ func main() {
 		rl.ClearBackground(rl.RayWhite)
 
 		// Draw the tiled area
-		src := rl.Rectangle{
+		src := rect2.Float32{
 			X:      optWidth + marginSize,
 			Y:      marginSize,
 			Width:  float32(rl.GetScreenWidth()) - optWidth - 2.0*marginSize,
 			Height: float32(rl.GetScreenHeight()) - 2.0*marginSize,
 		}
-		DrawTextureTiled(texPattern, recPattern[activePattern], src, rl.Vector2{}, rotation, scale, colors[activeCol])
+		DrawTextureTiled(texPattern, recPattern[activePattern], src, vector2.Float32{}, rotation, scale, colors[activeCol])
 
 		// Draw options
 		rl.DrawRectangle(marginSize, marginSize, optWidth-marginSize, int32(rl.GetScreenHeight())-2*marginSize,
-			rl.ColorAlpha(rl.LightGray, 0.5))
+			colorex.RGBAAlpha(rl.LightGray, 0.5))
 
 		rl.DrawText("Select Pattern", 2+marginSize, 30+marginSize, 10, rl.Black)
 		rl.DrawTexture(texPattern, 2+marginSize, 40+marginSize, rl.Black)
 		rl.DrawRectangle(int32(2+marginSize+recPattern[activePattern].X),
 			int32(40+marginSize+recPattern[activePattern].Y),
 			int32(recPattern[activePattern].Width),
-			int32(recPattern[activePattern].Height), rl.ColorAlpha(rl.DarkBlue, 0.3))
+			int32(recPattern[activePattern].Height), colorex.RGBAAlpha(rl.DarkBlue, 0.3))
 
 		rl.DrawText("Select Color", 2+marginSize, 10+256+marginSize, 10, rl.Black)
 		for i := 0; i < maxColors; i++ {
 			rl.DrawRectangleRec(colorRec[i], colors[i])
 			if activeCol == i {
-				rl.DrawRectangleLinesEx(colorRec[i], 3, rl.ColorAlpha(rl.White, 0.5))
+				rl.DrawRectangleLinesEx(colorRec[i], 3, colorex.RGBAAlpha(rl.White, 0.5))
 			}
 		}
 
@@ -181,8 +184,8 @@ func main() {
 }
 
 // DrawTextureTiled draws a part of a texture (defined by a rectangle) with rotation and scale tiled into dest.
-func DrawTextureTiled(texture rl.Texture2D, source, dest rl.Rectangle, origin rl.Vector2, rotation, scale float32,
-	tint rl.Color) {
+func DrawTextureTiled(texture rl.Texture2D, source, dest rect2.Float32, origin vector2.Float32, rotation, scale float32,
+	tint colorex.RGBA) {
 
 	if (texture.ID <= 0) || (scale <= 0.0) { // Want see an infinite loop?!...just delete this line!
 		return
@@ -195,56 +198,56 @@ func DrawTextureTiled(texture rl.Texture2D, source, dest rl.Rectangle, origin rl
 	tileHeight := source.Height * scale
 	if (dest.Width < tileWidth) && (dest.Height < tileHeight) {
 		// Can fit only one tile
-		src := rl.Rectangle{
+		src := rect2.Float32{
 			X:      source.X,
 			Y:      source.Y,
 			Width:  dest.Width / tileWidth * source.Width,
 			Height: dest.Height / tileHeight * source.Height,
 		}
-		dst := rl.Rectangle{X: dest.X, Y: dest.Y, Width: dest.Width, Height: dest.Height}
+		dst := rect2.Float32{X: dest.X, Y: dest.Y, Width: dest.Width, Height: dest.Height}
 		rl.DrawTexturePro(texture, src, dst, origin, rotation, tint)
 	} else if dest.Width <= tileWidth {
 		// Tiled vertically (one column)
 		var dy float32
 		for ; dy+tileHeight < dest.Height; dy += tileHeight {
-			src := rl.Rectangle{
+			src := rect2.Float32{
 				X:      source.X,
 				Y:      source.Y,
 				Width:  dest.Width / tileWidth * source.Width,
 				Height: source.Height,
 			}
-			dst := rl.Rectangle{X: dest.X, Y: dest.Y + dy, Width: dest.Width, Height: tileHeight}
+			dst := rect2.Float32{X: dest.X, Y: dest.Y + dy, Width: dest.Width, Height: tileHeight}
 			rl.DrawTexturePro(texture, src, dst, origin, rotation, tint)
 		}
 
 		// Fit last tile
 		if dy < dest.Height {
-			src := rl.Rectangle{X: source.X, Y: source.Y,
+			src := rect2.Float32{X: source.X, Y: source.Y,
 				Width:  (dest.Width / tileWidth) * source.Width,
 				Height: ((dest.Height - dy) / tileHeight) * source.Height,
 			}
-			dst := rl.Rectangle{X: dest.X, Y: dest.Y + dy, Width: dest.Width, Height: dest.Height - dy}
+			dst := rect2.Float32{X: dest.X, Y: dest.Y + dy, Width: dest.Width, Height: dest.Height - dy}
 			rl.DrawTexturePro(texture, src, dst, origin, rotation, tint)
 		}
 	} else if dest.Height <= tileHeight {
 		// Tiled horizontally (one row)
 		var dx float32
 		for ; dx+tileWidth < dest.Width; dx += tileWidth {
-			src := rl.Rectangle{
+			src := rect2.Float32{
 				X: source.X, Y: source.Y, Width: source.Width,
 				Height: (dest.Height / tileHeight) * source.Height,
 			}
-			dst := rl.Rectangle{X: dest.X + dx, Y: dest.Y, Width: tileWidth, Height: dest.Height}
+			dst := rect2.Float32{X: dest.X + dx, Y: dest.Y, Width: tileWidth, Height: dest.Height}
 			rl.DrawTexturePro(texture, src, dst, origin, rotation, tint)
 		}
 
 		// Fit last tile
 		if dx < dest.Width {
-			src := rl.Rectangle{
+			src := rect2.Float32{
 				X: source.X, Y: source.Y, Width: ((dest.Width - dx) / tileWidth) * source.Width,
 				Height: (dest.Height / tileHeight) * source.Height,
 			}
-			dst := rl.Rectangle{X: dest.X + dx, Y: dest.Y, Width: dest.Width - dx, Height: dest.Height}
+			dst := rect2.Float32{X: dest.X + dx, Y: dest.Y, Width: dest.Width - dx, Height: dest.Height}
 			rl.DrawTexturePro(texture, src,
 				dst, origin, rotation, tint)
 		}
@@ -254,16 +257,16 @@ func DrawTextureTiled(texture rl.Texture2D, source, dest rl.Rectangle, origin rl
 		for ; dx+tileWidth < dest.Width; dx += tileWidth {
 			var dy float32
 			for ; dy+tileHeight < dest.Height; dy += tileHeight {
-				dst := rl.Rectangle{X: dest.X + dx, Y: dest.Y + dy, Width: tileWidth, Height: tileHeight}
+				dst := rect2.Float32{X: dest.X + dx, Y: dest.Y + dy, Width: tileWidth, Height: tileHeight}
 				rl.DrawTexturePro(texture, source, dst, origin, rotation, tint)
 			}
 
 			if dy < dest.Height {
-				src := rl.Rectangle{
+				src := rect2.Float32{
 					X: source.X, Y: source.Y,
 					Width: source.Width, Height: ((dest.Height - dy) / tileHeight) * source.Height,
 				}
-				dst := rl.Rectangle{
+				dst := rect2.Float32{
 					X: dest.X + dx, Y: dest.Y + dy,
 					Width: tileWidth, Height: dest.Height - dy,
 				}
@@ -275,22 +278,22 @@ func DrawTextureTiled(texture rl.Texture2D, source, dest rl.Rectangle, origin rl
 		if dx < dest.Width {
 			var dy float32
 			for ; dy+tileHeight < dest.Height; dy += tileHeight {
-				src := rl.Rectangle{
+				src := rect2.Float32{
 					X: source.X, Y: source.Y,
 					Width: ((dest.Width - dx) / tileWidth) * source.Width, Height: source.Height,
 				}
-				dst := rl.Rectangle{X: dest.X + dx, Y: dest.Y + dy, Width: dest.Width - dx, Height: tileHeight}
+				dst := rect2.Float32{X: dest.X + dx, Y: dest.Y + dy, Width: dest.Width - dx, Height: tileHeight}
 				rl.DrawTexturePro(texture, src, dst, origin, rotation, tint)
 			}
 
 			// Draw final tile in the bottom right corner
 			if dy < dest.Height {
-				src := rl.Rectangle{
+				src := rect2.Float32{
 					X: source.X, Y: source.Y,
 					Width:  ((dest.Width - dx) / tileWidth) * source.Width,
 					Height: ((dest.Height - dy) / tileHeight) * source.Height,
 				}
-				dst := rl.Rectangle{X: dest.X + dx, Y: dest.Y + dy, Width: dest.Width - dx, Height: dest.Height - dy}
+				dst := rect2.Float32{X: dest.X + dx, Y: dest.Y + dy, Width: dest.Width - dx, Height: dest.Height - dy}
 				rl.DrawTexturePro(texture, src, dst, origin, rotation, tint)
 			}
 		}

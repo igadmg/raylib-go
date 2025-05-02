@@ -25,7 +25,7 @@ func main() {
 	mesh := rl.GenMeshHeightmap(image, vector3.NewFloat32(16, 8, 16)) // Generate heightmap mesh (RAM and VRAM)
 	model := rl.LoadModelFromMesh(mesh)                               // Load model from generated mesh
 
-	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, &texture) // Set map diffuse texture
+	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, texture) // Set map diffuse texture
 
 	mapPosition := vector3.NewFloat32(-8.0, 0.0, -8.0) // Set model position
 

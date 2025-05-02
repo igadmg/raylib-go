@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/igadmg/gamemath/rect2"
 	"github.com/igadmg/gamemath/vector2"
 	ez "github.com/igadmg/raylib-go/easings"
 	rl "github.com/igadmg/raylib-go/raylib"
@@ -23,7 +24,7 @@ func main() {
 
 	rl.InitWindow(screenWidth, screenHeight, "raylib [shapes] example - easings rectangle array")
 
-	var recs [maxRecsX * maxRecsY]rl.Rectangle
+	var recs [maxRecsX * maxRecsY]rect2.Float32
 
 	for y := 0; y < maxRecsY; y++ {
 

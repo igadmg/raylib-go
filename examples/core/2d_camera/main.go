@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/igadmg/gamemath/rect2"
 	"github.com/igadmg/gamemath/vector2"
 	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
@@ -18,13 +19,13 @@ func main() {
 
 	player := rl.NewRectangle(400, 280, 40, 40)
 
-	buildings := make([]rl.Rectangle, maxBuildings)
+	buildings := make([]rect2.Float32, maxBuildings)
 	buildColors := make([]colorex.RGBA, maxBuildings)
 
 	spacing := float32(0)
 
 	for i := 0; i < maxBuildings; i++ {
-		r := rl.Rectangle{}
+		r := rect2.Float32{}
 		r.Size.X = float32(rl.GetRandomValue(50, 200))
 		r.Size.Y = float32(rl.GetRandomValue(100, 800))
 		r.Position.Y = float32(screenHeight) - 130 - r.Size.Y

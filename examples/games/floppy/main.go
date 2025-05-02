@@ -5,6 +5,7 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/igadmg/gamemath/rect2"
 	"github.com/igadmg/gamemath/vector2"
 	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
@@ -42,7 +43,7 @@ type Floppy struct {
 
 // Pipe type
 type Pipe struct {
-	Rec    rl.Rectangle
+	Rec    rect2.Float32
 	Color  colorex.RGBA
 	Active bool
 }
@@ -68,8 +69,8 @@ type Game struct {
 	TxSmoke   rl.Texture2D
 	TxClouds  rl.Texture2D
 
-	CloudRec rl.Rectangle
-	FrameRec rl.Rectangle
+	CloudRec rect2.Float32
+	FrameRec rect2.Float32
 
 	GameOver bool
 	Dead     bool
@@ -233,7 +234,7 @@ func (g *Game) Update() {
 
 	if !g.GameOver {
 		if rl.IsKeyPressed(rl.KeyP) || rl.IsKeyPressed(rl.KeyBack) {
-			rl.PlaySound(&g.FxClick)
+			rl.PlaySound(g.FxClick)
 
 			if runtime.GOOS == "android" && g.Pause {
 				g.WindowShouldClose = true
@@ -262,7 +263,7 @@ func (g *Game) Update() {
 
 				// Movement/Controls
 				if rl.IsKeyDown(rl.KeySpace) || rl.IsMouseButtonDown(rl.MouseLeftButton) {
-					rl.PlaySound(&g.FxFlap)
+					rl.PlaySound(g.FxFlap)
 
 					// Activate one particle every frame
 					for i := 0; i < maxParticles; i++ {
@@ -321,7 +322,7 @@ func (g *Game) Update() {
 						// OMG You killed Gopher you bastard!
 						g.Dead = true
 
-						rl.PlaySound(&g.FxSlap)
+						rl.PlaySound(g.FxSlap)
 					} else if (g.PipesPos[i/2].X < g.Floppy.Position.X-spriteSize) && g.Pipes[i/2].Active && !g.GameOver {
 						// Score point
 						g.Score += 1
@@ -335,7 +336,7 @@ func (g *Game) Update() {
 							g.HiScore = g.Score
 						}
 
-						rl.PlaySound(&g.FxPoint)
+						rl.PlaySound(g.FxPoint)
 					}
 				}
 			} else {
@@ -359,7 +360,7 @@ func (g *Game) Update() {
 		}
 	} else {
 		if rl.IsKeyPressed(rl.KeyEnter) || rl.IsMouseButtonDown(rl.MouseLeftButton) {
-			rl.PlaySound(&g.FxClick)
+			rl.PlaySound(g.FxClick)
 
 			// Return of the Gopher!
 			g.Init()

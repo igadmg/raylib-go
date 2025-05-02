@@ -39,7 +39,7 @@ func main() {
 			active = true
 			position.X -= frameW / 2
 			position.Y -= frameH / 2
-			rl.PlaySound(&fxBoom)
+			rl.PlaySound(fxBoom)
 		}
 
 		if active {

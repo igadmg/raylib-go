@@ -18,7 +18,7 @@ func main() {
 	rl.SetTargetFPS(60) // Set our game to run at 60 frames-per-second
 
 	for !exitWindow {
-		if rl.WindowShouldClose() || rl.IsMouseButtonPressed(rl.KeyEscape) {
+		if rl.WindowShouldClose() || rl.IsKeyPressed(rl.KeyEscape) {
 			exitWindowRequested = true
 		}
 

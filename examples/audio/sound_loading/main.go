@@ -16,10 +16,10 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 		if rl.IsKeyPressed(rl.KeySpace) {
-			rl.PlaySound(&fxWav)
+			rl.PlaySound(fxWav)
 		}
 		if rl.IsKeyPressed(rl.KeyEnter) {
-			rl.PlaySound(&fxOgg)
+			rl.PlaySound(fxOgg)
 		}
 
 		rl.BeginDrawing()

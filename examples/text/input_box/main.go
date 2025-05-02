@@ -15,6 +15,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/igadmg/gamemath/rect2"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -31,7 +32,7 @@ func main() {
 	var letterCount, framesCounter int32
 	var mouseOnText bool
 
-	textBox := rl.Rectangle{X: screenWidth/2.0 - 100, Y: 180, Width: 225, Height: 50}
+	textBox := rect2.Float32{X: screenWidth/2.0 - 100, Y: 180, Width: 225, Height: 50}
 
 	rl.SetTargetFPS(60) // Set our game to run at 60 frames-per-second
 
@@ -85,9 +86,9 @@ func main() {
 		if mouseOnText {
 			col = rl.Red
 		}
-		rl.DrawRectangleLines(int32(textBox.X), int32(textBox.Y), int32(textBox.Width), int32(textBox.Height), col)
+		rl.DrawRectangleLines(int32(textBox.X()), int32(textBox.Y()), int32(textBox.Width()), int32(textBox.Height()), col)
 
-		rl.DrawText(getString(name), int32(textBox.X)+5, int32(textBox.Y)+8, 40, rl.Maroon)
+		rl.DrawText(getString(name), int32(textBox.X())+5, int32(textBox.Y())+8, 40, rl.Maroon)
 		text := fmt.Sprintf("INPUT CHARS: %d/%d", letterCount, maxInputChars)
 		rl.DrawText(text, 315, 250, 20, rl.DarkGray)
 
@@ -95,8 +96,8 @@ func main() {
 			if letterCount < maxInputChars {
 				// Draw blinking underscore char
 				if ((framesCounter / 20) % 2) == 0 {
-					x := int32(textBox.X) + 8 + rl.MeasureText(getString(name), 40)
-					rl.DrawText("_", x, int32(textBox.Y)+12, 40, rl.Maroon)
+					x := int32(textBox.X()) + 8 + rl.MeasureText(getString(name), 40)
+					rl.DrawText("_", x, int32(textBox.Y())+12, 40, rl.Maroon)
 				}
 			} else {
 				rl.DrawText("Press BACKSPACE to delete chars...", 230, 300, 20, rl.Gray)
