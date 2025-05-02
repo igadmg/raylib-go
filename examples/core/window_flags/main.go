@@ -166,10 +166,7 @@ func main() {
 
 		rl.DrawCircleV(ballPosition, ballRadius, rl.Maroon)
 		rl.DrawRectangleLinesEx(
-			rect2.Float32{
-				Width:  float32(rl.GetScreenWidth()),
-				Height: float32(rl.GetScreenHeight()),
-			},
+			rect2.NewFloat32(vector2.Zero[float32](), rl.GetScreenSize()),
 			4, rl.White,
 		)
 

@@ -81,7 +81,7 @@ func main() {
 		// Draw render texture to screen, properly scaled
 		rl.DrawTexturePro(
 			target.Texture,
-			rect2.Float32{Width: float32(target.Texture.Width), Height: float32(-target.Texture.Height)},
+			rect2.NewFloat32(vector2.Zero[float32](), vector2.NewFloat32(target.Texture.Width, -target.Texture.Height)),
 			rect2.Float32{
 				X:      (float32(rl.GetScreenWidth()) - float32(gameScreenWidth)*scale) * 0.5,
 				Y:      (float32(rl.GetScreenHeight()) - float32(gameScreenHeight)*scale) * 0.5,

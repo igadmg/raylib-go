@@ -87,20 +87,20 @@ func main() {
 		mousePosition = rl.GetMousePosition()
 
 		// Resize the n-patches based on mouse position
-		dstRec1.Width = mousePosition.X - dstRec1.X
-		dstRec1.Height = mousePosition.Y - dstRec1.Y
-		dstRec2.Width = mousePosition.X - dstRec2.X
-		dstRec2.Height = mousePosition.Y - dstRec2.Y
-		dstRecH.Width = mousePosition.X - dstRecH.X
-		dstRecV.Height = mousePosition.Y - dstRecV.Y
+		dstRec1.Width = mousePosition.X - dstRec1.X()
+		dstRec1.Height = mousePosition.Y - dstRec1.Y()
+		dstRec2.Width = mousePosition.X - dstRec2.X()
+		dstRec2.Height = mousePosition.Y - dstRec2.Y()
+		dstRecH.Width = mousePosition.X - dstRecH.X()
+		dstRecV.Height = mousePosition.Y - dstRecV.Y()
 
 		// Set a minimum Width and/or Height
-		dstRec1.Width = clamp(dstRec1.Width, 1, 300)
-		dstRec1.Height = clamp(dstRec1.Height, 1, screenHeight)
-		dstRec2.Width = clamp(dstRec2.Width, 1, 300)
-		dstRec2.Height = clamp(dstRec2.Height, 1, screenHeight)
-		dstRecH.Width = clamp(dstRecH.Width, 1, screenWidth)
-		dstRecV.Height = clamp(dstRecV.Height, 1, screenHeight)
+		dstRec1.Width = clamp(dstRec1.Width(), 1, 300)
+		dstRec1.Height = clamp(dstRec1.Height(), 1, screenHeight)
+		dstRec2.Width = clamp(dstRec2.Width(), 1, 300)
+		dstRec2.Height = clamp(dstRec2.Height(), 1, screenHeight)
+		dstRecH.Width = clamp(dstRecH.Width(), 1, screenWidth)
+		dstRecV.Height = clamp(dstRecV.Height(), 1, screenHeight)
 
 		// Draw
 		rl.BeginDrawing()

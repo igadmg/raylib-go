@@ -153,8 +153,8 @@ func main() {
 		rl.DrawTexture(texPattern, 2+marginSize, 40+marginSize, rl.Black)
 		rl.DrawRectangle(int32(2+marginSize+recPattern[activePattern].X),
 			int32(40+marginSize+recPattern[activePattern].Y),
-			int32(recPattern[activePattern].Width),
-			int32(recPattern[activePattern].Height), colorex.RGBAAlpha(rl.DarkBlue, 0.3))
+			int32(recPattern[activePattern].Width()),
+			int32(recPattern[activePattern].Height()), colorex.RGBAAlpha(rl.DarkBlue, 0.3))
 
 		rl.DrawText("Select Color", 2+marginSize, 10+256+marginSize, 10, rl.Black)
 		for i := 0; i < maxColors; i++ {
@@ -190,13 +190,13 @@ func DrawTextureTiled(texture rl.Texture2D, source, dest rect2.Float32, origin v
 	if (texture.ID <= 0) || (scale <= 0.0) { // Want see an infinite loop?!...just delete this line!
 		return
 	}
-	if (source.Width == 0) || (source.Height == 0) {
+	if (source.Width() == 0) || (source.Height() == 0) {
 		return
 	}
 
-	tileWidth := source.Width * scale
-	tileHeight := source.Height * scale
-	if (dest.Width < tileWidth) && (dest.Height < tileHeight) {
+	tileWidth := source.Width() * scale
+	tileHeight := source.Height() * scale
+	if (dest.Width() < tileWidth) && (dest.Height() < tileHeight) {
 		// Can fit only one tile
 		src := rect2.Float32{
 			X:      source.X,
@@ -206,10 +206,10 @@ func DrawTextureTiled(texture rl.Texture2D, source, dest rect2.Float32, origin v
 		}
 		dst := rect2.Float32{X: dest.X, Y: dest.Y, Width: dest.Width, Height: dest.Height}
 		rl.DrawTexturePro(texture, src, dst, origin, rotation, tint)
-	} else if dest.Width <= tileWidth {
+	} else if dest.Width() <= tileWidth {
 		// Tiled vertically (one column)
 		var dy float32
-		for ; dy+tileHeight < dest.Height; dy += tileHeight {
+		for ; dy+tileHeight < dest.Height(); dy += tileHeight {
 			src := rect2.Float32{
 				X:      source.X,
 				Y:      source.Y,
@@ -221,7 +221,7 @@ func DrawTextureTiled(texture rl.Texture2D, source, dest rect2.Float32, origin v
 		}
 
 		// Fit last tile
-		if dy < dest.Height {
+		if dy < dest.Height() {
 			src := rect2.Float32{X: source.X, Y: source.Y,
 				Width:  (dest.Width / tileWidth) * source.Width,
 				Height: ((dest.Height - dy) / tileHeight) * source.Height,
@@ -229,10 +229,10 @@ func DrawTextureTiled(texture rl.Texture2D, source, dest rect2.Float32, origin v
 			dst := rect2.Float32{X: dest.X, Y: dest.Y + dy, Width: dest.Width, Height: dest.Height - dy}
 			rl.DrawTexturePro(texture, src, dst, origin, rotation, tint)
 		}
-	} else if dest.Height <= tileHeight {
+	} else if dest.Height() <= tileHeight {
 		// Tiled horizontally (one row)
 		var dx float32
-		for ; dx+tileWidth < dest.Width; dx += tileWidth {
+		for ; dx+tileWidth < dest.Width(); dx += tileWidth {
 			src := rect2.Float32{
 				X: source.X, Y: source.Y, Width: source.Width,
 				Height: (dest.Height / tileHeight) * source.Height,
@@ -242,7 +242,7 @@ func DrawTextureTiled(texture rl.Texture2D, source, dest rect2.Float32, origin v
 		}
 
 		// Fit last tile
-		if dx < dest.Width {
+		if dx < dest.Width() {
 			src := rect2.Float32{
 				X: source.X, Y: source.Y, Width: ((dest.Width - dx) / tileWidth) * source.Width,
 				Height: (dest.Height / tileHeight) * source.Height,
@@ -256,12 +256,12 @@ func DrawTextureTiled(texture rl.Texture2D, source, dest rect2.Float32, origin v
 		var dx float32
 		for ; dx+tileWidth < dest.Width; dx += tileWidth {
 			var dy float32
-			for ; dy+tileHeight < dest.Height; dy += tileHeight {
+			for ; dy+tileHeight < dest.Height(); dy += tileHeight {
 				dst := rect2.Float32{X: dest.X + dx, Y: dest.Y + dy, Width: tileWidth, Height: tileHeight}
 				rl.DrawTexturePro(texture, source, dst, origin, rotation, tint)
 			}
 
-			if dy < dest.Height {
+			if dy < dest.Height() {
 				src := rect2.Float32{
 					X: source.X, Y: source.Y,
 					Width: source.Width, Height: ((dest.Height - dy) / tileHeight) * source.Height,
@@ -275,7 +275,7 @@ func DrawTextureTiled(texture rl.Texture2D, source, dest rect2.Float32, origin v
 		}
 
 		// Fit last column of tiles
-		if dx < dest.Width {
+		if dx < dest.Width() {
 			var dy float32
 			for ; dy+tileHeight < dest.Height; dy += tileHeight {
 				src := rect2.Float32{
@@ -287,11 +287,11 @@ func DrawTextureTiled(texture rl.Texture2D, source, dest rect2.Float32, origin v
 			}
 
 			// Draw final tile in the bottom right corner
-			if dy < dest.Height {
+			if dy < dest.Height() {
 				src := rect2.Float32{
 					X: source.X, Y: source.Y,
-					Width:  ((dest.Width - dx) / tileWidth) * source.Width,
-					Height: ((dest.Height - dy) / tileHeight) * source.Height,
+					Width:  ((dest.Width() - dx) / tileWidth) * source.Width,
+					Height: ((dest.Height() - dy) / tileHeight) * source.Height,
 				}
 				dst := rect2.Float32{X: dest.X + dx, Y: dest.Y + dy, Width: dest.Width - dx, Height: dest.Height - dy}
 				rl.DrawTexturePro(texture, src, dst, origin, rotation, tint)

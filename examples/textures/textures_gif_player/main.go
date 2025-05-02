@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"image/color"
 	"unsafe"
 
+	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -59,7 +59,7 @@ func main() {
 			// WARNING: Data size (frame size) and pixel format must match already created texture
 			// here we needed to make the Data as public
 			rl.UpdateTexture(&texScarfyAnim,
-				unsafe.Slice((*color.RGBA)(unsafe.Pointer(uintptr(imScarfyAnim.Data)+uintptr(nextFrameDataOffset))), texScarfyAnimSize))
+				unsafe.Slice((*colorex.RGBA)(unsafe.Pointer(uintptr(imScarfyAnim.Data)+uintptr(nextFrameDataOffset))), texScarfyAnimSize))
 
 			frameCounter = 0
 		}

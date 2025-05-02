@@ -12,7 +12,6 @@
 ********************************************************************************************/package main
 
 import (
-	"github.com/igadmg/gamemath/rect2"
 	"github.com/igadmg/gamemath/vector2"
 	"github.com/igadmg/gamemath/vector3"
 	rl "github.com/igadmg/raylib-go/raylib"
@@ -38,10 +37,7 @@ func main() {
 	billPositionRotating := vector3.NewFloat32(1.0, 2.0, 1.0) // Position of rotating billboard
 
 	// Entire billboard texture, source is used to take a segment from a larger texture.
-	source := rect2.Float32{
-		Width:  float32(bill.Width),
-		Height: float32(bill.Height),
-	}
+	source := bill.GetRect()
 
 	// NOTE: Billboard locked on axis-Y
 	billUp := vector3.Float32{Y: 1.0}

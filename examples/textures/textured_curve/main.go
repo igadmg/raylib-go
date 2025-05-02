@@ -69,7 +69,7 @@ func upCurve() {
 		curveSelectedPoint = &vector2.Float32{}
 	}
 
-	*curveSelectedPoint = vector2.Float32Add(*curveSelectedPoint, rl.GetMouseDelta())
+	*curveSelectedPoint = curveSelectedPoint.Add(rl.GetMouseDelta())
 
 	mouse := rl.GetMousePosition()
 
@@ -130,8 +130,8 @@ func drawTexturedCurve() {
 		current.X = a*curveStartPos.X + b*curveStartPosTangent.X + c*curveEndPosTangent.X + d*curveEndPos.X
 
 		delta := vector2.NewFloat32(current.X-previous.X, current.Y-previous.Y)
-		normal := vector2.Float32Normalize(vector2.NewFloat32(-delta.Y, delta.X))
-		v := previousV + vector2.Float32Length(delta)
+		normal := vector2.NewFloat32(-delta.Y, delta.X).Normalized()
+		v := previousV + delta.LengthF()
 
 		if !tangentSet {
 			previousTangent = normal

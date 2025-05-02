@@ -51,19 +51,19 @@ func main() {
 		rl.DrawCircleSectorLines(center, outerRadius, startAngle, endAngle, int32(segments), rl.Fade(rl.Maroon, 0.6))
 
 		// Draw GUI controls
-		r := rect2.Float32{X: 600, Y: 40, Width: 120, Height: 20}
+		r := rect2.NewFloat32(vector2.NewFloat32(600, 40), vector2.NewFloat32(120, 20))
 		msg := fmt.Sprintf("%.2f", startAngle)
 		startAngle = gui.Slider(r, "StartAngle", msg, startAngle, 0, 720)
 
-		r = rect2.Float32{X: 600, Y: 70, Width: 120, Height: 20}
+		r = rect2.NewFloat32(vector2.NewFloat32(600, 70), vector2.NewFloat32(120, 20))
 		msg = fmt.Sprintf("%.2f", endAngle)
 		endAngle = gui.Slider(r, "EndAngle", msg, endAngle, 0, 720)
 
-		r = rect2.Float32{X: 600, Y: 140, Width: 120, Height: 20}
+		r = rect2.NewFloat32(vector2.NewFloat32(600, 140), vector2.NewFloat32(120, 20))
 		msg = fmt.Sprintf("%.2f", outerRadius)
 		outerRadius = gui.Slider(r, "Radius", msg, outerRadius, 0, 200)
 
-		r = rect2.Float32{X: 600, Y: 170, Width: 120, Height: 20}
+		r = rect2.NewFloat32(vector2.NewFloat32(600, 170), vector2.NewFloat32(120, 20))
 		msg = fmt.Sprintf("%.2f", segments)
 		segments = gui.Slider(r, "Segments", msg, segments, 0, 100)
 

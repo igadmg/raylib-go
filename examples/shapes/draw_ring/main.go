@@ -71,33 +71,41 @@ func main() {
 
 		// Draw GUI controls
 		//------------------------------------------------------------------------------
-		startAngle = gui.Slider(rect2.Float32{
-			X: 600, Y: 40, Width: 120, Height: 20,
-		}, "StartAngle", fmt.Sprintf("%.2f", startAngle), startAngle, -450, 450)
-		endAngle = gui.Slider(rect2.Float32{
-			X: 600, Y: 70, Width: 120, Height: 20,
-		}, "EndAngle", fmt.Sprintf("%.2f", endAngle), endAngle, -450, 450)
+		startAngle = gui.Slider(rect2.NewFloat32(
+			vector2.NewFloat32(600, 40),
+			vector2.NewFloat32(120, 20),
+		), "StartAngle", fmt.Sprintf("%.2f", startAngle), startAngle, -450, 450)
+		endAngle = gui.Slider(rect2.NewFloat32(
+			vector2.NewFloat32(600, 70),
+			vector2.NewFloat32(120, 20),
+		), "EndAngle", fmt.Sprintf("%.2f", endAngle), endAngle, -450, 450)
 
-		innerRadius = gui.Slider(rect2.Float32{
-			X: 600, Y: 140, Width: 120, Height: 20,
-		}, "InnerRadius", fmt.Sprintf("%.2f", innerRadius), innerRadius, 0, 100)
-		outerRadius = gui.Slider(rect2.Float32{
-			X: 600, Y: 170, Width: 120, Height: 20,
-		}, "OuterRadius", fmt.Sprintf("%.2f", outerRadius), outerRadius, 0, 200)
+		innerRadius = gui.Slider(rect2.NewFloat32(
+			vector2.NewFloat32(600, 140),
+			vector2.NewFloat32(120, 20),
+		), "InnerRadius", fmt.Sprintf("%.2f", innerRadius), innerRadius, 0, 100)
+		outerRadius = gui.Slider(rect2.NewFloat32(
+			vector2.NewFloat32(600, 170),
+			vector2.NewFloat32(120, 20),
+		), "OuterRadius", fmt.Sprintf("%.2f", outerRadius), outerRadius, 0, 200)
 
-		segments = gui.Slider(rect2.Float32{
-			X: 600, Y: 240, Width: 120, Height: 20,
-		}, "Segments", fmt.Sprintf("%.2f", segments), segments, 0, 100)
+		segments = gui.Slider(rect2.NewFloat32(
+			vector2.NewFloat32(600, 240),
+			vector2.NewFloat32(120, 20),
+		), "Segments", fmt.Sprintf("%.2f", segments), segments, 0, 100)
 
-		drawRing = gui.CheckBox(rect2.Float32{
-			X: 600, Y: 320, Width: 20, Height: 20,
-		}, "Draw Ring", drawRing)
-		drawRingLines = gui.CheckBox(rect2.Float32{
-			X: 600, Y: 350, Width: 20, Height: 20,
-		}, "Draw Ring Lines", drawRingLines)
-		drawSectorLines = gui.CheckBox(rect2.Float32{
-			X: 600, Y: 380, Width: 20, Height: 20,
-		}, "Draw Sector Lines", drawSectorLines)
+		drawRing = gui.CheckBox(rect2.NewFloat32(
+			vector2.NewFloat32(600, 320),
+			vector2.NewFloat32(20, 20),
+		), "Draw Ring", drawRing)
+		drawRingLines = gui.CheckBox(rect2.NewFloat32(
+			vector2.NewFloat32(600, 350),
+			vector2.NewFloat32(20, 20),
+		), "Draw Ring Lines", drawRingLines)
+		drawSectorLines = gui.CheckBox(rect2.NewFloat32(
+			vector2.NewFloat32(600, 380),
+			vector2.NewFloat32(20, 20),
+		), "Draw Sector Lines", drawSectorLines)
 
 		minSegments := ceil((endAngle - startAngle) / 90)
 		var color = rl.DarkGray

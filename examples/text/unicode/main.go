@@ -157,7 +157,7 @@ func main() {
 			// Coordinates for the chat bubble triangle
 			a := vector2.Float32{
 				X: selectedPos.X,
-				Y: msgRect.Y() + msgRect.Height,()
+				Y: msgRect.Y() + msgRect.Height(),
 			}
 			b := vector2.Float32{
 				X: a.X + 8,
@@ -195,7 +195,7 @@ func main() {
 				X:      msgRect.X + float32(horizontalPadding)/2,
 				Y:      msgRect.Y() + float32(verticalPadding)/2,
 				Width:  msgRect.Width - float32(horizontalPadding),
-				Height: msgRect.Height,()
+				Height: msgRect.Height(),
 			}
 			DrawTextBoxed(font, messages[message].text, textRect, float32(font.BaseSize), 1.0, true, rl.White)
 
@@ -205,7 +205,7 @@ func main() {
 			info := fmt.Sprintf("%s %d characters %d bytes", messages[message].language, length, size)
 			sz = rl.MeasureTextEx(rl.GetFontDefault(), info, 10, 1.0)
 
-			rl.DrawText(info, int32(textRect.X+textRect.Width-sz.X), int32(msgRect.Y()+msgRect.Height-sz.Y-2), 10,()
+			rl.DrawText(info, int32(textRect.X+textRect.Width-sz.X), int32(msgRect.Y()+msgRect.Height()-sz.Y-2), 10,
 				rl.RayWhite)
 
 		}

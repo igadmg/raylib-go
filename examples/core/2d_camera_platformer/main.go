@@ -46,11 +46,11 @@ func main() {
 	}
 
 	envItems := []EnvironmentItem{
-		{rect: rect2.Float32{Width: 1000, Height: 400}, blocking: false, color: rl.LightGray},
-		{rect: rect2.Float32{Y: 400, Width: 1000, Height: 200}, blocking: true, color: rl.Gray},
-		{rect: rect2.Float32{X: 300, Y: 200, Width: 400, Height: 10}, blocking: true, color: rl.Gray},
-		{rect: rect2.Float32{X: 250, Y: 300, Width: 100, Height: 10}, blocking: true, color: rl.Gray},
-		{rect: rect2.Float32{X: 650, Y: 300, Width: 100, Height: 10}, blocking: true, color: rl.Gray},
+		{rect: rect2.NewFloat32(vector2.Zero[float32](), vector2.NewFloat32(1000, 400)), blocking: false, color: rl.LightGray},
+		{rect: rect2.NewFloat32(vector2.NewFloat32(0, 400), vector2.NewFloat32(1000, 200)), blocking: true, color: rl.Gray},
+		{rect: rect2.NewFloat32(vector2.NewFloat32(300, 200), vector2.NewFloat32(400, 10)), blocking: true, color: rl.Gray},
+		{rect: rect2.NewFloat32(vector2.NewFloat32(250, 300), vector2.NewFloat32(100, 10)), blocking: true, color: rl.Gray},
+		{rect: rect2.NewFloat32(vector2.NewFloat32(650, 300), vector2.NewFloat32(100, 10)), blocking: true, color: rl.Gray},
 	}
 
 	camera := rl.Camera2D{
