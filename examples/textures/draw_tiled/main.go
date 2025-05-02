@@ -147,20 +147,20 @@ func main() {
 
 		// Draw options
 		rl.DrawRectangle(marginSize, marginSize, optWidth-marginSize, int32(rl.GetScreenHeight())-2*marginSize,
-			colorex.RGBAAlpha(rl.LightGray, 0.5))
+			rl.ColorAlpha(rl.LightGray, 0.5))
 
 		rl.DrawText("Select Pattern", 2+marginSize, 30+marginSize, 10, rl.Black)
 		rl.DrawTexture(texPattern, 2+marginSize, 40+marginSize, rl.Black)
-		rl.DrawRectangle(int32(2+marginSize+recPattern[activePattern].X),
-			int32(40+marginSize+recPattern[activePattern].Y),
+		rl.DrawRectangle(int32(2+marginSize+recPattern[activePattern].X()),
+			int32(40+marginSize+recPattern[activePattern].Y()),
 			int32(recPattern[activePattern].Width()),
-			int32(recPattern[activePattern].Height()), colorex.RGBAAlpha(rl.DarkBlue, 0.3))
+			int32(recPattern[activePattern].Height()), rl.ColorAlpha(rl.DarkBlue, 0.3))
 
 		rl.DrawText("Select Color", 2+marginSize, 10+256+marginSize, 10, rl.Black)
 		for i := 0; i < maxColors; i++ {
 			rl.DrawRectangleRec(colorRec[i], colors[i])
 			if activeCol == i {
-				rl.DrawRectangleLinesEx(colorRec[i], 3, colorex.RGBAAlpha(rl.White, 0.5))
+				rl.DrawRectangleLinesEx(colorRec[i], 3, rl.ColorAlpha(rl.White, 0.5))
 			}
 		}
 
@@ -178,7 +178,7 @@ func main() {
 	}
 
 	// De-Initialization
-	rl.UnloadTexture(texPattern) // Unload texture
+	rl.UnloadTexture(&texPattern) // Unload texture
 
 	rl.CloseWindow() // Close window and OpenGL context
 }

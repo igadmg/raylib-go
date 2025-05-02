@@ -125,7 +125,7 @@ func DrawSphereBasic(color colorex.RGBA) {
 	rl.CheckRenderBatchLimit((rings + 2) * slices * 6)
 
 	rl.Begin(rl.Triangles)
-	colorex.RGBA4ub(color.R, color.G, color.B, color.A)
+	rl.Color4ub(color.R, color.G, color.B, color.A)
 
 	for ring := int32(0); ring < (rings + 2); ring++ {
 		for slice := int32(0); slice < slices; slice++ {

@@ -96,12 +96,10 @@ func main() {
 		// Draw random emojis in the background
 		for i := int32(0); i < emojiPerWidth*emojiPerHeight; i++ {
 			txt := emojiCodepoints[emoji[i].index : emoji[i].index+4]
-			emojiRect := rect2.Float32{
-				X:      position.X,
-				Y:      position.Y,
-				Width:  float32(fontEmoji.BaseSize),
-				Height: float32(fontEmoji.BaseSize),
-			}
+			emojiRect := rect2.NewFloat32(
+				position,
+				vector2.NewFloat32(fontEmoji.BaseSize, fontEmoji.BaseSize),
+			)
 
 			if !rl.CheckCollisionPointRec(mouse, emojiRect) {
 				col := rl.Fade(rl.LightGray, 0.4)
@@ -146,13 +144,11 @@ func main() {
 				sz.X = 160
 			}
 
-			msgRect := rect2.Float32{
-				X:      selectedPos.X - 38.8,
-				Y:      selectedPos.Y,
-				Width:  float32(2*horizontalPadding) + sz.X,
-				Height: float32(2*verticalPadding) + sz.Y,
-			}
-			msgRect.Y() -= msgRect.Height()
+			msgRect := rect2.NewFloat32(
+				selectedPos.AddX(-38.8),
+				vector2.NewFloat32(float32(2*horizontalPadding)+sz.X, float32(2*verticalPadding)+sz.Y),
+			)
+			msgRect.Position.AddY(-msgRect.Height())
 
 			// Coordinates for the chat bubble triangle
 			a := vector2.Float32{
@@ -169,11 +165,11 @@ func main() {
 			}
 
 			// Don't go outside the screen
-			if msgRect.X < 10 {
-				msgRect.X += 28
+			if msgRect.X() < 10 {
+				msgRect.Position.X += 28
 			}
 			if msgRect.Y() < 10 {
-				msgRect.Y() = selectedPos.Y + 84
+				msgRect.SetY(selectedPos.Y + 84)
 				a.Y = msgRect.Y()
 				c.Y = a.Y
 				b.Y = a.Y - 10
@@ -182,8 +178,8 @@ func main() {
 				a, b = b, a
 			}
 
-			if msgRect.X+msgRect.Width > screenWidth {
-				msgRect.X -= (msgRect.X + msgRect.Width) - screenWidth + 10
+			if msgRect.B().X > screenWidth {
+				msgRect.Position.AddX(-msgRect.B().X - screenWidth + 10)
 			}
 
 			// Draw chat bubble
@@ -191,12 +187,10 @@ func main() {
 			rl.DrawTriangle(a, b, c, emoji[selected].color)
 
 			// Draw the main text message
-			textRect := rect2.Float32{
-				X:      msgRect.X + float32(horizontalPadding)/2,
-				Y:      msgRect.Y() + float32(verticalPadding)/2,
-				Width:  msgRect.Width - float32(horizontalPadding),
-				Height: msgRect.Height(),
-			}
+			textRect := rect2.NewFloat32(
+				msgRect.Position.AddXY(float32(horizontalPadding)/2, float32(verticalPadding)/2),
+				msgRect.Size.AddX(-float32(horizontalPadding)),
+			)
 			DrawTextBoxed(font, messages[message].text, textRect, float32(font.BaseSize), 1.0, true, rl.White)
 
 			// Draw the info text below the main message
@@ -205,7 +199,7 @@ func main() {
 			info := fmt.Sprintf("%s %d characters %d bytes", messages[message].language, length, size)
 			sz = rl.MeasureTextEx(rl.GetFontDefault(), info, 10, 1.0)
 
-			rl.DrawText(info, int32(textRect.X+textRect.Width-sz.X), int32(msgRect.Y()+msgRect.Height()-sz.Y-2), 10,
+			rl.DrawText(info, int32(textRect.B().X-sz.X), int32(msgRect.B().Y-sz.Y-2), 10,
 				rl.RayWhite)
 
 		}
@@ -220,9 +214,9 @@ func main() {
 	}
 
 	// De-Initialization
-	rl.UnloadFont(fontDefault) // Unload font resource
-	rl.UnloadFont(fontAsian)   // Unload font resource
-	rl.UnloadFont(fontEmoji)   // Unload font resource
+	rl.UnloadFont(&fontDefault) // Unload font resource
+	rl.UnloadFont(&fontAsian)   // Unload font resource
+	rl.UnloadFont(&fontEmoji)   // Unload font resource
 
 	rl.CloseWindow() // Close window and OpenGL context
 }
@@ -237,7 +231,7 @@ func RandomizeEmoji() {
 		emoji[i].index = rl.GetRandomValue(0, 179) * 5
 
 		// Generate a random color for this emoji
-		emoji[i].color = rl.Fade(colorex.RGBAFromHSV(float32((start*(i+1))%360), 0.6, 0.85), 0.8)
+		emoji[i].color = rl.Fade(rl.ColorFromHSV(float32((start*(i+1))%360), 0.6, 0.85), 0.8)
 
 		// Set a random message for this emoji
 		emoji[i].message = rl.GetRandomValue(0, int32(len(messages)-1))
@@ -310,7 +304,7 @@ func DrawTextBoxedSelectable(font rl.Font, text string, rec rect2.Float32, fontS
 				endLine = i
 			}
 
-			if (textOffsetX + glyphWidth) > rec.Width {
+			if (textOffsetX + glyphWidth) > rec.Width() {
 				if endLine < 1 {
 					endLine = i
 				}
@@ -345,13 +339,13 @@ func DrawTextBoxedSelectable(font rl.Font, text string, rec rect2.Float32, fontS
 					textOffsetX = 0
 				}
 			} else {
-				if !wordWrap && ((textOffsetX + glyphWidth) > rec.Width) {
+				if !wordWrap && ((textOffsetX + glyphWidth) > rec.Width()) {
 					textOffsetY += float32(font.BaseSize+font.BaseSize/2) * scaleFactor
 					textOffsetX = 0
 				}
 
 				// When text overflows rectangle height limit, just stop drawing
-				if (textOffsetY + float32(font.BaseSize)*scaleFactor) > rec.Height {
+				if (textOffsetY + float32(font.BaseSize)*scaleFactor) > rec.Height() {
 					break
 				}
 
@@ -373,10 +367,8 @@ func DrawTextBoxedSelectable(font rl.Font, text string, rec rect2.Float32, fontS
 					if isGlyphSelected {
 						col = selectTint
 					}
-					pos := vector2.Float32{
-						X: rec.X + textOffsetX,
-						Y: rec.Y + textOffsetY,
-					}
+					pos := rec.Position.AddXY(textOffsetX, textOffsetY)
+
 					rl.DrawTextEx(font, string(codepoint), pos, fontSize, 0, col)
 				}
 			}

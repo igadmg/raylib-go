@@ -14,6 +14,7 @@ package main
 
 import (
 	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -33,15 +34,13 @@ func main() {
 
 	// Define frame rectangle for drawing
 	frameHeight := float32(button.Height) / numFrames
-	sourceRec := rect2.Float32{Width: float32(button.Width), Height: frameHeight}
+	sourceRec := rect2.NewFloat32(vector2.Zero[float32](), vector2.NewFloat32(button.Width, frameHeight))
 
 	// Define button bounds on screen
-	btnBounds := rect2.Float32{
-		X:      float32(screenWidth/2.0 - button.Width/2.0),
-		Y:      float32(screenHeight/2.0 - button.Height/numFrames/2.0),
-		Width:  float32(button.Width),
-		Height: frameHeight,
-	}
+	btnBounds := rect2.NewFloat32(
+		vector2.NewFloat32(screenWidth/2.0-button.Width/2.0, screenHeight/2.0-button.Height/numFrames/2.0),
+		vector2.NewFloat32(button.Width, frameHeight),
+	)
 
 	btnState := 0      // Button state: 0-NORMAL, 1-MOUSE_HOVER, 2-PRESSED
 	btnAction := false // Button action should be activated

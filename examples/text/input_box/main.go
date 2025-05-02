@@ -16,6 +16,7 @@ import (
 	"fmt"
 
 	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -32,7 +33,10 @@ func main() {
 	var letterCount, framesCounter int32
 	var mouseOnText bool
 
-	textBox := rect2.Float32{X: screenWidth/2.0 - 100, Y: 180, Width: 225, Height: 50}
+	textBox := rect2.NewFloat32(
+		vector2.NewFloat32(screenWidth/2.0-100, 180),
+		vector2.NewFloat32(225, 50),
+	)
 
 	rl.SetTargetFPS(60) // Set our game to run at 60 frames-per-second
 
@@ -51,7 +55,7 @@ func main() {
 			for key > 0 {
 				// NOTE: Only allow keys in range [32..125]
 				if (key >= 32) && (key <= 125) && (letterCount < maxInputChars) {
-					name[letterCount] = key
+					name[letterCount] = rune(key)
 					letterCount++
 				}
 

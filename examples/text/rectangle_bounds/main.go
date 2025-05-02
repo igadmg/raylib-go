@@ -18,6 +18,7 @@ import (
 	"unicode/utf8"
 	"unsafe"
 
+	rm "github.com/igadmg/gamemath"
 	"github.com/igadmg/gamemath/rect2"
 	"github.com/igadmg/gamemath/vector2"
 	"github.com/igadmg/goex/image/colorex"
@@ -36,23 +37,19 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [text] example - draw text inside a rectangle")
 
 	text := `Text cannot escape	this container	...word wrap also works when active so here's a long text for testing.
-		
+
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nec ullamcorper sit amet risus nullam eget felis eget.`
 
 	resizing, wordWrap := false, true
 
-	container := rect2.Float32{
-		X:      25.0,
-		Y:      25.0,
-		Width:  screenWidth - 50.0,
-		Height: screenHeight - 250.0,
-	}
-	resizer := rect2.Float32{
-		X:      container.X + container.Width() - 17,
-		Y:      container.Y + container.Height() - 17,
-		Width:  14,
-		Height: 14,
-	}
+	container := rect2.NewFloat32(
+		vector2.NewFloat32(25.0, 25.0),
+		vector2.NewFloat32(screenWidth-50, screenHeight-250),
+	)
+	resizer := rect2.NewFloat32(
+		vector2.NewFloat32(container.B().X-17, container.B().Y-17),
+		vector2.NewFloat32(14, 14),
+	)
 
 	// Minimum width and height for the container rectangle
 	minWidth := float32(60.0)
@@ -90,8 +87,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 			width := container.Width() + (mouse.X - lastMouse.X)
 			height := container.Height() + (mouse.Y - lastMouse.Y)
 
-			container.Width() = rl.Clamp(width, minWidth, maxWidth)
-			container.Height() = rl.Clamp(height, minHeight, maxHeight)
+			container.SetWidth(rm.Clamp(width, minWidth, maxWidth))
+			container.SetHeight(rm.Clamp(height, minHeight, maxHeight))
 		} else {
 			// Check if we're resizing
 			if rl.IsMouseButtonDown(rl.MouseButtonLeft) && rl.CheckCollisionPointRec(mouse, resizer) {
@@ -100,8 +97,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 		}
 
 		// Move resizer rectangle properly
-		resizer.X = container.X + container.Width() - 17
-		resizer.Y = container.Y + container.Height() - 17
+		resizer.SetX(container.X() + container.Width() - 17)
+		resizer.SetY(container.Y() + container.Height() - 17)
 
 		lastMouse = mouse // Update mouse
 
@@ -112,23 +109,16 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 		rl.DrawRectangleLinesEx(container, 3, borderColor) // Draw container border
 
 		// Draw text in container (add some padding)
-		DrawTextBoxed(font, text, rect2.Float32{
-			X:      container.X + 4,
-			Y:      container.Y + 4,
-			Width:  container.Width() - 4,
-			Height: container.Height() - 4,
-		}, 20.0, 2.0, wordWrap, rl.Gray)
+		DrawTextBoxed(font, text, container.ShrinkXYWH(4, 4, 0, 0), 20.0, 2.0, wordWrap, rl.Gray)
 
 		rl.DrawRectangleRec(resizer, borderColor) // Draw the resize box
 
 		// Draw bottom info
 		rl.DrawRectangle(0, screenHeight-54, screenWidth, 54, rl.Gray)
-		rl.DrawRectangleRec(rect2.Float32{
-			X:      382.0,
-			Y:      screenHeight - 34.0,
-			Width:  12.0,
-			Height: 12.0,
-		}, rl.Maroon)
+		rl.DrawRectangleRec(rect2.NewFloat32(
+			vector2.NewFloat32(382.0, screenHeight-34.0),
+			vector2.NewFloat32(12.0, 12.0),
+		), rl.Maroon)
 
 		rl.DrawText("Word Wrap: ", 313, screenHeight-115, 20, rl.Black)
 		if wordWrap {
@@ -196,7 +186,7 @@ func DrawTextBoxedSelectable(font rl.Font, text string, rec rect2.Float32, fontS
 		if codepoint != '\n' {
 			chars := unsafe.Slice(font.Glyphs, font.GlyphCount)
 			if chars[index].AdvanceX == 0 {
-				glyphWidth = unsafe.Slice(font.Recs, font.GlyphCount)[index].Width * scaleFactor
+				glyphWidth = font.GetRecs()[index].Width() * scaleFactor
 			} else {
 				glyphWidth = float32(chars[index].AdvanceX) * scaleFactor
 			}
@@ -268,12 +258,10 @@ func DrawTextBoxedSelectable(font rl.Font, text string, rec rect2.Float32, fontS
 				// Draw selection background
 				isGlyphSelected := false
 				if (selectStart >= 0) && (k >= selectStart) && (k < (selectStart + selectLength)) {
-					rl.DrawRectangleRec(rect2.Float32{
-						X:      rec.X() + textOffsetX - 1,
-						Y:      rec.Y() + textOffsetY,
-						Width:  glyphWidth,
-						Height: float32(font.BaseSize) * scaleFactor,
-					}, selectBackTint)
+					rl.DrawRectangleRec(rect2.NewFloat32(
+						rec.Position.AddXY(textOffsetX-1, textOffsetY),
+						vector2.NewFloat32(glyphWidth, float32(font.BaseSize)*scaleFactor),
+					), selectBackTint)
 					isGlyphSelected = true
 				}
 

@@ -1150,6 +1150,10 @@ func (f Font) MeasureEx(text string, fontSize float32, spacing float32) vector2.
 	return MeasureTextEx(f, text, fontSize, spacing)
 }
 
+func (f Font) GetRecs() []rect2.Float32 {
+	return unsafe.Slice(f.Recs, f.GlyphCount)
+}
+
 // Font type, includes texture and charSet array data
 type FontPreset struct {
 	Font

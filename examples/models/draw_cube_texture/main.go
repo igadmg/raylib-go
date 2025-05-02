@@ -14,6 +14,7 @@ package main
 
 import (
 	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
 	"github.com/igadmg/gamemath/vector3"
 	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
@@ -62,11 +63,10 @@ func main() {
 		DrawCubeTexture(texture, vec, 2.0, 4.0, 2.0, rl.White)
 
 		// Draw cube with an applied texture, but only a defined rectangle piece of the texture
-		rec := rect2.Float32{
-			Y:      float32(texture.Height) / 2.0,
-			Width:  float32(texture.Width) / 2.0,
-			Height: float32(texture.Height) / 2.0,
-		}
+		rec := rect2.NewFloat32(
+			vector2.NewFloat32(0, float32(texture.Height)/2.0),
+			texture.GetSize().ScaleF(0.5),
+		)
 		vec = vector3.Float32{
 			X: 2.0,
 			Y: 1.0,
@@ -103,7 +103,7 @@ func DrawCubeTexture(texture rl.Texture2D, position vector3.Float32, width, heig
 	//rl.Scalef(2.0, 2.0, 2.0)
 
 	rl.Begin(rl.Quads)
-	colorex.RGBA4ub(color.R, color.G, color.B, color.A)
+	rl.Color4ub(color.R, color.G, color.B, color.A)
 	// Front Face
 	rl.Normal3f(0.0, 0.0, 1.0) // Normal Pointing Towards Viewer
 	rl.TexCoord2f(0.0, 0.0)
@@ -187,7 +187,7 @@ func DrawCubeTextureRec(texture rl.Texture2D, source rect2.Float32, position vec
 	// We calculate the normalized texture coordinates for the desired texture-source-rectangle
 	// It means converting from (tex.width, tex.height) coordinates to [0.0f, 1.0f] equivalent
 	rl.Begin(rl.Quads)
-	colorex.RGBA4ub(color.R, color.G, color.B, color.A)
+	rl.Color4ub(color.R, color.G, color.B, color.A)
 
 	// Front face
 	rl.Normal3f(0.0, 0.0, 1.0)

@@ -17,6 +17,7 @@
 package main
 
 import (
+	rm "github.com/igadmg/gamemath"
 	"github.com/igadmg/gamemath/rect2"
 	"github.com/igadmg/gamemath/vector2"
 	rl "github.com/igadmg/raylib-go/raylib"
@@ -37,14 +38,14 @@ func main() {
 	var origin vector2.Float32
 
 	// Position and size of the n-patches
-	dstRec1 := rect2.Float32{X: 480.0, Y: 160.0, Width: 32.0, Height: 32.0}
-	dstRec2 := rect2.Float32{X: 160.0, Y: 160.0, Width: 32.0, Height: 32.0}
-	dstRecH := rect2.Float32{X: 160.0, Y: 93.0, Width: 32.0, Height: 32.0}
-	dstRecV := rect2.Float32{X: 92.0, Y: 160.0, Width: 32.0, Height: 32.0}
+	dstRec1 := rect2.NewFloat32(vector2.NewFloat32(480.0, 160.0), vector2.NewFloat32(32.0, 32.0))
+	dstRec2 := rect2.NewFloat32(vector2.NewFloat32(160.0, 160.0), vector2.NewFloat32(32.0, 32.0))
+	dstRecH := rect2.NewFloat32(vector2.NewFloat32(160.0, 93.0), vector2.NewFloat32(32.0, 32.0))
+	dstRecV := rect2.NewFloat32(vector2.NewFloat32(92.0, 160.0), vector2.NewFloat32(32.0, 32.0))
 
 	// A 9-patch (NPatchNinePatch) changes its sizes in both axis
 	ninePatchInfo1 := rl.NPatchInfo{
-		Source: rect2.Float32{Width: 64.0, Height: 64.0},
+		Source: rect2.NewFloat32(vector2.Zero[float32](), vector2.NewFloat32(64.0, 64.0)),
 		Left:   12,
 		Top:    40,
 		Right:  12,
@@ -52,7 +53,7 @@ func main() {
 		Layout: rl.NPatchNinePatch,
 	}
 	ninePatchInfo2 := rl.NPatchInfo{
-		Source: rect2.Float32{Y: 128.0, Width: 64.0, Height: 64.0},
+		Source: rect2.NewFloat32(vector2.NewFloat32(0, 128.0), vector2.NewFloat32(64.0, 64.0)),
 		Left:   16,
 		Top:    16,
 		Right:  16,
@@ -62,7 +63,7 @@ func main() {
 
 	// A horizontal 3-patch (NPatchThreePatchHorizontal) changes its sizes along the x-axis only
 	h3PatchInfo := rl.NPatchInfo{
-		Source: rect2.Float32{Y: 64.0, Width: 64.0, Height: 64.0},
+		Source: rect2.NewFloat32(vector2.NewFloat32(0, 64.0), vector2.NewFloat32(64.0, 64.0)),
 		Left:   8,
 		Top:    8,
 		Right:  8,
@@ -72,7 +73,7 @@ func main() {
 
 	// A vertical 3-patch (NPatchThreePatchVertical) changes its sizes along the y-axis only
 	v3PatchInfo := rl.NPatchInfo{
-		Source: rect2.Float32{Y: 192.0, Width: 64.0, Height: 64.0},
+		Source: rect2.NewFloat32(vector2.NewFloat32(0, 192.0), vector2.NewFloat32(64.0, 64.0)),
 		Left:   6,
 		Top:    6,
 		Right:  6,
@@ -87,20 +88,20 @@ func main() {
 		mousePosition = rl.GetMousePosition()
 
 		// Resize the n-patches based on mouse position
-		dstRec1.Width = mousePosition.X - dstRec1.X()
-		dstRec1.Height = mousePosition.Y - dstRec1.Y()
-		dstRec2.Width = mousePosition.X - dstRec2.X()
-		dstRec2.Height = mousePosition.Y - dstRec2.Y()
-		dstRecH.Width = mousePosition.X - dstRecH.X()
-		dstRecV.Height = mousePosition.Y - dstRecV.Y()
+		dstRec1.SetWidth(mousePosition.X - dstRec1.X())
+		dstRec1.SetHeight(mousePosition.Y - dstRec1.Y())
+		dstRec2.SetWidth(mousePosition.X - dstRec2.X())
+		dstRec2.SetHeight(mousePosition.Y - dstRec2.Y())
+		dstRecH.SetWidth(mousePosition.X - dstRecH.X())
+		dstRecV.SetHeight(mousePosition.Y - dstRecV.Y())
 
 		// Set a minimum Width and/or Height
-		dstRec1.Width = clamp(dstRec1.Width(), 1, 300)
-		dstRec1.Height = clamp(dstRec1.Height(), 1, screenHeight)
-		dstRec2.Width = clamp(dstRec2.Width(), 1, 300)
-		dstRec2.Height = clamp(dstRec2.Height(), 1, screenHeight)
-		dstRecH.Width = clamp(dstRecH.Width(), 1, screenWidth)
-		dstRecV.Height = clamp(dstRecV.Height(), 1, screenHeight)
+		dstRec1.SetWidth(rm.Clamp(dstRec1.Width(), 1, 300))
+		dstRec1.SetHeight(rm.Clamp(dstRec1.Height(), 1, screenHeight))
+		dstRec2.SetWidth(rm.Clamp(dstRec2.Width(), 1, 300))
+		dstRec2.SetHeight(rm.Clamp(dstRec2.Height(), 1, screenHeight))
+		dstRecH.SetWidth(rm.Clamp(dstRecH.Width(), 1, screenWidth))
+		dstRecV.SetHeight(rm.Clamp(dstRecV.Height(), 1, screenHeight))
 
 		// Draw
 		rl.BeginDrawing()
@@ -125,14 +126,4 @@ func main() {
 	// De-Initialization
 	rl.UnloadTexture(&nPatchTexture) // Texture unloading
 	rl.CloseWindow()                 // Close window and OpenGL context
-}
-
-func clamp(value, min, max float32) float32 {
-	if value < min {
-		return min
-	}
-	if value > max {
-		return max
-	}
-	return value
 }

@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"github.com/igadmg/gamemath/vector2"
-	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
 
@@ -147,7 +146,7 @@ func drawTexturedCurve() {
 		rl.SetTexture(texRoad.ID)
 		rl.Begin(rl.Quads)
 
-		colorex.RGBA4ub(255, 255, 255, 255)
+		rl.Color4ub(255, 255, 255, 255)
 		rl.Normal3f(0, 0, 1)
 
 		rl.TexCoord2f(0, previousV)

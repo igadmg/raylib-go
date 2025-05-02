@@ -144,7 +144,7 @@ func main() {
 			cursorColor = rl.Purple
 			hitObjectName = "Triangle"
 
-			bary = vector3.Float32Barycenter(collision.Point, ta, tb, tc)
+			bary = collision.Point.Barycenter(ta, tb, tc)
 		}
 
 		// Check ray collision against test sphere

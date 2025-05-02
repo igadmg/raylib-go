@@ -487,12 +487,10 @@ func drawTextCodepoint3D(font rl.Font, codepoint rune, position vector3.Float32,
 	// Character source rectangle from font texture atlas
 	// NOTE: We consider chars padding when drawing, it could be required for outline/glow shader effects
 	recs := unsafe.Slice(font.Recs, font.GlyphCount)
-	srcRec := rect2.Float32{
-		X:      recs[index].X() - float32(font.GlyphPadding),
-		Y:      recs[index].Y() - float32(font.GlyphPadding),
-		Width:  recs[index].Width() + 2.0*float32(font.GlyphPadding),
-		Height: recs[index].Height() + 2.0*float32(font.GlyphPadding),
-	}
+	srcRec := rect2.NewFloat32(
+		recs[index].Position.SubXY(float32(font.GlyphPadding), float32(font.GlyphPadding)),
+		recs[index].Size.AddXY(float32(2*font.GlyphPadding), float32(2*font.GlyphPadding)),
+	)
 
 	width := (recs[index].Width() + 2.0*float32(font.GlyphPadding)) / float32(font.BaseSize) * scale
 	height := (recs[index].Height() + 2.0*float32(font.GlyphPadding)) / float32(font.BaseSize) * scale
@@ -531,7 +529,7 @@ func drawTextCodepoint3D(font rl.Font, codepoint rune, position vector3.Float32,
 		rl.Translatef(position.X, position.Y, position.Z)
 
 		rl.Begin(rl.Quads)
-		colorex.RGBA4ub(tint.R, tint.G, tint.B, tint.A)
+		rl.Color4ub(tint.R, tint.G, tint.B, tint.A)
 
 		// Front Face
 		rl.Normal3f(0.0, 1.0, 0.0) // Normal Pointing Up
@@ -797,7 +795,7 @@ func generateRandomColor(s, v float32) colorex.RGBA {
 	const Phi = float64(0.618033988749895) // Golden ratio conjugate
 	h := float64(rl.GetRandomValue(0, 360))
 	h = math.Mod(h+h*Phi, 360.0)
-	return colorex.RGBAFromHSV(float32(h), s, v)
+	return rl.ColorFromHSV(float32(h), s, v)
 }
 
 // getCodepoint returns the rune starting at index, plus the length of that rune in bytes
