@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 /*******************************************************************************************
@@ -43,9 +43,9 @@ func main() {
 		// Translate based on mouse right click
 		if rl.IsMouseButtonDown(rl.MouseRightButton) {
 			delta := rl.GetMouseDelta()
-			delta = rl.Vector2Scale(delta, -1.0/camera.Zoom)
+			delta = delta.ScaleF(-1.0 / camera.Zoom)
 
-			camera.Target = rl.Vector2Add(camera.Target, delta)
+			camera.Target = camera.Target.Add(delta)
 		}
 
 		// Zoom based on mouse wheel

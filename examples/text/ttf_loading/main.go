@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -24,8 +25,8 @@ func main() {
 	rl.GenTextureMipmaps(&font.Texture)
 
 	fontSize := font.BaseSize
-	fontPosition := rl.NewVector2(40, float32(screenHeight)/2+50)
-	textSize := rl.Vector2{}
+	fontPosition := vector2.NewFloat32(40, float32(screenHeight)/2+50)
+	textSize := vector2.Float32{}
 
 	rl.SetTextureFilter(font.Texture, rl.FilterPoint)
 	currentFontFilter := 0 // FilterPoint
@@ -53,7 +54,7 @@ func main() {
 			currentFontFilter = 2
 		}
 
-		textSize = rl.MeasureTextEx(&font, msg, float32(fontSize), 0)
+		textSize = rl.MeasureTextEx(font, msg, float32(fontSize), 0)
 
 		if rl.IsKeyDown(rl.KeyLeft) {
 			fontPosition.X -= 10
@@ -82,7 +83,7 @@ func main() {
 		rl.DrawText("Use 1, 2, 3 to change texture filter", 20, 60, 10, rl.Gray)
 		rl.DrawText("Drop a new TTF font for dynamic loading", 20, 80, 10, rl.DarkGray)
 
-		rl.DrawTextEx(&font, msg, fontPosition, float32(fontSize), 0, rl.Black)
+		rl.DrawTextEx(font, msg, fontPosition, float32(fontSize), 0, rl.Black)
 
 		// TODO: It seems texSize measurement is not accurate due to chars offsets...
 		//rl.DrawRectangleLines(int32(fontPosition.X), int32(fontPosition.Y), int32(textSize.X), int32(textSize.Y), rl.Red)

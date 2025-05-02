@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -28,15 +29,15 @@ func main() {
 		rl.DrawRectangleGradientH(screenWidth/4*2-90, 170, 180, 130, rl.Maroon, rl.Gold)
 		rl.DrawRectangleLines(screenWidth/4*2-40, 320, 80, 60, rl.Orange)
 
-		rl.DrawTriangle(rl.NewVector2(float32(screenWidth)/4*3, 80),
-			rl.NewVector2(float32(screenWidth)/4*3-60, 150),
-			rl.NewVector2(float32(screenWidth)/4*3+60, 150), rl.Violet)
+		rl.DrawTriangle(vector2.NewFloat32(float32(screenWidth)/4*3, 80),
+			vector2.NewFloat32(float32(screenWidth)/4*3-60, 150),
+			vector2.NewFloat32(float32(screenWidth)/4*3+60, 150), rl.Violet)
 
-		rl.DrawTriangleLines(rl.NewVector2(float32(screenWidth)/4*3, 160),
-			rl.NewVector2(float32(screenWidth)/4*3-20, 230),
-			rl.NewVector2(float32(screenWidth)/4*3+20, 230), rl.DarkBlue)
+		rl.DrawTriangleLines(vector2.NewFloat32(float32(screenWidth)/4*3, 160),
+			vector2.NewFloat32(float32(screenWidth)/4*3-20, 230),
+			vector2.NewFloat32(float32(screenWidth)/4*3+20, 230), rl.DarkBlue)
 
-		rl.DrawPoly(rl.NewVector2(float32(screenWidth)/4*3, 320), 6, 80, 0, rl.Brown)
+		rl.DrawPoly(vector2.NewFloat32(float32(screenWidth)/4*3, 320), 6, 80, 0, rl.Brown)
 
 		rl.EndDrawing()
 	}

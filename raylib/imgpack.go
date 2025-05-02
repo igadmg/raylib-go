@@ -12,9 +12,9 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
 	"github.com/igadmg/goex/image/colorex"
-	"github.com/igadmg/raylib-go/raymath/rect2"
-	"github.com/igadmg/raylib-go/raymath/vector2"
 )
 
 type PackContext struct {
@@ -28,7 +28,7 @@ func (r PackRect) Id() int {
 	return int(r.id)
 }
 
-func (r PackRect) Rect() Rectangle {
+func (r PackRect) Rect() rect2.Float32 {
 	return NewRectangle(int(r.x), int(r.y), int(r.w), int(r.h))
 }
 
@@ -86,7 +86,7 @@ func (ctx *PackContext) PackRects(rects ...PackRect) ([]PackRect, error) {
 
 type ImageAtlas struct {
 	Image Image
-	Atlas []Rectangle
+	Atlas []rect2.Float32
 }
 
 func LoadImageAtlas(width, height int, fileNames ...string) (ImageAtlas, error) {
@@ -112,7 +112,7 @@ func LoadImageAtlas(width, height int, fileNames ...string) (ImageAtlas, error) 
 	}
 
 	atlasImage := GenImageColor(width, height, Blank)
-	atlasAtlas := make([]Rectangle, len(icons))
+	atlasAtlas := make([]rect2.Float32, len(icons))
 	for i, icon := range icons {
 		rect := icon.Rect().ShrinkXYWH(1, 1, 1, 1)
 		atlasAtlas[i] = rect
@@ -148,7 +148,7 @@ func LoadImageAtlasEx(width, height int, imgFn func(path string) Image, fileName
 	}
 
 	atlasImage := GenImageColor(width, height, Blank)
-	atlasAtlas := make([]Rectangle, len(icons))
+	atlasAtlas := make([]rect2.Float32, len(icons))
 	for i, icon := range icons {
 		rect := icon.Rect().ShrinkXYWH(1, 1, 1, 1)
 		atlasAtlas[i] = rect
@@ -169,24 +169,24 @@ func (i *ImageAtlas) Unload() {
 
 type TextureAtlasItem struct {
 	Texture *Texture2D
-	Rect    Rectangle
+	Rect    rect2.Float32
 }
 
-func (t TextureAtlasItem) DrawExDef(position Vector2) {
-	DrawTexturePro(t.Texture, t.Rect, rect2.NewFloat32(position, t.Rect.Size), vector2.Zero[float32](), 0, White)
+func (t TextureAtlasItem) DrawExDef(position vector2.Float32) {
+	DrawTexturePro(*t.Texture, t.Rect, rect2.NewFloat32(position, t.Rect.Size), vector2.Zero[float32](), 0, White)
 }
 
-func (t TextureAtlasItem) DrawProDef(destRec Rectangle) {
-	DrawTexturePro(t.Texture, t.Rect, destRec, vector2.Zero[float32](), 0, White)
+func (t TextureAtlasItem) DrawProDef(destRec rect2.Float32) {
+	DrawTexturePro(*t.Texture, t.Rect, destRec, vector2.Zero[float32](), 0, White)
 }
 
-func (t TextureAtlasItem) DrawProTintedDef(destRec Rectangle, tint colorex.RGBA) {
-	DrawTexturePro(t.Texture, t.Rect, destRec, vector2.Zero[float32](), 0, tint)
+func (t TextureAtlasItem) DrawProTintedDef(destRec rect2.Float32, tint colorex.RGBA) {
+	DrawTexturePro(*t.Texture, t.Rect, destRec, vector2.Zero[float32](), 0, tint)
 }
 
 type TextureAtlas struct {
 	Texture Texture2D
-	Atlas   []Rectangle
+	Atlas   []rect2.Float32
 }
 
 func LoadTextureAtlas(width, height int, fileNames ...string) (TextureAtlas, error) {

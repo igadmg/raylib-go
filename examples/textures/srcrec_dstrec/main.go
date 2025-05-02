@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -23,7 +24,7 @@ func main() {
 	destRec := rl.NewRectangle(float32(screenWidth)/2, float32(screenHeight)/2, frameWidth*2, frameHeight*2)
 
 	// NOTE: Origin of the texture (rotation/scale point), it's relative to destination rectangle size
-	origin := rl.NewVector2(float32(frameWidth), float32(frameHeight))
+	origin := vector2.NewFloat32(float32(frameWidth), float32(frameHeight))
 
 	rotation := float32(0)
 
@@ -43,10 +44,10 @@ func main() {
 		// destRec defines the rectangle where our texture part will fit (scaling it to fit)
 		// origin defines the point of the texture used as reference for rotation and scaling
 		// rotation defines the texture rotation (using origin as rotation point)
-		rl.DrawTexturePro(&scarfy, sourceRec, destRec, origin, rotation, rl.White)
+		rl.DrawTexturePro(scarfy, sourceRec, destRec, origin, rotation, rl.White)
 
-		rl.DrawLine(int32(destRec.XY.X), 0, int32(destRec.XY.X), screenHeight, rl.Gray)
-		rl.DrawLine(0, int32(destRec.XY.Y), screenWidth, int32(destRec.XY.Y), rl.Gray)
+		rl.DrawLine(int32(destRec.Position.X), 0, int32(destRec.Position.X), screenHeight, rl.Gray)
+		rl.DrawLine(0, int32(destRec.Position.Y), screenWidth, int32(destRec.Position.Y), rl.Gray)
 
 		rl.DrawText("(c) Scarfy sprite by Eiden Marsal", screenWidth-200, screenHeight-20, 10, rl.Gray)
 

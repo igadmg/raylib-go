@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -44,20 +45,20 @@ func main() {
 
 		rl.DrawText("USING DEFAULT SHADER", 370, 40, 10, rl.Red)
 
-		rl.DrawTriangle(rl.NewVector2(430, 80),
-			rl.NewVector2(430-60, 150),
-			rl.NewVector2(430+60, 150), rl.Violet)
+		rl.DrawTriangle(vector2.NewFloat32(430, 80),
+			vector2.NewFloat32(430-60, 150),
+			vector2.NewFloat32(430+60, 150), rl.Violet)
 
-		rl.DrawTriangleLines(rl.NewVector2(430, 160),
-			rl.NewVector2(430-20, 230),
-			rl.NewVector2(430+20, 230), rl.DarkBlue)
+		rl.DrawTriangleLines(vector2.NewFloat32(430, 160),
+			vector2.NewFloat32(430-20, 230),
+			vector2.NewFloat32(430+20, 230), rl.DarkBlue)
 
-		rl.DrawPoly(rl.NewVector2(430, 320), 6, 80, 0, rl.Brown)
+		rl.DrawPoly(vector2.NewFloat32(430, 320), 6, 80, 0, rl.Brown)
 
 		// Activate our custom shader to be applied on next shapes/textures drawings
 		rl.BeginShaderMode(shader)
 
-		rl.DrawTexture(&fudesumi, 500, -30, rl.White) // Using custom shader
+		rl.DrawTexture(fudesumi, 500, -30, rl.White) // Using custom shader
 
 		// Activate our default shader for next drawings
 		rl.EndShaderMode()

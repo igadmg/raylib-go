@@ -14,6 +14,8 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
 	"github.com/igadmg/goex/image/colorex"
 	rl "github.com/igadmg/raylib-go/raylib"
 )
@@ -248,7 +250,7 @@ const (
 // GuiColorPickerProperty .
 type GuiColorPickerProperty = int32
 
-func GetTextSize(text string) rl.Vector2 {
+func GetTextSize(text string) vector2.Float32 {
 	ctext := textAlloc(text)
 	ret := C.GetTextSize(ctext)
 	return *govec2ptr(&ret)
@@ -351,7 +353,7 @@ func PanelEx(bounds rl.Rectangle, text string, fn BoundsFn) {
 }
 
 // ScrollPanel control - Scroll Panel control
-func ScrollPanel(bounds rl.Rectangle, text string, content rl.Rectangle, scroll *rl.Vector2, view *rl.Rectangle) int32 {
+func ScrollPanel(bounds rl.Rectangle, text string, content rl.Rectangle, scroll *vector2.Float32, view *rl.Rectangle) int32 {
 	ctext := textAlloc(text)
 	cbounds := crect2ptr(&bounds)
 	ccontent := crect2ptr(&content)
@@ -556,7 +558,7 @@ func DummyRec(bounds rl.Rectangle, text string) {
 }
 
 // Grid control, returns mouse cell position
-func Grid(bounds rl.Rectangle, text string, spacing float32, subdivs int32, mouseCell *rl.Vector2) int32 {
+func Grid(bounds rl.Rectangle, text string, spacing float32, subdivs int32, mouseCell *vector2.Float32) int32 {
 	cbounds := crect2ptr(&bounds)
 	ctext := textAlloc(text)
 	cspacing := C.float(spacing)
@@ -649,7 +651,7 @@ func ColorBarHue(bounds rl.Rectangle, text string, value float32) float32 {
 }
 
 // ColorPickerHSV - Color Picker control that avoids conversion to RGB on each call (multiple color controls)
-func ColorPickerHSV(bounds rl.Rectangle, text string, colorHSV *rl.Vector3) int32 {
+func ColorPickerHSV(bounds rl.Rectangle, text string, colorHSV *vector3.Float32) int32 {
 	cbounds := crect2ptr(&bounds)
 	ctext := textAlloc(text)
 	ccolorHSV := cvec3ptr(colorHSV)
@@ -658,7 +660,7 @@ func ColorPickerHSV(bounds rl.Rectangle, text string, colorHSV *rl.Vector3) int3
 }
 
 // ColorPanelHSV - Color Panel control that returns HSV color value, used by GuiColorPickerHSV()
-func ColorPanelHSV(bounds rl.Rectangle, text string, colorHSV *rl.Vector3) int32 {
+func ColorPanelHSV(bounds rl.Rectangle, text string, colorHSV *vector3.Float32) int32 {
 	cbounds := crect2ptr(&bounds)
 	ctext := textAlloc(text)
 	ccolorHSV := cvec3ptr(colorHSV)

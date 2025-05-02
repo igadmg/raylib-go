@@ -2,19 +2,21 @@
 
 package rl
 
+import "github.com/igadmg/gamemath/vector3"
+
 // GetCameraForward - Returns the cameras forward vector (normalized)
-func GetCameraForward(camera *Camera) Vector3 {
+func GetCameraForward(camera *Camera) vector3.Float32 {
 	return camera.Target.Sub(camera.Position).Normalized()
 }
 
 // GetCameraUp - Returns the cameras up vector (normalized)
 // Note: The up vector might not be perpendicular to the forward vector
-func GetCameraUp(camera *Camera) Vector3 {
+func GetCameraUp(camera *Camera) vector3.Float32 {
 	return camera.Up.Normalized()
 }
 
 // GetCameraRight - Returns the cameras right vector (normalized)
-func GetCameraRight(camera *Camera) Vector3 {
+func GetCameraRight(camera *Camera) vector3.Float32 {
 	forward := GetCameraForward(camera)
 	up := GetCameraUp(camera)
 
@@ -69,13 +71,13 @@ func CameraMoveRight(camera *Camera, distance float32, moveInWorldPlane uint8) {
 
 // CameraMoveToTarget - Moves the camera position closer/farther to/from the camera target
 func CameraMoveToTarget(camera *Camera, delta float32) {
-	distance := camera.Position.Distance(camera.Target)
+	distance := camera.Position.DistanceF(camera.Target)
 
 	// Apply delta
 	distance = distance + delta
 
 	// Distance must be greater than 0
-	if distance <= float32(0) {
+	if distance <= 0 {
 		distance = 0.001
 	}
 
@@ -320,7 +322,7 @@ func UpdateCamera(camera *Camera, mode CameraMode) {
 }
 
 // UpdateCameraPro - Update camera movement, movement/rotation values should be provided by user
-func UpdateCameraPro(camera *Camera, movement Vector3, rotation Vector3, zoom float32) {
+func UpdateCameraPro(camera *Camera, movement vector3.Float32, rotation vector3.Float32, zoom float32) {
 	// Required values
 	// movement.X - Move forward/backward
 	// movement.Y - Move right/left
@@ -336,14 +338,14 @@ func UpdateCameraPro(camera *Camera, movement Vector3, rotation Vector3, zoom fl
 	moveInWorldPlane := uint8(1)
 
 	// Camera rotation
-	CameraPitch(camera, -rotation.Y()*(Pi/180.0), lockView, rotateAroundTarget, rotateUp)
-	CameraYaw(camera, -rotation.X()*(Pi/180.0), rotateAroundTarget)
-	CameraRoll(camera, rotation.Z()*(Pi/180.0))
+	CameraPitch(camera, -rotation.Y*(Pi/180.0), lockView, rotateAroundTarget, rotateUp)
+	CameraYaw(camera, -rotation.X*(Pi/180.0), rotateAroundTarget)
+	CameraRoll(camera, rotation.Z*(Pi/180.0))
 
 	// Camera movement
-	CameraMoveForward(camera, movement.X(), moveInWorldPlane)
-	CameraMoveRight(camera, movement.Y(), moveInWorldPlane)
-	CameraMoveUp(camera, movement.Z())
+	CameraMoveForward(camera, movement.X, moveInWorldPlane)
+	CameraMoveRight(camera, movement.Y, moveInWorldPlane)
+	CameraMoveUp(camera, movement.Z)
 
 	// Zoom target distance
 	CameraMoveToTarget(camera, zoom)

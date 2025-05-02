@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"math"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var (
@@ -13,9 +14,9 @@ var (
 	curveW        = float32(50)
 	curveSegments = 24
 
-	curveStartPos, curveStartPosTangent, curveEndPos, curveEndPosTangent rl.Vector2
+	curveStartPos, curveStartPosTangent, curveEndPos, curveEndPosTangent vector2.Float32
 
-	curveSelectedPoint *rl.Vector2
+	curveSelectedPoint *vector2.Float32
 
 	screenW = int32(800)
 	screenH = int32(450)
@@ -30,11 +31,11 @@ func main() {
 	texRoad = rl.LoadTexture("road.png")
 	rl.SetTextureFilter(texRoad, rl.TextureFilterMode(rl.FilterBilinear))
 
-	curveStartPos = rl.NewVector2(80, 100)
-	curveStartPosTangent = rl.NewVector2(100, 300)
+	curveStartPos = vector2.NewFloat32(80, 100)
+	curveStartPosTangent = vector2.NewFloat32(100, 300)
 
-	curveEndPos = rl.NewVector2(700, 350)
-	curveEndPosTangent = rl.NewVector2(600, 100)
+	curveEndPos = vector2.NewFloat32(700, 350)
+	curveEndPosTangent = vector2.NewFloat32(600, 100)
 
 	rl.SetTargetFPS(60)
 
@@ -64,7 +65,7 @@ func main() {
 func upCurve() {
 
 	if !rl.IsMouseButtonDown(rl.MouseLeftButton) {
-		curveSelectedPoint = &rl.Vector2{}
+		curveSelectedPoint = &vector2.Float32{}
 	}
 
 	*curveSelectedPoint = rl.Vector2Add(*curveSelectedPoint, rl.GetMouseDelta())
@@ -111,10 +112,10 @@ func drawTexturedCurve() {
 
 	step := float32(1) / float32(curveSegments)
 	previous := curveStartPos
-	previousTangent := rl.Vector2Zero()
+	previousTangent := vector2.Zero[float32]()
 	previousV := float32(0)
 	tangentSet := false
-	current := rl.Vector2Zero()
+	current := vector2.Zero[float32]()
 	t := float32(0)
 
 	for i := 0; i < curveSegments; i++ {
@@ -127,8 +128,8 @@ func drawTexturedCurve() {
 		current.Y = a*curveStartPos.Y + b*curveStartPosTangent.Y + c*curveEndPosTangent.Y + d*curveEndPos.Y
 		current.X = a*curveStartPos.X + b*curveStartPosTangent.X + c*curveEndPosTangent.X + d*curveEndPos.X
 
-		delta := rl.NewVector2(current.X-previous.X, current.Y-previous.Y)
-		normal := rl.Vector2Normalize(rl.NewVector2(-delta.Y, delta.X))
+		delta := vector2.NewFloat32(current.X-previous.X, current.Y-previous.Y)
+		normal := rl.Vector2Normalize(vector2.NewFloat32(-delta.Y, delta.X))
 		v := previousV + rl.Vector2Length(delta)
 
 		if !tangentSet {
@@ -136,11 +137,11 @@ func drawTexturedCurve() {
 			tangentSet = true
 		}
 
-		prevPosNormal := rl.Vector2Add(previous, rl.Vector2Scale(previousTangent, curveW))
-		prevNegNormal := rl.Vector2Add(previous, rl.Vector2Scale(previousTangent, -curveW))
+		prevPosNormal := previous.Add(previousTangent.ScaleF(curveW))
+		prevNegNormal := previous.Add(previousTangent.ScaleF(-curveW))
 
-		currentPosNormal := rl.Vector2Add(current, rl.Vector2Scale(normal, curveW))
-		currentNegNormal := rl.Vector2Add(current, rl.Vector2Scale(normal, -curveW))
+		currentPosNormal := current.Add(normal.ScaleF(curveW))
+		currentNegNormal := current.Add(normal.ScaleF(-curveW))
 
 		rl.SetTexture(texRoad.ID)
 		rl.Begin(rl.Quads)

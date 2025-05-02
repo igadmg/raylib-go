@@ -1,7 +1,7 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	image := rl.LoadImage("raylib_logo.png")  // Loaded in CPU memory (RAM)
 	texture := rl.LoadTextureFromImage(image) // Image converted to texture, GPU memory (VRAM)
 
-	rl.UnloadImage(image) // Once image has been converted to texture and uploaded to VRAM, it can be unloaded from RAM
+	rl.UnloadImage(&image) // Once image has been converted to texture and uploaded to VRAM, it can be unloaded from RAM
 
 	rl.SetTargetFPS(60)
 
@@ -24,7 +24,7 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTexture(&texture, screenWidth/2-texture.Width/2, screenHeight/2-texture.Height/2, rl.White)
+		rl.DrawTexture(texture, screenWidth/2-texture.Width/2, screenHeight/2-texture.Height/2, rl.White)
 
 		rl.DrawText("this IS a texture loaded from an image!", 300, 370, 10, rl.Gray)
 

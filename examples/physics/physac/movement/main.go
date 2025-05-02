@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/physics"
-	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/raylib-go/physics"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const (
@@ -24,11 +25,11 @@ func main() {
 	physics.Init()
 
 	// Create floor and walls rectangle physics body
-	floor := physics.NewBodyRectangle(rl.NewVector2(screenWidth/2, screenHeight), screenWidth, 100, 10)
-	platformLeft := physics.NewBodyRectangle(rl.NewVector2(screenWidth*0.25, screenHeight*0.6), screenWidth*0.25, 10, 10)
-	platformRight := physics.NewBodyRectangle(rl.NewVector2(screenWidth*0.75, screenHeight*0.6), screenWidth*0.25, 10, 10)
-	wallLeft := physics.NewBodyRectangle(rl.NewVector2(-5, screenHeight/2), 10, screenHeight, 10)
-	wallRight := physics.NewBodyRectangle(rl.NewVector2(screenWidth+5, screenHeight/2), 10, screenHeight, 10)
+	floor := physics.NewBodyRectangle(vector2.NewFloat32(screenWidth/2, screenHeight), screenWidth, 100, 10)
+	platformLeft := physics.NewBodyRectangle(vector2.NewFloat32(screenWidth*0.25, screenHeight*0.6), screenWidth*0.25, 10, 10)
+	platformRight := physics.NewBodyRectangle(vector2.NewFloat32(screenWidth*0.75, screenHeight*0.6), screenWidth*0.25, 10, 10)
+	wallLeft := physics.NewBodyRectangle(vector2.NewFloat32(-5, screenHeight/2), 10, screenHeight, 10)
+	wallRight := physics.NewBodyRectangle(vector2.NewFloat32(screenWidth+5, screenHeight/2), 10, screenHeight, 10)
 
 	// Disable dynamics to floor and walls physics bodies
 	floor.Enabled = false
@@ -38,7 +39,7 @@ func main() {
 	wallRight.Enabled = false
 
 	// Create movement physics body
-	body := physics.NewBodyRectangle(rl.NewVector2(screenWidth/2, screenHeight/2), 50, 50, 1)
+	body := physics.NewBodyRectangle(vector2.NewFloat32(screenWidth/2, screenHeight/2), 50, 50, 1)
 	body.FreezeOrient = true // Constrain body rotation to avoid little collision torque amounts
 
 	rl.SetTargetFPS(60)
@@ -49,8 +50,8 @@ func main() {
 
 		if rl.IsKeyPressed(rl.KeyR) { // Reset physics input
 			// Reset movement physics body position, velocity and rotation
-			body.Position = rl.NewVector2(screenWidth/2, screenHeight/2)
-			body.Velocity = rl.NewVector2(0, 0)
+			body.Position = vector2.NewFloat32(screenWidth/2, screenHeight/2)
+			body.Velocity = vector2.NewFloat32(0, 0)
 			body.SetRotation(0)
 		}
 

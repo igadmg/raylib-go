@@ -11,17 +11,18 @@ import "C"
 import (
 	"unsafe"
 
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
+	"github.com/igadmg/gamemath/vector4"
 	"github.com/igadmg/goex/image/colorex"
-	"github.com/igadmg/raylib-go/raymath/vector2"
-	"github.com/igadmg/raylib-go/raymath/vector3"
-	"github.com/igadmg/raylib-go/raymath/vector4"
 )
 
 // core
 
 // govec2ptr - Returns new Vector2 from pointer
-func govec2ptr(v *C.Vector2) *Vector2 {
-	return (*Vector2)(unsafe.Pointer(v))
+func govec2ptr(v *C.Vector2) *vector2.Float32 {
+	return (*vector2.Float32)(unsafe.Pointer(v))
 }
 
 // cptr returns C pointer
@@ -30,8 +31,8 @@ func cvec2ptr(v *vector2.Float32) *C.Vector2 {
 }
 
 // govec3ptr - Returns new Vector3 from pointer
-func govec3ptr(v *C.Vector3) *Vector3 {
-	return (*Vector3)(unsafe.Pointer(v))
+func govec3ptr(v *C.Vector3) *vector3.Float32 {
+	return (*vector3.Float32)(unsafe.Pointer(v))
 }
 
 // cvec3 returns C pointer
@@ -40,8 +41,8 @@ func cvec3ptr(v *vector3.Float32) *C.Vector3 {
 }
 
 // govec4ptr - Returns new Vector4 from pointer
-func govec4ptr(v *C.Vector4) *Vector4 {
-	return (*Vector4)(unsafe.Pointer(v))
+func govec4ptr(v *C.Vector4) *vector4.Float32 {
+	return (*vector4.Float32)(unsafe.Pointer(v))
 }
 
 // cvec4 returns C pointer
@@ -70,12 +71,12 @@ func ccolorptr(col *colorex.RGBA) *C.Color {
 }
 
 // gorec2ptr - Returns new Rectangle from pointer
-func gorec2ptr(ptr *C.Rectangle) *Rectangle {
-	return (*Rectangle)(unsafe.Pointer(ptr))
+func gorec2ptr(ptr *C.Rectangle) *rect2.Float32 {
+	return (*rect2.Float32)(unsafe.Pointer(ptr))
 }
 
 // cptr returns C pointer
-func crect2ptr(r *Rectangle) *C.Rectangle {
+func crect2ptr(r *rect2.Float32) *C.Rectangle {
 	return (*C.Rectangle)(unsafe.Pointer(r))
 }
 

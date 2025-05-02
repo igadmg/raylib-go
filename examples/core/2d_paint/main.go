@@ -3,7 +3,9 @@ package main
 import (
 	"os"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const colorCount = 23
@@ -14,7 +16,7 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raypaint")
 
 	// Colors to choose from
-	var colors = [colorCount]rl.Color{
+	var colors = [colorCount]colorex.RGBA{
 		rl.RayWhite, rl.Yellow, rl.Gold, rl.Orange, rl.Pink, rl.Red, rl.Maroon, rl.Green, rl.Lime, rl.DarkGreen,
 		rl.SkyBlue, rl.Blue, rl.DarkBlue, rl.Purple, rl.Violet, rl.DarkPurple, rl.Beige, rl.Brown, rl.DarkBrown,
 		rl.LightGray, rl.Gray, rl.DarkGray, rl.Black,
@@ -24,10 +26,10 @@ func main() {
 	var colorRecs = [colorCount]rl.Rectangle{}
 
 	for i := 0; i < colorCount; i++ {
-		colorRecs[i].XY.X = float32(10 + 30*i + 2*i)
-		colorRecs[i].XY.Y = 10
-		colorRecs[i].WH.X = 30
-		colorRecs[i].WH.Y = 30
+		colorRecs[i].Position.X = float32(10 + 30*i + 2*i)
+		colorRecs[i].Position.Y = 10
+		colorRecs[i].Size.X = 30
+		colorRecs[i].Size.Y = 30
 	}
 
 	colorSelected := 0
@@ -40,7 +42,7 @@ func main() {
 	showSaveMessage := false
 	saveMessageCounter := 0
 
-	checkSaveHover := func() rl.Color {
+	checkSaveHover := func() colorex.RGBA {
 		if btnSaveMouseHover {
 			return rl.Red
 		}
@@ -51,7 +53,7 @@ func main() {
 	target := rl.LoadRenderTexture(screenWidth, screenHeight)
 
 	// Clear render texture before entering the game loop
-	rl.BeginTextureMode(&target)
+	rl.BeginTextureMode(target)
 	rl.ClearBackground(colors[0])
 	rl.EndTextureMode()
 
@@ -101,14 +103,14 @@ func main() {
 
 		if rl.IsKeyPressed(rl.KeyC) {
 			// Clear render texture to clear color
-			rl.BeginTextureMode(&target)
+			rl.BeginTextureMode(target)
 			rl.ClearBackground(colors[0])
 			rl.EndTextureMode()
 		}
 
 		if rl.IsMouseButtonDown(rl.MouseLeftButton) || rl.GetGestureDetected() == rl.GestureDrag {
 			// Clear render texture to clear color
-			rl.BeginTextureMode(&target)
+			rl.BeginTextureMode(target)
 
 			if mousePos.Y > 50 {
 				rl.DrawCircle(int32(mousePos.X), int32(mousePos.Y), float32(brushSize), colors[colorSelected])
@@ -121,7 +123,7 @@ func main() {
 			colorSelected = 0
 
 			// Erase circle from render texture
-			rl.BeginTextureMode(&target)
+			rl.BeginTextureMode(target)
 
 			if mousePos.Y > 50 {
 				rl.DrawCircle(int32(mousePos.X), int32(mousePos.Y), float32(brushSize), colors[0])
@@ -139,10 +141,10 @@ func main() {
 		}
 
 		if btnSaveMouseHover && rl.IsMouseButtonReleased(rl.MouseLeftButton) || rl.IsKeyPressed(rl.KeyS) {
-			image := rl.LoadImageFromTexture(&target.Texture)
-			rl.ImageFlipVertical(*&image)
+			image := rl.LoadImageFromTexture(target.Texture)
+			rl.ImageFlipVertical(&image)
 			rl.ExportImage(image, "export.png")
-			rl.UnloadImage(image)
+			rl.UnloadImage(&image)
 			showSaveMessage = true
 		}
 
@@ -162,7 +164,7 @@ func main() {
 		rl.ClearBackground(rl.RayWhite)
 
 		// NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
-		rl.DrawTextureRec(&target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)), rl.NewVector2(0, 0), rl.White)
+		rl.DrawTextureRec(target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)), vector2.NewFloat32(0, 0), rl.White)
 
 		if mousePos.Y > 50 {
 			if rl.IsMouseButtonDown(rl.MouseRightButton) {
@@ -188,7 +190,7 @@ func main() {
 		}
 
 		rl.DrawRectangleLinesEx(rl.NewRectangle(
-			colorRecs[colorSelected].XY.X-2, colorRecs[colorSelected].XY.Y-2, colorRecs[colorSelected].WH.X+4, colorRecs[colorSelected].WH.Y+4,
+			colorRecs[colorSelected].Position.X-2, colorRecs[colorSelected].Position.Y-2, colorRecs[colorSelected].Size.X+4, colorRecs[colorSelected].Size.Y+4,
 		), 2, rl.Black)
 
 		// Draw save image button

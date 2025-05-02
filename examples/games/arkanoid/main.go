@@ -18,7 +18,8 @@ package main
 import (
 	"math"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const (
@@ -28,20 +29,20 @@ const (
 )
 
 type Player struct {
-	position rl.Vector2
-	size     rl.Vector2
+	position vector2.Float32
+	size     vector2.Float32
 	life     int
 }
 
 type Ball struct {
-	position rl.Vector2
-	speed    rl.Vector2
+	position vector2.Float32
+	speed    vector2.Float32
 	radius   float32
 	active   bool
 }
 
 type Brick struct {
-	position rl.Vector2
+	position vector2.Float32
 	active   bool
 }
 
@@ -56,7 +57,7 @@ type Game struct {
 	player    Player
 	ball      Ball
 	brick     [LINES_OF_BRICKS][BRICKS_PER_LINE]Brick
-	brickSize rl.Vector2
+	brickSize vector2.Float32
 }
 
 func main() {
@@ -92,16 +93,16 @@ func NewGame() (g Game) {
 
 // Init - initialize game
 func (g *Game) Init() {
-	g.brickSize = rl.Vector2{float32(rl.GetScreenWidth() / BRICKS_PER_LINE), 40}
+	g.brickSize = vector2.Float32{float32(rl.GetScreenWidth() / BRICKS_PER_LINE), 40}
 
 	// Initialize player
-	g.player.position = rl.Vector2{float32(screenWidth / 2), float32(screenHeight * 7 / 8)}
-	g.player.size = rl.Vector2{float32(screenWidth / 10), 20}
+	g.player.position = vector2.Float32{float32(screenWidth / 2), float32(screenHeight * 7 / 8)}
+	g.player.size = vector2.Float32{float32(screenWidth / 10), 20}
 	g.player.life = PLAYER_MAX_LIFE
 
 	// Initialize ball
-	g.ball.position = rl.Vector2{float32(screenWidth / 2), float32(screenHeight*7/8 - 30)}
-	g.ball.speed = rl.Vector2{0, 0}
+	g.ball.position = vector2.Float32{float32(screenWidth / 2), float32(screenHeight*7/8 - 30)}
+	g.ball.speed = vector2.Float32{0, 0}
 	g.ball.radius = 7
 	g.ball.active = false
 
@@ -109,7 +110,7 @@ func (g *Game) Init() {
 
 	for i := 0; i < LINES_OF_BRICKS; i++ {
 		for j := 0; j < BRICKS_PER_LINE; j++ {
-			g.brick[i][j].position = rl.Vector2{float32(j)*g.brickSize.X + g.brickSize.X/2, float32(i)*g.brickSize.Y + float32(initialDownPosition)}
+			g.brick[i][j].position = vector2.Float32{float32(j)*g.brickSize.X + g.brickSize.X/2, float32(i)*g.brickSize.Y + float32(initialDownPosition)}
 			g.brick[i][j].active = true
 		}
 	}
@@ -141,7 +142,7 @@ func (g *Game) Update() {
 			if !g.ball.active {
 				if rl.IsKeyPressed(rl.KeySpace) {
 					g.ball.active = true
-					g.ball.speed = rl.Vector2{0, -5}
+					g.ball.speed = vector2.Float32{0, -5}
 				}
 			}
 
@@ -149,7 +150,7 @@ func (g *Game) Update() {
 				g.ball.position.X += g.ball.speed.X
 				g.ball.position.Y += g.ball.speed.Y
 			} else {
-				g.ball.position = rl.Vector2{g.player.position.X, screenHeight*7/8 - 30}
+				g.ball.position = vector2.Float32{g.player.position.X, screenHeight*7/8 - 30}
 			}
 
 			// Collision logic: ball vs walls
@@ -160,7 +161,7 @@ func (g *Game) Update() {
 				g.ball.speed.Y *= -1
 			}
 			if (g.ball.position.Y + g.ball.radius) >= screenHeight {
-				g.ball.speed = rl.Vector2{0, 0}
+				g.ball.speed = vector2.Float32{0, 0}
 				g.ball.active = false
 
 				g.player.life--

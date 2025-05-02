@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -11,9 +12,9 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [models] example - voxel loading")
 
 	camera := rl.Camera{}
-	camera.Position = rl.NewVector3(10.0, 10.0, 10.0)
-	camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	camera.Position = vector3.NewFloat32(10.0, 10.0, 10.0)
+	camera.Target = vector3.NewFloat32(0.0, 0.0, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
 	camera.Fovy = 45.0
 	camera.Projection = rl.CameraPerspective
 
@@ -24,7 +25,7 @@ func main() {
 	for i := 0; i < len(voxFiles); i++ {
 		models = append(models, rl.LoadModel(voxFiles[i]))
 		bb := rl.GetModelBoundingBox(models[i])
-		center := rl.Vector3Zero()
+		center := vector3.Zero[float32]()
 		center.X = bb.Min.X + ((bb.Max.X - bb.Min.X) / 2)
 		center.Z = bb.Min.Z + ((bb.Max.Z - bb.Min.Z) / 2)
 
@@ -63,7 +64,7 @@ func main() {
 
 		rl.BeginMode3D(camera)
 
-		rl.DrawModel(models[currentModel], rl.Vector3Zero(), 1, rl.White)
+		rl.DrawModel(models[currentModel], vector3.Zero[float32](), 1, rl.White)
 
 		rl.EndMode3D()
 

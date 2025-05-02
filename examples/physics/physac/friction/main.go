@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/physics"
-	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/raylib-go/physics"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -20,28 +21,28 @@ func main() {
 	physics.Init()
 
 	// Create floor rectangle physics body
-	floor := physics.NewBodyRectangle(rl.NewVector2(float32(screenWidth)/2, float32(screenHeight)), float32(screenHeight), 100, 10)
+	floor := physics.NewBodyRectangle(vector2.NewFloat32(float32(screenWidth)/2, float32(screenHeight)), float32(screenHeight), 100, 10)
 	floor.Enabled = false // Disable body state to convert it to static (no dynamics, but collisions)
-	wall := physics.NewBodyRectangle(rl.NewVector2(float32(screenWidth)/2, float32(screenHeight)*0.8), 10, 80, 10)
+	wall := physics.NewBodyRectangle(vector2.NewFloat32(float32(screenWidth)/2, float32(screenHeight)*0.8), 10, 80, 10)
 	wall.Enabled = false // Disable body state to convert it to static (no dynamics, but collisions)
 
 	// Create left ramp physics body
-	rectLeft := physics.NewBodyRectangle(rl.NewVector2(25, float32(screenHeight)-5), 250, 250, 10)
+	rectLeft := physics.NewBodyRectangle(vector2.NewFloat32(25, float32(screenHeight)-5), 250, 250, 10)
 	rectLeft.Enabled = false // Disable body state to convert it to static (no dynamics, but collisions)
 	rectLeft.SetRotation(30 * rl.Deg2rad)
 
 	// Create right ramp  physics body
-	rectRight := physics.NewBodyRectangle(rl.NewVector2(float32(screenWidth)-25, float32(screenHeight)-5), 250, 250, 10)
+	rectRight := physics.NewBodyRectangle(vector2.NewFloat32(float32(screenWidth)-25, float32(screenHeight)-5), 250, 250, 10)
 	rectRight.Enabled = false // Disable body state to convert it to static (no dynamics, but collisions)
 	rectRight.SetRotation(330 * rl.Deg2rad)
 
 	// Create dynamic physics bodies
-	bodyA := physics.NewBodyRectangle(rl.NewVector2(35, float32(screenHeight)*0.6), 40, 40, 10)
+	bodyA := physics.NewBodyRectangle(vector2.NewFloat32(35, float32(screenHeight)*0.6), 40, 40, 10)
 	bodyA.StaticFriction = 0.1
 	bodyA.DynamicFriction = 0.1
 	bodyA.SetRotation(30 * rl.Deg2rad)
 
-	bodyB := physics.NewBodyRectangle(rl.NewVector2(float32(screenWidth)-35, float32(screenHeight)*0.6), 40, 40, 10)
+	bodyB := physics.NewBodyRectangle(vector2.NewFloat32(float32(screenWidth)-35, float32(screenHeight)*0.6), 40, 40, 10)
 	bodyB.StaticFriction = 1
 	bodyB.DynamicFriction = 1
 	bodyB.SetRotation(330 * rl.Deg2rad)
@@ -54,13 +55,13 @@ func main() {
 
 		if rl.IsKeyPressed(rl.KeyR) { // Reset physics input
 			// Reset dynamic physics bodies position, velocity and rotation
-			bodyA.Position = rl.NewVector2(35, float32(screenHeight)*0.6)
-			bodyA.Velocity = rl.NewVector2(0, 0)
+			bodyA.Position = vector2.NewFloat32(35, float32(screenHeight)*0.6)
+			bodyA.Velocity = vector2.NewFloat32(0, 0)
 			bodyA.AngularVelocity = 0
 			bodyA.SetRotation(30 * rl.Deg2rad)
 
-			bodyB.Position = rl.NewVector2(float32(screenWidth)-35, float32(screenHeight)*0.6)
-			bodyB.Velocity = rl.NewVector2(0, 0)
+			bodyB.Position = vector2.NewFloat32(float32(screenWidth)-35, float32(screenHeight)*0.6)
+			bodyB.Velocity = vector2.NewFloat32(0, 0)
 			bodyB.AngularVelocity = 0
 			bodyB.SetRotation(330 * rl.Deg2rad)
 		}

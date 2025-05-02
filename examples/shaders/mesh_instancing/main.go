@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"math"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const MAX_INSTANCES = 100000
@@ -28,9 +29,9 @@ func main() {
 
 	// Define the camera to look into our 3d world
 	camera := rl.Camera{
-		Position:   rl.NewVector3(-125.0, 125.0, -125.0),
-		Target:     rl.NewVector3(0.0, 0.0, 0.0),
-		Up:         rl.NewVector3(0.0, 1.0, 0.0),
+		Position:   vector3.NewFloat32(-125.0, 125.0, -125.0),
+		Target:     vector3.NewFloat32(0.0, 0.0, 0.0),
+		Up:         vector3.NewFloat32(0.0, 1.0, 0.0),
 		Fovy:       45.0,
 		Projection: rl.CameraPerspective,
 	}
@@ -51,7 +52,7 @@ func main() {
 		x = float32(rl.GetRandomValue(0, 360))
 		y = float32(rl.GetRandomValue(0, 360))
 		z = float32(rl.GetRandomValue(0, 360))
-		axis := rl.Vector3Normalize(rl.NewVector3(x, y, z))
+		axis := rl.Vector3Normalize(vector3.NewFloat32(x, y, z))
 		angle := float32(rl.GetRandomValue(0, 10)) * rl.Deg2rad
 
 		rotationsInc[i] = rl.MatrixRotate(axis, angle)
@@ -68,7 +69,7 @@ func main() {
 	// ambient light level
 	ambientLoc := rl.GetShaderLocation(shader, "ambient")
 	rl.SetShaderValue(shader, ambientLoc, []float32{0.2, 0.2, 0.2, 1.0}, rl.ShaderUniformVec4)
-	NewLight(LightTypeDirectional, rl.NewVector3(50.0, 50.0, 0.0), rl.Vector3Zero(), rl.White, shader)
+	NewLight(LightTypeDirectional, vector3.NewFloat32(50.0, 50.0, 0.0), vector3.Zero[float32](), rl.White, shader)
 
 	material := rl.LoadMaterialDefault()
 	material.Shader = shader

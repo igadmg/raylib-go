@@ -1,7 +1,7 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -14,11 +14,11 @@ func main() {
 
 	imRed := rl.GenImageColor(int(screenWidth), int(screenHeight), rl.NewColor(uint8(255), uint8(0), uint8(0), uint8(255)))
 	texRed := rl.LoadTextureFromImage(imRed)
-	rl.UnloadImage(imRed)
+	rl.UnloadImage(&imRed)
 
 	imBlue := rl.GenImageColor(int(screenWidth), int(screenHeight), rl.NewColor(uint8(0), uint8(0), uint8(255), uint8(255)))
 	texBlue := rl.LoadTextureFromImage(imBlue)
-	rl.UnloadImage(imBlue)
+	rl.UnloadImage(&imBlue)
 
 	shader := rl.LoadShader("", "color_mix.fs")
 
@@ -51,7 +51,7 @@ func main() {
 		rl.BeginShaderMode(shader)
 
 		rl.SetShaderValueTexture(shader, texBlueLoc, &texBlue)
-		rl.DrawTexture(&texRed, 0, 0, rl.White)
+		rl.DrawTexture(texRed, 0, 0, rl.White)
 
 		rl.EndShaderMode()
 

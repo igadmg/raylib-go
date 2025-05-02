@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -16,13 +17,13 @@ func main() {
 	parrots := rl.LoadImage("parrots.png") // Load image in CPU memory (RAM)
 
 	// Draw over image using custom font
-	rl.ImageDrawTextEx(parrots, rl.NewVector2(20, 20), font, "[Parrots font drawing]", float32(font.BaseSize), 0, rl.White)
+	rl.ImageDrawTextEx(&parrots, vector2.NewFloat32(20, 20), font, "[Parrots font drawing]", float32(font.BaseSize), 0, rl.White)
 
 	texture := rl.LoadTextureFromImage(parrots) // Image converted to texture, uploaded to GPU memory (VRAM)
 
-	rl.UnloadImage(parrots) // Once image has been converted to texture and uploaded to VRAM, it can be unloaded from RAM
+	rl.UnloadImage(&parrots) // Once image has been converted to texture and uploaded to VRAM, it can be unloaded from RAM
 
-	position := rl.NewVector2(float32(screenWidth)/2-float32(texture.Width)/2, float32(screenHeight)/2-float32(texture.Height)/2-20)
+	position := vector2.NewFloat32(float32(screenWidth)/2-float32(texture.Width)/2, float32(screenHeight)/2-float32(texture.Height)/2-20)
 
 	showFont := false
 
@@ -41,12 +42,12 @@ func main() {
 
 		if !showFont {
 			// Draw texture with text already drawn inside
-			rl.DrawTextureV(&texture, position, rl.White)
+			rl.DrawTextureV(texture, position, rl.White)
 
 			// Draw text directly using sprite font
-			rl.DrawTextEx(&font, "[Parrots font drawing]", rl.NewVector2(position.X+20, position.Y+20+280), float32(font.BaseSize), 0, rl.White)
+			rl.DrawTextEx(font, "[Parrots font drawing]", vector2.NewFloat32(position.X+20, position.Y+20+280), float32(font.BaseSize), 0, rl.White)
 		} else {
-			rl.DrawTexture(&font.Texture, screenWidth/2-font.Texture.Width/2, 50, rl.Black)
+			rl.DrawTexture(font.Texture, screenWidth/2-font.Texture.Width/2, 50, rl.Black)
 		}
 
 		rl.DrawText("PRESS SPACE to SEE USED SPRITEFONT ", 290, 420, 10, rl.DarkGray)

@@ -5,9 +5,9 @@ package rl
 import (
 	"math"
 
-	mathex "github.com/igadmg/raylib-go/raymath"
-	"github.com/igadmg/raylib-go/raymath/vector2"
-	"github.com/igadmg/raylib-go/raymath/vector3"
+	mathex "github.com/igadmg/gamemath"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
 )
 
 // Vector2LineAngle - Calculate angle defined by a two vectors line

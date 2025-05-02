@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"math"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const screenW = int32(1280)
@@ -32,7 +33,7 @@ func main() {
 	sourceRec := rl.NewRectangle(0, 0, float32(target.Texture.Width), -float32(target.Texture.Height))
 	destRec := rl.NewRectangle(-virtualRatio, -virtualRatio, float32(screenW)+(virtualRatio*2), float32(screenH)+(virtualRatio*2))
 
-	origin := rl.NewVector2(0, 0)
+	origin := vector2.NewFloat32(0, 0)
 
 	rotation, camX, camY := float32(0), float32(0), float32(0)
 
@@ -45,7 +46,7 @@ func main() {
 		camX = float32(math.Sin(rl.GetTime()) * 50)
 		camY = float32(math.Cos(rl.GetTime()) * 30)
 
-		screenSpaceCam.Target = rl.NewVector2(camX, camY)
+		screenSpaceCam.Target = vector2.NewFloat32(camX, camY)
 
 		worldSpaceCam.Target.X = screenSpaceCam.Target.X
 		screenSpaceCam.Target.X -= worldSpaceCam.Target.X
@@ -55,7 +56,7 @@ func main() {
 		screenSpaceCam.Target.Y -= worldSpaceCam.Target.Y
 		screenSpaceCam.Target.Y *= virtualRatio
 
-		rl.BeginTextureMode(&target)
+		rl.BeginTextureMode(target)
 		rl.ClearBackground(rl.RayWhite)
 		rl.BeginMode2D(worldSpaceCam)
 
@@ -69,7 +70,7 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Red)
 		rl.BeginMode2D(screenSpaceCam)
-		rl.DrawTexturePro(&target.Texture, sourceRec, destRec, origin, 0, rl.White)
+		rl.DrawTexturePro(target.Texture, sourceRec, destRec, origin, 0, rl.White)
 		rl.EndMode2D()
 
 		rl.DrawText("screen res "+fmt.Sprint(screenW)+"x"+fmt.Sprint(screenH), 10, 10, 20, rl.Black)

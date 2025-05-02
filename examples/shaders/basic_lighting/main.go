@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -13,9 +14,9 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [shaders] example - basic lighting")
 
 	camera := rl.Camera{}
-	camera.Position = rl.NewVector3(2.0, 4.0, 6.0)
-	camera.Target = rl.NewVector3(0.0, 0.5, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	camera.Position = vector3.NewFloat32(2.0, 4.0, 6.0)
+	camera.Target = vector3.NewFloat32(0.0, 0.5, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
 	camera.Fovy = 45.0
 	camera.Projection = rl.CameraPerspective
 
@@ -34,13 +35,13 @@ func main() {
 	cube.Materials.Shader = shader
 
 	lights := make([]Light, 4)
-	lights[0] = NewLight(LightTypePoint, rl.NewVector3(-2, 1, -2), rl.NewVector3(0, 0, 0), rl.Yellow, shader)
+	lights[0] = NewLight(LightTypePoint, vector3.NewFloat32(-2, 1, -2), vector3.NewFloat32(0, 0, 0), rl.Yellow, shader)
 
-	lights[1] = NewLight(LightTypePoint, rl.NewVector3(2, 1, 2), rl.NewVector3(0, 0, 0), rl.Red, shader)
+	lights[1] = NewLight(LightTypePoint, vector3.NewFloat32(2, 1, 2), vector3.NewFloat32(0, 0, 0), rl.Red, shader)
 
-	lights[2] = NewLight(LightTypePoint, rl.NewVector3(-2, 1, 2), rl.NewVector3(0, 0, 0), rl.Green, shader)
+	lights[2] = NewLight(LightTypePoint, vector3.NewFloat32(-2, 1, 2), vector3.NewFloat32(0, 0, 0), rl.Green, shader)
 
-	lights[3] = NewLight(LightTypePoint, rl.NewVector3(2, 1, -2), rl.NewVector3(0, 0, 0), rl.Blue, shader)
+	lights[3] = NewLight(LightTypePoint, vector3.NewFloat32(2, 1, -2), vector3.NewFloat32(0, 0, 0), rl.Blue, shader)
 
 	rl.SetTargetFPS(60)
 
@@ -73,8 +74,8 @@ func main() {
 
 		rl.BeginMode3D(camera)
 
-		rl.DrawModel(ground, rl.NewVector3(0, 0, 0), 1, rl.White)
-		rl.DrawModel(cube, rl.NewVector3(0, 0, 0), 1, rl.White)
+		rl.DrawModel(ground, vector3.NewFloat32(0, 0, 0), 1, rl.White)
+		rl.DrawModel(cube, vector3.NewFloat32(0, 0, 0), 1, rl.White)
 
 		for i := 0; i < len(lights); i++ {
 			if lights[i].enabled == 1 {

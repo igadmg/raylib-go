@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 
-	gui "github.com/gen2brain/raylib-go/raygui"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	gui "github.com/igadmg/raylib-go/raygui"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 /*******************************************************************************************
@@ -48,8 +49,8 @@ func main() {
 		panelRec        = rl.NewRectangle(20, 40, 200, 150)
 		panelContentRec = rl.NewRectangle(0, 0, 340, 340)
 		panelView       = rl.NewRectangle(0, 0, 0, 0)
-		panelScroll     = rl.NewVector2(99, -20)
-		mouseCell       = rl.NewVector2(0, 0)
+		panelScroll     = vector2.NewFloat32(99, -20)
+		mouseCell       = vector2.NewFloat32(0, 0)
 
 		showContentArea = true
 	)
@@ -76,21 +77,21 @@ func main() {
 
 		gui.ScrollPanel(panelRec, "", panelContentRec, &panelScroll, &panelView)
 
-		rl.BeginScissorMode(int32(panelView.XY.X), int32(panelView.XY.Y), int32(panelView.WH.X), int32(panelView.WH.Y))
+		rl.BeginScissorMode(int32(panelView.Position.X), int32(panelView.Position.Y), int32(panelView.Size.X), int32(panelView.Size.Y))
 		gui.Grid(rl.NewRectangle(
-			float32(panelRec.XY.X+panelScroll.X),
-			float32(panelRec.XY.Y+panelScroll.Y),
-			float32(panelContentRec.WH.X),
-			float32(panelContentRec.WH.Y),
+			float32(panelRec.Position.X+panelScroll.X),
+			float32(panelRec.Position.Y+panelScroll.Y),
+			float32(panelContentRec.Size.X),
+			float32(panelContentRec.Size.Y),
 		), "", 16, 3, &mouseCell)
 		rl.EndScissorMode()
 
 		if showContentArea {
 			rl.DrawRectangle(
-				int32(panelRec.XY.X+panelScroll.X),
-				int32(panelRec.XY.Y+panelScroll.Y),
-				int32(panelContentRec.WH.X),
-				int32(panelContentRec.WH.Y),
+				int32(panelRec.Position.X+panelScroll.X),
+				int32(panelRec.Position.Y+panelScroll.Y),
+				int32(panelContentRec.Size.X),
+				int32(panelContentRec.Size.Y),
 				rl.Fade(rl.Red, 0.1),
 			)
 		}
@@ -99,15 +100,15 @@ func main() {
 
 		showContentArea = gui.CheckBox(rl.NewRectangle(565, 80, 20, 20), "SHOW CONTENT AREA", showContentArea)
 
-		panelContentRec.WH.X = gui.SliderBar(rl.NewRectangle(590, 385, 145, 15),
+		panelContentRec.Size.X = gui.SliderBar(rl.NewRectangle(590, 385, 145, 15),
 			"WIDTH",
-			fmt.Sprintf("%.1f", panelContentRec.WH.X),
-			panelContentRec.WH.X,
+			fmt.Sprintf("%.1f", panelContentRec.Size.X),
+			panelContentRec.Size.X,
 			1, 600)
-		panelContentRec.WH.Y = gui.SliderBar(rl.NewRectangle(590, 410, 145, 15),
+		panelContentRec.Size.Y = gui.SliderBar(rl.NewRectangle(590, 410, 145, 15),
 			"HEIGHT",
-			fmt.Sprintf("%.1f", panelContentRec.WH.Y),
-			panelContentRec.WH.Y, 1, 400)
+			fmt.Sprintf("%.1f", panelContentRec.Size.Y),
+			panelContentRec.Size.Y, 1, 400)
 
 		rl.EndDrawing()
 		//----------------------------------------------------------------------------------

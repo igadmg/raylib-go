@@ -1,14 +1,16 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var (
 	screenW = int32(800)
 	screenH = int32(450)
 
-	colors = []rl.Color{rl.RayWhite, rl.Yellow, rl.Gold, rl.Pink, rl.Red, rl.Maroon, rl.Green, rl.Lime, rl.DarkGreen, rl.SkyBlue, rl.Blue, rl.DarkBlue, rl.Purple, rl.Violet, rl.DarkPurple, rl.Beige, rl.Brown, rl.DarkBrown, rl.LightGray, rl.Gray, rl.DarkGray, rl.Black}
+	colors = []colorex.RGBA{rl.RayWhite, rl.Yellow, rl.Gold, rl.Pink, rl.Red, rl.Maroon, rl.Green, rl.Lime, rl.DarkGreen, rl.SkyBlue, rl.Blue, rl.DarkBlue, rl.Purple, rl.Violet, rl.DarkPurple, rl.Beige, rl.Brown, rl.DarkBrown, rl.LightGray, rl.Gray, rl.DarkGray, rl.Black}
 
 	colorRecs []rl.Rectangle
 )
@@ -31,7 +33,7 @@ func main() {
 
 	target := rl.LoadRenderTexture(screenW, screenH)
 
-	rl.BeginTextureMode(&target)
+	rl.BeginTextureMode(target)
 	rl.ClearBackground(colors[0])
 	rl.EndTextureMode()
 
@@ -80,13 +82,13 @@ func main() {
 		}
 
 		if rl.IsKeyPressed(rl.KeyC) {
-			rl.BeginTextureMode(&target)
+			rl.BeginTextureMode(target)
 			rl.ClearBackground(colors[0])
 			rl.EndTextureMode()
 		}
 
 		if rl.IsMouseButtonDown(rl.MouseButtonLeft) {
-			rl.BeginTextureMode(&target)
+			rl.BeginTextureMode(target)
 			if mousePos.Y > 50 {
 				rl.DrawCircle(int32(mousePos.X), int32(mousePos.Y), brushSize, colors[colorSelected])
 			}
@@ -101,7 +103,7 @@ func main() {
 
 			mousePressed = true
 
-			rl.BeginTextureMode(&target)
+			rl.BeginTextureMode(target)
 			if mousePos.Y > 50 {
 				rl.DrawCircle(int32(mousePos.X), int32(mousePos.Y), brushSize, colors[0])
 			}
@@ -118,10 +120,10 @@ func main() {
 		}
 
 		if btnSaveMouseHover && rl.IsMouseButtonReleased(rl.MouseButtonLeft) || rl.IsKeyPressed(rl.KeyS) {
-			image := rl.LoadImageFromTexture(&target.Texture)
-			rl.ImageFlipVertical(image)
+			image := rl.LoadImageFromTexture(target.Texture)
+			rl.ImageFlipVertical(&image)
 			rl.ExportImage(image, "raylib_mouse_painting.png")
-			rl.UnloadImage(image)
+			rl.UnloadImage(&image)
 			showSaveMsg = true
 		}
 
@@ -136,7 +138,7 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTextureRec(&target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), -float32(target.Texture.Height)), rl.Vector2Zero(), rl.White)
+		rl.DrawTextureRec(target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), -float32(target.Texture.Height)), vector2.Zero[float32](), rl.White)
 
 		if mousePos.Y > 50 {
 			if rl.IsMouseButtonDown(rl.MouseButtonRight) {
@@ -159,7 +161,7 @@ func main() {
 			rl.DrawRectangleRec(colorRecs[colorMouseHover], rl.Fade(rl.White, 0.6))
 		}
 
-		rl.DrawRectangleLinesEx(rl.NewRectangle(colorRecs[colorSelected].XY.X-2, colorRecs[colorSelected].XY.Y-2, colorRecs[colorSelected].WH.X+4, colorRecs[colorSelected].WH.Y+4), 2, rl.Black)
+		rl.DrawRectangleLinesEx(rl.NewRectangle(colorRecs[colorSelected].Position.X-2, colorRecs[colorSelected].Position.Y-2, colorRecs[colorSelected].Size.X+4, colorRecs[colorSelected].Size.Y+4), 2, rl.Black)
 
 		if btnSaveMouseHover {
 			rl.DrawRectangleLinesEx(btnSaveRec, 2, rl.Red)

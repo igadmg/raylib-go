@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var (
@@ -24,7 +25,7 @@ func main() {
 	currentFrame, currentLine := 0, 0
 
 	frameRec := rl.NewRectangle(0, 0, frameW, frameH)
-	position := rl.NewVector2(0, 0)
+	position := vector2.NewFloat32(0, 0)
 
 	active := false
 	framesCount := 0
@@ -58,8 +59,8 @@ func main() {
 			}
 		}
 
-		frameRec.XY.X = frameW * float32(currentFrame)
-		frameRec.XY.Y = frameH * float32(currentLine)
+		frameRec.Position.X = frameW * float32(currentFrame)
+		frameRec.Position.Y = frameH * float32(currentLine)
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
@@ -68,7 +69,7 @@ func main() {
 		rl.DrawText("click left mouse on screen to explode", 20, 20, 20, rl.Black)
 
 		if active {
-			rl.DrawTextureRec(&explosion, frameRec, position, rl.White)
+			rl.DrawTextureRec(explosion, frameRec, position, rl.White)
 		}
 
 		rl.EndDrawing()

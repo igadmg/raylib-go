@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var (
@@ -14,7 +15,7 @@ func main() {
 
 	rl.InitWindow(screenWidth, screenHeight, "raylib [core] example - gestures detection")
 
-	touchPosition := rl.NewVector2(0, 0)
+	touchPosition := vector2.NewFloat32(0, 0)
 	touchArea := rl.NewRectangle(220, 10, float32(screenWidth)-230, float32(screenHeight)-20)
 
 	gestureStrings := make([]string, 0)
@@ -36,7 +37,7 @@ func main() {
 				switch currentGesture {
 				case rl.GestureTap:
 					gestureStrings = append(gestureStrings, "GESTURE TAP")
-				case rl.GestureDoubletap:
+				case rl.GestureDoubleTap:
 					gestureStrings = append(gestureStrings, "GESTURE DOUBLETAP")
 				case rl.GestureHold:
 					gestureStrings = append(gestureStrings, "GESTURE HOLD")

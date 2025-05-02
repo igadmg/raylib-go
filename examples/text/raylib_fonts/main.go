@@ -1,7 +1,9 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const maxFonts = 8
@@ -34,13 +36,13 @@ func main() {
 	}
 
 	spacings := []float32{2, 4, 8, 4, 3, 4, 4, 1}
-	positions := make([]rl.Vector2, maxFonts)
+	positions := make([]vector2.Float32, maxFonts)
 
 	var i int32
 	for i = 0; i < maxFonts; i++ {
-		x := screenWidth/2 - int32(rl.MeasureTextEx(&fonts[i], messages[i], float32(fonts[i].BaseSize*2), spacings[i]).X/2)
+		x := screenWidth/2 - int32(rl.MeasureTextEx(fonts[i], messages[i], float32(fonts[i].BaseSize*2), spacings[i]).X/2)
 		y := 60 + fonts[i].BaseSize + 45*i
-		positions[i] = rl.NewVector2(float32(x), float32(y))
+		positions[i] = vector2.NewFloat32(float32(x), float32(y))
 	}
 
 	// Small Y position corrections
@@ -48,7 +50,7 @@ func main() {
 	positions[4].Y += 2
 	positions[7].Y -= 8
 
-	colors := []rl.Color{rl.Maroon, rl.Orange, rl.DarkGreen, rl.DarkBlue, rl.DarkPurple, rl.Lime, rl.Gold, rl.DarkBrown}
+	colors := []colorex.RGBA{rl.Maroon, rl.Orange, rl.DarkGreen, rl.DarkBlue, rl.DarkPurple, rl.Lime, rl.Gold, rl.DarkBrown}
 
 	rl.SetTargetFPS(60)
 
@@ -60,7 +62,7 @@ func main() {
 		rl.DrawLine(220, 50, 590, 50, rl.DarkGray)
 
 		for i = 0; i < maxFonts; i++ {
-			rl.DrawTextEx(&fonts[i], messages[i], positions[i], float32(fonts[i].BaseSize*2), spacings[i], colors[i])
+			rl.DrawTextEx(fonts[i], messages[i], positions[i], float32(fonts[i].BaseSize*2), spacings[i], colors[i])
 		}
 
 		rl.EndDrawing()

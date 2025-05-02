@@ -1,7 +1,7 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -53,8 +53,8 @@ func main() {
 		rl.ClearBackground(rl.RayWhite)
 
 		rl.BeginShaderMode(shader)
-		rl.DrawTexture(&texture, 0, 0, rl.White)
-		rl.DrawTexture(&texture, texture.Width, 0, rl.White)
+		rl.DrawTexture(texture, 0, 0, rl.White)
+		rl.DrawTexture(texture, texture.Width, 0, rl.White)
 		rl.EndShaderMode()
 
 		rl.EndDrawing()

@@ -21,29 +21,28 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
-)
-
-const (
-	screenWidth  = 800
-	screenHeight = 450
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
+	screenWidth := int32(1280)
+	screenHeight := int32(800)
+
 	rl.InitWindow(screenWidth, screenHeight, "raylib [models] example - model animation")
 
 	camera := rl.Camera{}
-	camera.Position = rl.NewVector3(10.0, 10.0, 10.0)
-	camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
-	camera.Fovy = 45.0
+	camera.Position = vector3.NewFloat32(10.0, 15.0, 10.0)
+	camera.Target = vector3.NewFloat32(0.0, 0.0, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
+	camera.Fovy = 75.0
 	camera.Projection = rl.CameraPerspective
 
 	model := rl.LoadModel("guy.iqm")
 	texture := rl.LoadTexture("guytex.png")
 	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, &texture)
 
-	position := rl.NewVector3(0, 0, 0)
+	position := vector3.NewFloat32(0, 0, 0)
 
 	anims := rl.LoadModelAnimations("guyanim.iqm")
 	animFrameCount := 0
@@ -53,8 +52,7 @@ func main() {
 	rl.SetTargetFPS(60)
 
 	for !rl.WindowShouldClose() {
-
-		rl.UpdateCamera(&camera, rl.CameraFirstPerson)
+		rl.UpdateCamera(&camera, rl.CameraOrbital)
 
 		if rl.IsKeyDown(rl.KeySpace) {
 			animFrameCount++
@@ -71,7 +69,7 @@ func main() {
 		rl.ClearBackground(rl.RayWhite)
 		rl.BeginMode3D(camera)
 
-		rl.DrawModelEx(model, position, rl.NewVector3(1, 0, 0), -90, rl.NewVector3(1, 1, 1), rl.White)
+		rl.DrawModelEx(model, position, vector3.NewFloat32(1, 0, 0), -90, vector3.NewFloat32(1, 1, 1), rl.White)
 		// Draw translation cubes
 		for i := int32(0); i < model.BoneCount; i++ {
 			pose := anims[0].GetFramePose(animFrameCount, int(i))

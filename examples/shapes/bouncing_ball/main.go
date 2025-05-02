@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -12,8 +13,8 @@ func main() {
 
 	rl.InitWindow(screenWidth, screenHeight, "raylib [shapes] example - bouncing ball")
 
-	ballPos := rl.NewVector2(float32(screenWidth)/2, float32(screenHeight)/2)
-	ballSpeed := rl.NewVector2(5, 4)
+	ballPos := vector2.NewFloat32(float32(screenWidth)/2, float32(screenHeight)/2)
+	ballSpeed := vector2.NewFloat32(5, 4)
 	ballRadius := 20
 
 	pause := false

@@ -1,7 +1,9 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const (
@@ -9,8 +11,8 @@ const (
 )
 
 type particle struct {
-	Position rl.Vector2
-	Color    rl.Color
+	Position vector2.Float32
+	Color    colorex.RGBA
 	Alpha    float32
 	Size     float32
 	Rotation float32
@@ -29,7 +31,7 @@ func main() {
 
 	// Initialize particles
 	for i := 0; i < maxParticles; i++ {
-		mouseTail[i].Position = rl.NewVector2(0, 0)
+		mouseTail[i].Position = vector2.NewFloat32(0, 0)
 		mouseTail[i].Color = rl.NewColor(byte(rl.GetRandomValue(0, 255)), byte(rl.GetRandomValue(0, 255)), byte(rl.GetRandomValue(0, 255)), 255)
 		mouseTail[i].Alpha = 1.0
 		mouseTail[i].Size = float32(rl.GetRandomValue(1, 30)) / 20.0
@@ -94,10 +96,10 @@ func main() {
 		for i := 0; i < maxParticles; i++ {
 			if mouseTail[i].Active {
 				rl.DrawTexturePro(
-					&smoke,
+					smoke,
 					rl.NewRectangle(0, 0, float32(smoke.Width), float32(smoke.Height)),
 					rl.NewRectangle(mouseTail[i].Position.X, mouseTail[i].Position.Y, float32(smoke.Width)*mouseTail[i].Size, float32(smoke.Height)*mouseTail[i].Size),
-					rl.NewVector2(float32(smoke.Width)*mouseTail[i].Size/2, float32(smoke.Height)*mouseTail[i].Size/2),
+					vector2.NewFloat32(float32(smoke.Width)*mouseTail[i].Size/2, float32(smoke.Height)*mouseTail[i].Size/2),
 					mouseTail[i].Rotation,
 					rl.Fade(mouseTail[i].Color, mouseTail[i].Alpha),
 				)

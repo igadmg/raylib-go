@@ -3,7 +3,8 @@ package main
 import (
 	//"fmt"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -13,22 +14,22 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [models] example - heightmap loading and drawing")
 
 	camera := rl.Camera{}
-	camera.Position = rl.NewVector3(18.0, 16.0, 18.0)
-	camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	camera.Position = vector3.NewFloat32(18.0, 16.0, 18.0)
+	camera.Target = vector3.NewFloat32(0.0, 0.0, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
 	camera.Fovy = 45.0
 
 	image := rl.LoadImage("heightmap.png")    // Load heightmap image (RAM)
 	texture := rl.LoadTextureFromImage(image) // Convert image to texture (VRAM)
 
-	mesh := rl.GenMeshHeightmap(*image, rl.NewVector3(16, 8, 16)) // Generate heightmap mesh (RAM and VRAM)
-	model := rl.LoadModelFromMesh(mesh)                           // Load model from generated mesh
+	mesh := rl.GenMeshHeightmap(image, vector3.NewFloat32(16, 8, 16)) // Generate heightmap mesh (RAM and VRAM)
+	model := rl.LoadModelFromMesh(mesh)                               // Load model from generated mesh
 
 	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, &texture) // Set map diffuse texture
 
-	mapPosition := rl.NewVector3(-8.0, 0.0, -8.0) // Set model position
+	mapPosition := vector3.NewFloat32(-8.0, 0.0, -8.0) // Set model position
 
-	rl.UnloadImage(image) // Unload heightmap image from RAM, already uploaded to VRAM
+	rl.UnloadImage(&image) // Unload heightmap image from RAM, already uploaded to VRAM
 
 	rl.SetTargetFPS(60)
 
@@ -51,7 +52,7 @@ func main() {
 
 		rl.EndMode3D()
 
-		rl.DrawTexture(&texture, screenWidth-texture.Width-20, 20, rl.White)
+		rl.DrawTexture(texture, screenWidth-texture.Width-20, 20, rl.White)
 		rl.DrawRectangleLines(screenWidth-texture.Width-20, 20, texture.Width, texture.Height, rl.Green)
 
 		rl.DrawFPS(10, 10)

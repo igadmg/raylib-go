@@ -1,7 +1,7 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var (
@@ -21,8 +21,8 @@ func main() {
 	fgImg := rl.LoadImage("cyberpunk_street_foreground.png")
 	fgTex := rl.LoadTextureFromImage(fgImg)
 
-	rl.UnloadImage(bgImg)
-	rl.UnloadImage(fgImg)
+	rl.UnloadImage(&bgImg)
+	rl.UnloadImage(&fgImg)
 
 	rl.SetTargetFPS(60)
 
@@ -40,9 +40,9 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTexture(&bgTex, screenW/2-bgTex.Width/2, screenH/2-bgTex.Height/2, rl.White)
+		rl.DrawTexture(bgTex, screenW/2-bgTex.Width/2, screenH/2-bgTex.Height/2, rl.White)
 		rl.BeginBlendMode(rl.BlendMode(blendMode))
-		rl.DrawTexture(&fgTex, screenW/2-fgTex.Width/2, screenH/2-fgTex.Height/2, rl.White)
+		rl.DrawTexture(fgTex, screenW/2-fgTex.Width/2, screenH/2-fgTex.Height/2, rl.White)
 		rl.EndBlendMode()
 
 		txt := "Press SPACE to change blend modes"

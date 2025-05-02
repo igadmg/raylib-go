@@ -4,6 +4,7 @@ package rl
 #include "raylib.h"
 */
 import "C"
+import "github.com/igadmg/gamemath/vector2"
 
 // SetGesturesEnabled - Enable a set of gestures using flags
 func SetGesturesEnabled(gestureFlags uint32) {
@@ -24,7 +25,7 @@ func GetGestureDetected() Gestures {
 	return (Gestures)(ret)
 }
 
-func GetGestureTapPosition() Vector2 {
+func GetGestureTapPosition() vector2.Float32 {
 	ret := C.GetGestureTapPosition()
 	return *govec2ptr(&ret)
 }
@@ -60,7 +61,7 @@ func GetGestureSwipeAngle() float32 {
 }
 
 // GetGestureDragVector - Get gesture drag vector
-func GetGestureDragVector() Vector2 {
+func GetGestureDragVector() vector2.Float32 {
 	ret := C.GetGestureDragVector()
 	return *govec2ptr(&ret)
 }
@@ -72,7 +73,7 @@ func GetGestureDragAngle() float32 {
 }
 
 // GetGesturePinchVector - Get gesture pinch delta
-func GetGesturePinchVector() Vector2 {
+func GetGesturePinchVector() vector2.Float32 {
 	ret := C.GetGesturePinchVector()
 	return *govec2ptr(&ret)
 }

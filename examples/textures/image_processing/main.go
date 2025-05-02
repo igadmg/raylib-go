@@ -1,7 +1,7 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const numProcesses = 8
@@ -35,9 +35,9 @@ func main() {
 
 	rl.InitWindow(screenWidth, screenHeight, "raylib [textures] example - image processing")
 
-	image := rl.LoadImage("parrots.png")           // Loaded in CPU memory (RAM)
-	rl.ImageFormat(image, rl.UncompressedR8g8b8a8) // Format image to RGBA 32bit (required for texture update)
-	texture := rl.LoadTextureFromImage(image)      // Image converted to texture, GPU memory (VRAM)
+	image := rl.LoadImage("parrots.png")            // Loaded in CPU memory (RAM)
+	rl.ImageFormat(&image, rl.UncompressedR8g8b8a8) // Format image to RGBA 32bit (required for texture update)
+	texture := rl.LoadTextureFromImage(image)       // Image converted to texture, GPU memory (VRAM)
 
 	currentProcess := None
 	textureReload := false
@@ -66,7 +66,7 @@ func main() {
 		}
 
 		if textureReload {
-			rl.UnloadImage(image)               // Unload current image data
+			rl.UnloadImage(&image)              // Unload current image data
 			image = rl.LoadImage("parrots.png") // Re-load image data
 
 			// NOTE: Image processing is a costly CPU process to be done every frame,
@@ -74,32 +74,32 @@ func main() {
 			// with a texture and by shaders
 			switch currentProcess {
 			case ColorGrayscale:
-				rl.ImageColorGrayscale(image)
+				rl.ImageColorGrayscale(&image)
 				break
 			case ColorTint:
-				rl.ImageColorTint(image, rl.Green)
+				rl.ImageColorTint(&image, rl.Green)
 				break
 			case ColorInvert:
-				rl.ImageColorInvert(image)
+				rl.ImageColorInvert(&image)
 				break
 			case ColorContrast:
-				rl.ImageColorContrast(image, -40)
+				rl.ImageColorContrast(&image, -40)
 				break
 			case ColorBrightness:
-				rl.ImageColorBrightness(image, -80)
+				rl.ImageColorBrightness(&image, -80)
 				break
 			case FlipVertical:
-				rl.ImageFlipVertical(image)
+				rl.ImageFlipVertical(&image)
 				break
 			case FlipHorizontal:
-				rl.ImageFlipHorizontal(image)
+				rl.ImageFlipHorizontal(&image)
 				break
 			default:
 				break
 			}
 
 			pixels := rl.LoadImageColors(image) // Get pixel data from image (RGBA 32bit)
-			rl.UpdateTexture(texture, pixels)   // Update texture with new image data
+			rl.UpdateTexture(&texture, pixels)  // Update texture with new image data
 
 			textureReload = false
 		}
@@ -114,16 +114,16 @@ func main() {
 		for i := 0; i < numProcesses; i++ {
 			if i == currentProcess {
 				rl.DrawRectangleRec(selectRecs[i], rl.SkyBlue)
-				rl.DrawRectangleLines(int32(selectRecs[i].XY.X), int32(selectRecs[i].XY.Y), int32(selectRecs[i].WH.X), int32(selectRecs[i].WH.Y), rl.Blue)
-				rl.DrawText(processText[i], int32(selectRecs[i].XY.X+selectRecs[i].WH.X/2)-rl.MeasureText(processText[i], 10)/2, int32(selectRecs[i].XY.Y)+11, 10, rl.DarkBlue)
+				rl.DrawRectangleLines(int32(selectRecs[i].Position.X), int32(selectRecs[i].Position.Y), int32(selectRecs[i].Size.X), int32(selectRecs[i].Size.Y), rl.Blue)
+				rl.DrawText(processText[i], int32(selectRecs[i].Position.X+selectRecs[i].Size.X/2)-rl.MeasureText(processText[i], 10)/2, int32(selectRecs[i].Position.Y)+11, 10, rl.DarkBlue)
 			} else {
 				rl.DrawRectangleRec(selectRecs[i], rl.LightGray)
-				rl.DrawRectangleLines(int32(selectRecs[i].XY.X), int32(selectRecs[i].XY.Y), int32(selectRecs[i].WH.X), int32(selectRecs[i].WH.Y), rl.Gray)
-				rl.DrawText(processText[i], int32(selectRecs[i].XY.X+selectRecs[i].WH.X/2)-rl.MeasureText(processText[i], 10)/2, int32(selectRecs[i].XY.Y)+11, 10, rl.DarkGray)
+				rl.DrawRectangleLines(int32(selectRecs[i].Position.X), int32(selectRecs[i].Position.Y), int32(selectRecs[i].Size.X), int32(selectRecs[i].Size.Y), rl.Gray)
+				rl.DrawText(processText[i], int32(selectRecs[i].Position.X+selectRecs[i].Size.X/2)-rl.MeasureText(processText[i], 10)/2, int32(selectRecs[i].Position.Y)+11, 10, rl.DarkGray)
 			}
 		}
 
-		rl.DrawTexture(&texture, screenWidth-texture.Width-60, screenHeight/2-texture.Height/2, rl.White)
+		rl.DrawTexture(texture, screenWidth-texture.Width-60, screenHeight/2-texture.Height/2, rl.White)
 		rl.DrawRectangleLines(screenWidth-texture.Width-60, screenHeight/2-texture.Height/2, texture.Width, texture.Height, rl.Black)
 
 		rl.EndDrawing()

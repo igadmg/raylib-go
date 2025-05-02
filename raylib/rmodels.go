@@ -7,15 +7,16 @@ package rl
 import "C"
 
 import (
-	"runtime"
-	"slices"
 	"unsafe"
 
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
 	"github.com/igadmg/goex/image/colorex"
 )
 
 // DrawLine3D - Draw a line in 3D world space
-func DrawLine3D(startPos Vector3, endPos Vector3, col colorex.RGBA) {
+func DrawLine3D(startPos vector3.Float32, endPos vector3.Float32, col colorex.RGBA) {
 	cstartPos := cvec3ptr(&startPos)
 	cendPos := cvec3ptr(&endPos)
 	ccolor := ccolorptr(&col)
@@ -23,14 +24,14 @@ func DrawLine3D(startPos Vector3, endPos Vector3, col colorex.RGBA) {
 }
 
 // DrawPoint3D - Draw a point in 3D space, actually a small line
-func DrawPoint3D(position Vector3, col colorex.RGBA) {
+func DrawPoint3D(position vector3.Float32, col colorex.RGBA) {
 	cposition := cvec3ptr(&position)
 	ccolor := ccolorptr(&col)
 	C.DrawPoint3D(*cposition, *ccolor)
 }
 
 // DrawCircle3D - Draw a circle in 3D world space
-func DrawCircle3D(center Vector3, radius float32, rotationAxis Vector3, rotationAngle float32, col colorex.RGBA) {
+func DrawCircle3D(center vector3.Float32, radius float32, rotationAxis vector3.Float32, rotationAngle float32, col colorex.RGBA) {
 	ccenter := cvec3ptr(&center)
 	cradius := (C.float)(radius)
 	crotationAxis := cvec3ptr(&rotationAxis)
@@ -40,7 +41,7 @@ func DrawCircle3D(center Vector3, radius float32, rotationAxis Vector3, rotation
 }
 
 // DrawTriangle3D - Draw a color-filled triangle (vertex in counter-clockwise order!)
-func DrawTriangle3D(v1 Vector3, v2 Vector3, v3 Vector3, col colorex.RGBA) {
+func DrawTriangle3D(v1 vector3.Float32, v2 vector3.Float32, v3 vector3.Float32, col colorex.RGBA) {
 	cv1 := cvec3ptr(&v1)
 	cv2 := cvec3ptr(&v2)
 	cv3 := cvec3ptr(&v3)
@@ -49,7 +50,7 @@ func DrawTriangle3D(v1 Vector3, v2 Vector3, v3 Vector3, col colorex.RGBA) {
 }
 
 // DrawCube - Draw cube
-func DrawCube(position Vector3, width float32, height float32, length float32, col colorex.RGBA) {
+func DrawCube(position vector3.Float32, width float32, height float32, length float32, col colorex.RGBA) {
 	cposition := cvec3ptr(&position)
 	cwidth := (C.float)(width)
 	cheight := (C.float)(height)
@@ -59,7 +60,7 @@ func DrawCube(position Vector3, width float32, height float32, length float32, c
 }
 
 // DrawCubeV - Draw cube (Vector version)
-func DrawCubeV(position Vector3, size Vector3, col colorex.RGBA) {
+func DrawCubeV(position vector3.Float32, size vector3.Float32, col colorex.RGBA) {
 	cposition := cvec3ptr(&position)
 	csize := cvec3ptr(&size)
 	ccolor := ccolorptr(&col)
@@ -67,7 +68,7 @@ func DrawCubeV(position Vector3, size Vector3, col colorex.RGBA) {
 }
 
 // DrawCubeWires - Draw cube wires
-func DrawCubeWires(position Vector3, width float32, height float32, length float32, col colorex.RGBA) {
+func DrawCubeWires(position vector3.Float32, width float32, height float32, length float32, col colorex.RGBA) {
 	cposition := cvec3ptr(&position)
 	cwidth := (C.float)(width)
 	cheight := (C.float)(height)
@@ -77,7 +78,7 @@ func DrawCubeWires(position Vector3, width float32, height float32, length float
 }
 
 // DrawCubeWiresV - Draw cube wires (Vector version)
-func DrawCubeWiresV(position Vector3, size Vector3, col colorex.RGBA) {
+func DrawCubeWiresV(position vector3.Float32, size vector3.Float32, col colorex.RGBA) {
 	cposition := cvec3ptr(&position)
 	csize := cvec3ptr(&size)
 	ccolor := ccolorptr(&col)
@@ -85,7 +86,7 @@ func DrawCubeWiresV(position Vector3, size Vector3, col colorex.RGBA) {
 }
 
 // DrawSphere - Draw sphere
-func DrawSphere(centerPos Vector3, radius float32, col colorex.RGBA) {
+func DrawSphere(centerPos vector3.Float32, radius float32, col colorex.RGBA) {
 	ccenterPos := cvec3ptr(&centerPos)
 	cradius := (C.float)(radius)
 	ccolor := ccolorptr(&col)
@@ -93,7 +94,7 @@ func DrawSphere(centerPos Vector3, radius float32, col colorex.RGBA) {
 }
 
 // DrawSphereEx - Draw sphere with extended parameters
-func DrawSphereEx(centerPos Vector3, radius float32, rings int32, slices int32, col colorex.RGBA) {
+func DrawSphereEx(centerPos vector3.Float32, radius float32, rings int32, slices int32, col colorex.RGBA) {
 	ccenterPos := cvec3ptr(&centerPos)
 	cradius := (C.float)(radius)
 	crings := (C.int)(rings)
@@ -103,7 +104,7 @@ func DrawSphereEx(centerPos Vector3, radius float32, rings int32, slices int32, 
 }
 
 // DrawSphereWires - Draw sphere wires
-func DrawSphereWires(centerPos Vector3, radius float32, rings int32, slices int32, col colorex.RGBA) {
+func DrawSphereWires(centerPos vector3.Float32, radius float32, rings int32, slices int32, col colorex.RGBA) {
 	ccenterPos := cvec3ptr(&centerPos)
 	cradius := (C.float)(radius)
 	crings := (C.int)(rings)
@@ -113,7 +114,7 @@ func DrawSphereWires(centerPos Vector3, radius float32, rings int32, slices int3
 }
 
 // DrawCylinder - Draw a cylinder/cone
-func DrawCylinder(position Vector3, radiusTop float32, radiusBottom float32, height float32, slices int32, col colorex.RGBA) {
+func DrawCylinder(position vector3.Float32, radiusTop float32, radiusBottom float32, height float32, slices int32, col colorex.RGBA) {
 	cposition := cvec3ptr(&position)
 	cradiusTop := (C.float)(radiusTop)
 	cradiusBottom := (C.float)(radiusBottom)
@@ -124,7 +125,7 @@ func DrawCylinder(position Vector3, radiusTop float32, radiusBottom float32, hei
 }
 
 // DrawCylinderEx - Draw a cylinder with base at startPos and top at endPos
-func DrawCylinderEx(startPos Vector3, endPos Vector3, startRadius float32, endRadius float32, sides int32, col colorex.RGBA) {
+func DrawCylinderEx(startPos vector3.Float32, endPos vector3.Float32, startRadius float32, endRadius float32, sides int32, col colorex.RGBA) {
 	cstartPos := cvec3ptr(&startPos)
 	cendPos := cvec3ptr(&endPos)
 	cstartRadius := (C.float)(startRadius)
@@ -135,7 +136,7 @@ func DrawCylinderEx(startPos Vector3, endPos Vector3, startRadius float32, endRa
 }
 
 // DrawCylinderWires - Draw a cylinder/cone wires
-func DrawCylinderWires(position Vector3, radiusTop float32, radiusBottom float32, height float32, slices int32, col colorex.RGBA) {
+func DrawCylinderWires(position vector3.Float32, radiusTop float32, radiusBottom float32, height float32, slices int32, col colorex.RGBA) {
 	cposition := cvec3ptr(&position)
 	cradiusTop := (C.float)(radiusTop)
 	cradiusBottom := (C.float)(radiusBottom)
@@ -146,7 +147,7 @@ func DrawCylinderWires(position Vector3, radiusTop float32, radiusBottom float32
 }
 
 // DrawCylinderWiresEx - Draw a cylinder wires with base at startPos and top at endPos
-func DrawCylinderWiresEx(startPos Vector3, endPos Vector3, startRadius float32, endRadius float32, sides int32, col colorex.RGBA) {
+func DrawCylinderWiresEx(startPos vector3.Float32, endPos vector3.Float32, startRadius float32, endRadius float32, sides int32, col colorex.RGBA) {
 	cstartPos := cvec3ptr(&startPos)
 	cendPos := cvec3ptr(&endPos)
 	cstartRadius := (C.float)(startRadius)
@@ -157,7 +158,7 @@ func DrawCylinderWiresEx(startPos Vector3, endPos Vector3, startRadius float32, 
 }
 
 // DrawCapsule - Draw a capsule with the center of its sphere caps at startPos and endPos
-func DrawCapsule(startPos, endPos Vector3, radius float32, slices, rings int32, col colorex.RGBA) {
+func DrawCapsule(startPos, endPos vector3.Float32, radius float32, slices, rings int32, col colorex.RGBA) {
 	cstartPos := cvec3ptr(&startPos)
 	cendPos := cvec3ptr(&endPos)
 	cradius := (C.float)(radius)
@@ -168,7 +169,7 @@ func DrawCapsule(startPos, endPos Vector3, radius float32, slices, rings int32, 
 }
 
 // DrawCapsuleWires - Draw capsule wireframe with the center of its sphere caps at startPos and endPos
-func DrawCapsuleWires(startPos, endPos Vector3, radius float32, slices, rings int32, col colorex.RGBA) {
+func DrawCapsuleWires(startPos, endPos vector3.Float32, radius float32, slices, rings int32, col colorex.RGBA) {
 	cstartPos := cvec3ptr(&startPos)
 	cendPos := cvec3ptr(&endPos)
 	cradius := (C.float)(radius)
@@ -179,7 +180,7 @@ func DrawCapsuleWires(startPos, endPos Vector3, radius float32, slices, rings in
 }
 
 // DrawPlane - Draw a plane XZ
-func DrawPlane(centerPos Vector3, size Vector2, col colorex.RGBA) {
+func DrawPlane(centerPos vector3.Float32, size vector2.Float32, col colorex.RGBA) {
 	ccenterPos := cvec3ptr(&centerPos)
 	csize := cvec2ptr(&size)
 	ccolor := ccolorptr(&col)
@@ -236,7 +237,7 @@ func GetModelBoundingBox(model Model) BoundingBox {
 }
 
 // DrawModel - Draw a model (with texture if set)
-func DrawModel(model Model, position Vector3, scale float32, tint colorex.RGBA) {
+func DrawModel(model Model, position vector3.Float32, scale float32, tint colorex.RGBA) {
 	cmodel := model.cptr()
 	cposition := cvec3ptr(&position)
 	cscale := (C.float)(scale)
@@ -245,7 +246,7 @@ func DrawModel(model Model, position Vector3, scale float32, tint colorex.RGBA) 
 }
 
 // DrawModelEx - Draw a model with extended parameters
-func DrawModelEx(model Model, position Vector3, rotationAxis Vector3, rotationAngle float32, scale Vector3, tint colorex.RGBA) {
+func DrawModelEx(model Model, position vector3.Float32, rotationAxis vector3.Float32, rotationAngle float32, scale vector3.Float32, tint colorex.RGBA) {
 	cmodel := model.cptr()
 	cposition := cvec3ptr(&position)
 	crotationAxis := cvec3ptr(&rotationAxis)
@@ -256,7 +257,7 @@ func DrawModelEx(model Model, position Vector3, rotationAxis Vector3, rotationAn
 }
 
 // DrawModelWires - Draw a model wires (with texture if set)
-func DrawModelWires(model Model, position Vector3, scale float32, tint colorex.RGBA) {
+func DrawModelWires(model Model, position vector3.Float32, scale float32, tint colorex.RGBA) {
 	cmodel := model.cptr()
 	cposition := cvec3ptr(&position)
 	cscale := (C.float)(scale)
@@ -265,7 +266,7 @@ func DrawModelWires(model Model, position Vector3, scale float32, tint colorex.R
 }
 
 // DrawModelWiresEx - Draw a model wires (with texture if set) with extended parameters
-func DrawModelWiresEx(model Model, position Vector3, rotationAxis Vector3, rotationAngle float32, scale Vector3, tint colorex.RGBA) {
+func DrawModelWiresEx(model Model, position vector3.Float32, rotationAxis vector3.Float32, rotationAngle float32, scale vector3.Float32, tint colorex.RGBA) {
 	cmodel := model.cptr()
 	cposition := cvec3ptr(&position)
 	crotationAxis := cvec3ptr(&rotationAxis)
@@ -276,22 +277,22 @@ func DrawModelWiresEx(model Model, position Vector3, rotationAxis Vector3, rotat
 }
 
 // DrawModelPoints - Draw a model as points
-func DrawModelPoints(model Model, position Vector3, scale float32, tint color.RGBA) {
+func DrawModelPoints(model Model, position vector3.Float32, scale float32, tint colorex.RGBA) {
 	cmodel := model.cptr()
-	cposition := position.cptr()
+	cposition := cvec3ptr(&position)
 	cscale := (C.float)(scale)
-	ctint := colorCptr(tint)
+	ctint := ccolorptr(&tint)
 	C.DrawModelPoints(*cmodel, *cposition, cscale, *ctint)
 }
 
 // DrawModelPointsEx - Draw a model as points with extended parameters
-func DrawModelPointsEx(model Model, position Vector3, rotationAxis Vector3, rotationAngle float32, scale Vector3, tint color.RGBA) {
+func DrawModelPointsEx(model Model, position vector3.Float32, rotationAxis vector3.Float32, rotationAngle float32, scale vector3.Float32, tint colorex.RGBA) {
 	cmodel := model.cptr()
-	cposition := position.cptr()
-	crotationAxis := rotationAxis.cptr()
+	cposition := cvec3ptr(&position)
+	crotationAxis := cvec3ptr(&rotationAxis)
 	crotationAngle := (C.float)(rotationAngle)
-	cscale := scale.cptr()
-	ctint := colorCptr(tint)
+	cscale := cvec3ptr(&scale)
+	ctint := ccolorptr(&tint)
 	C.DrawModelPointsEx(*cmodel, *cposition, *crotationAxis, crotationAngle, *cscale, *ctint)
 }
 
@@ -303,7 +304,7 @@ func DrawBoundingBox(box BoundingBox, col colorex.RGBA) {
 }
 
 // DrawBillboard - Draw a billboard texture
-func DrawBillboard(camera Camera, texture Texture2D, center Vector3, scale float32, tint colorex.RGBA) {
+func DrawBillboard(camera Camera, texture Texture2D, center vector3.Float32, scale float32, tint colorex.RGBA) {
 	ccamera := camera.cptr()
 	ctexture := texture.cptr()
 	ccenter := cvec3ptr(&center)
@@ -313,7 +314,7 @@ func DrawBillboard(camera Camera, texture Texture2D, center Vector3, scale float
 }
 
 // DrawBillboardRec - Draw a billboard texture defined by sourceRec
-func DrawBillboardRec(camera Camera, texture Texture2D, sourceRec Rectangle, center Vector3, size Vector2, tint colorex.RGBA) {
+func DrawBillboardRec(camera Camera, texture Texture2D, sourceRec rect2.Float32, center vector3.Float32, size vector2.Float32, tint colorex.RGBA) {
 	ccamera := camera.cptr()
 	ctexture := texture.cptr()
 	csourceRec := crect2ptr(&sourceRec)
@@ -324,7 +325,7 @@ func DrawBillboardRec(camera Camera, texture Texture2D, sourceRec Rectangle, cen
 }
 
 // DrawBillboardPro - Draw a billboard texture with pro parameters
-func DrawBillboardPro(camera Camera, texture Texture2D, sourceRec Rectangle, position Vector3, up Vector3, size Vector2, origin Vector2, rotation float32, tint colorex.RGBA) {
+func DrawBillboardPro(camera Camera, texture Texture2D, sourceRec rect2.Float32, position vector3.Float32, up vector3.Float32, size vector2.Float32, origin vector2.Float32, rotation float32, tint colorex.RGBA) {
 	ccamera := camera.cptr()
 	ctexture := texture.cptr()
 	csourceRec := crect2ptr(&sourceRec)
@@ -483,7 +484,7 @@ func GenMeshKnot(radius, size float32, radSeg, sides int) Mesh {
 }
 
 // GenMeshHeightmap - Generate heightmap mesh from image data
-func GenMeshHeightmap(heightmap Image, size Vector3) Mesh {
+func GenMeshHeightmap(heightmap Image, size vector3.Float32) Mesh {
 	cheightmap := heightmap.cptr()
 	csize := cvec3ptr(&size)
 
@@ -492,7 +493,7 @@ func GenMeshHeightmap(heightmap Image, size Vector3) Mesh {
 }
 
 // GenMeshCubicmap - Generate cubes-based map mesh from image data
-func GenMeshCubicmap(cubicmap Image, size Vector3) Mesh {
+func GenMeshCubicmap(cubicmap Image, size vector3.Float32) Mesh {
 	ccubicmap := cubicmap.cptr()
 	csize := cvec3ptr(&size)
 
@@ -591,7 +592,7 @@ func IsModelAnimationValid(model Model, anim ModelAnimation) bool {
 }
 
 // CheckCollisionSpheres - Detect collision between two spheres
-func CheckCollisionSpheres(centerA Vector3, radiusA float32, centerB Vector3, radiusB float32) bool {
+func CheckCollisionSpheres(centerA vector3.Float32, radiusA float32, centerB vector3.Float32, radiusB float32) bool {
 	ccenterA := cvec3ptr(&centerA)
 	cradiusA := (C.float)(radiusA)
 	ccenterB := cvec3ptr(&centerB)
@@ -611,7 +612,7 @@ func CheckCollisionBoxes(box1 BoundingBox, box2 BoundingBox) bool {
 }
 
 // CheckCollisionBoxSphere - Detect collision between box and sphere
-func CheckCollisionBoxSphere(box BoundingBox, centerSphere Vector3, radiusSphere float32) bool {
+func CheckCollisionBoxSphere(box BoundingBox, centerSphere vector3.Float32, radiusSphere float32) bool {
 	cbox := box.cptr()
 	ccenterSphere := cvec3ptr(&centerSphere)
 	cradiusSphere := (C.float)(radiusSphere)
@@ -621,7 +622,7 @@ func CheckCollisionBoxSphere(box BoundingBox, centerSphere Vector3, radiusSphere
 }
 
 // GetRayCollisionSphere - Get collision info between ray and sphere
-func GetRayCollisionSphere(ray Ray, center Vector3, radius float32) RayCollision {
+func GetRayCollisionSphere(ray Ray, center vector3.Float32, radius float32) RayCollision {
 	cray := ray.cptr()
 	ccenter := cvec3ptr(&center)
 	cradius := (C.float)(radius)
@@ -647,7 +648,7 @@ func GetRayCollisionMesh(ray Ray, mesh Mesh, transform Matrix) RayCollision {
 }
 
 // GetRayCollisionTriangle - Get collision info between ray and triangle
-func GetRayCollisionTriangle(ray Ray, p1, p2, p3 Vector3) RayCollision {
+func GetRayCollisionTriangle(ray Ray, p1, p2, p3 vector3.Float32) RayCollision {
 	cray := ray.cptr()
 	cp1 := cvec3ptr(&p1)
 	cp2 := cvec3ptr(&p2)
@@ -657,7 +658,7 @@ func GetRayCollisionTriangle(ray Ray, p1, p2, p3 Vector3) RayCollision {
 }
 
 // GetRayCollisionQuad - Get collision info between ray and quad
-func GetRayCollisionQuad(ray Ray, p1, p2, p3, p4 Vector3) RayCollision {
+func GetRayCollisionQuad(ray Ray, p1, p2, p3, p4 vector3.Float32) RayCollision {
 	cray := ray.cptr()
 	cp1 := cvec3ptr(&p1)
 	cp2 := cvec3ptr(&p2)

@@ -5,7 +5,8 @@ import (
 	"slices"
 	"unsafe"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var supportedFileTypes = []string{
@@ -24,9 +25,9 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [models] example - obj model loading")
 
 	camera := rl.Camera{}
-	camera.Position = rl.NewVector3(50.0, 50.0, 50.0)
-	camera.Target = rl.NewVector3(0.0, 10.0, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	camera.Position = vector3.NewFloat32(50.0, 50.0, 50.0)
+	camera.Target = vector3.NewFloat32(0.0, 10.0, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
 	camera.Fovy = 45.0
 	camera.Projection = rl.CameraPerspective
 

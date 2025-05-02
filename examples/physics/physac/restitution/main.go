@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/physics"
-	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/raylib-go/physics"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const (
@@ -24,16 +25,16 @@ func main() {
 	physics.Init()
 
 	// Create floor rectangle physics body
-	floor := physics.NewBodyRectangle(rl.NewVector2(screenWidth/2, screenHeight), screenWidth, 100, 10)
+	floor := physics.NewBodyRectangle(vector2.NewFloat32(screenWidth/2, screenHeight), screenWidth, 100, 10)
 	floor.Enabled = false // Disable body state to convert it to static (no dynamics, but collisions)
 	floor.Restitution = 1
 
 	// Create circles physics body
-	circleA := physics.NewBodyCircle(rl.NewVector2(screenWidth*0.25, screenHeight/2), 30, 10)
+	circleA := physics.NewBodyCircle(vector2.NewFloat32(screenWidth*0.25, screenHeight/2), 30, 10)
 	circleA.Restitution = 0
-	circleB := physics.NewBodyCircle(rl.NewVector2(screenWidth*0.5, screenHeight/2), 30, 10)
+	circleB := physics.NewBodyCircle(vector2.NewFloat32(screenWidth*0.5, screenHeight/2), 30, 10)
 	circleB.Restitution = 0.5
-	circleC := physics.NewBodyCircle(rl.NewVector2(screenWidth*0.75, screenHeight/2), 30, 10)
+	circleC := physics.NewBodyCircle(vector2.NewFloat32(screenWidth*0.75, screenHeight/2), 30, 10)
 	circleC.Restitution = 1
 
 	rl.SetTargetFPS(60)
@@ -44,12 +45,12 @@ func main() {
 
 		if rl.IsKeyPressed(rl.KeyR) { // Reset physics input
 			// Reset circles physics bodies position and velocity
-			circleA.Position = rl.NewVector2(screenWidth*0.25, screenHeight/2)
-			circleA.Velocity = rl.NewVector2(0, 0)
-			circleB.Position = rl.NewVector2(screenWidth*0.5, screenHeight/2)
-			circleB.Velocity = rl.NewVector2(0, 0)
-			circleC.Position = rl.NewVector2(screenWidth*0.75, screenHeight/2)
-			circleC.Velocity = rl.NewVector2(0, 0)
+			circleA.Position = vector2.NewFloat32(screenWidth*0.25, screenHeight/2)
+			circleA.Velocity = vector2.NewFloat32(0, 0)
+			circleB.Position = vector2.NewFloat32(screenWidth*0.5, screenHeight/2)
+			circleB.Velocity = vector2.NewFloat32(0, 0)
+			circleC.Position = vector2.NewFloat32(screenWidth*0.75, screenHeight/2)
+			circleC.Velocity = vector2.NewFloat32(0, 0)
 		}
 
 		rl.BeginDrawing()

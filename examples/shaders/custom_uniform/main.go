@@ -1,7 +1,9 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -13,9 +15,9 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [shaders] example - custom uniform variable")
 
 	camera := rl.Camera{}
-	camera.Position = rl.NewVector3(8.0, 8.0, 8.0)
-	camera.Target = rl.NewVector3(0.0, 1.5, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	camera.Position = vector3.NewFloat32(8.0, 8.0, 8.0)
+	camera.Target = vector3.NewFloat32(0.0, 1.5, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
 	camera.Fovy = 45.0
 	camera.Projection = rl.CameraPerspective
 
@@ -24,7 +26,7 @@ func main() {
 
 	rl.SetMaterialTexture(obj.Materials, rl.MapDiffuse, &texture) // Set obj model diffuse texture
 
-	position := rl.NewVector3(0.0, 0.0, 0.0) // Set model position
+	position := vector3.NewFloat32(0.0, 0.0, 0.0) // Set model position
 
 	shader := rl.LoadShader("", "glsl330/swirl.fs")
 
@@ -61,7 +63,7 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.BeginTextureMode(&target) // Enable drawing to texture
+		rl.BeginTextureMode(target) // Enable drawing to texture
 
 		rl.ClearBackground(rl.RayWhite)
 
@@ -80,7 +82,7 @@ func main() {
 		rl.BeginShaderMode(shader)
 
 		// NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
-		rl.DrawTextureRec(&target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)), rl.NewVector2(0, 0), rl.White)
+		rl.DrawTextureRec(target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)), vector2.NewFloat32(0, 0), rl.White)
 
 		rl.EndShaderMode()
 

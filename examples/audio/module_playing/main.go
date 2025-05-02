@@ -1,17 +1,19 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const maxCircles = 64
 
 type circleWave struct {
-	Position rl.Vector2
+	Position vector2.Float32
 	Radius   float32
 	Alpha    float32
 	Speed    float32
-	Color    rl.Color
+	Color    colorex.RGBA
 }
 
 func main() {
@@ -24,7 +26,7 @@ func main() {
 
 	rl.InitAudioDevice()
 
-	colors := []rl.Color{
+	colors := []colorex.RGBA{
 		rl.Orange, rl.Red, rl.Gold, rl.Lime, rl.Blue,
 		rl.Violet, rl.Brown, rl.LightGray, rl.Pink,
 		rl.Yellow, rl.Green, rl.SkyBlue, rl.Purple, rl.Beige,
@@ -40,7 +42,7 @@ func main() {
 
 		x := rl.GetRandomValue(int32(c.Radius), screenWidth-int32(c.Radius))
 		y := rl.GetRandomValue(int32(c.Radius), screenHeight-int32(c.Radius))
-		c.Position = rl.NewVector2(float32(x), float32(y))
+		c.Position = vector2.NewFloat32(float32(x), float32(y))
 
 		c.Speed = float32(rl.GetRandomValue(1, 100)) / 20000.0
 		c.Color = colors[rl.GetRandomValue(0, int32(len(colors)-1))]

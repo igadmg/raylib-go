@@ -6,7 +6,7 @@ package easings
 import (
 	"math"
 
-	rm "github.com/igadmg/raylib-go/raymath"
+	rm "github.com/igadmg/gamemath"
 )
 
 // Linear Easing functions

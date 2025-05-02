@@ -4,7 +4,9 @@ import (
 	"math/rand"
 	"time"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const (
@@ -13,8 +15,8 @@ const (
 
 // Cell type
 type Cell struct {
-	Position rl.Vector2
-	Size     rl.Vector2
+	Position vector2.Float32
+	Size     vector2.Float32
 	Alive    bool
 	Next     bool
 	Visited  bool
@@ -70,8 +72,8 @@ func (g *Game) Init(clear bool) {
 	for x := int32(0); x <= g.Cols; x++ {
 		for y := int32(0); y <= g.Rows; y++ {
 			g.Cells[x][y] = &Cell{}
-			g.Cells[x][y].Position = rl.NewVector2((float32(x) * squareSize), (float32(y)*squareSize)+1)
-			g.Cells[x][y].Size = rl.NewVector2(squareSize-1, squareSize-1)
+			g.Cells[x][y].Position = vector2.NewFloat32((float32(x) * squareSize), (float32(y)*squareSize)+1)
+			g.Cells[x][y].Size = vector2.NewFloat32(squareSize-1, squareSize-1)
 			if rand.Float64() < 0.1 && clear == false {
 				g.Cells[x][y].Alive = true
 			}
@@ -174,7 +176,7 @@ func (g *Game) Draw() {
 			if g.Cells[x][y].Alive {
 				rl.DrawRectangleV(g.Cells[x][y].Position, g.Cells[x][y].Size, rl.Blue)
 			} else if g.Cells[x][y].Visited {
-				rl.DrawRectangleV(g.Cells[x][y].Position, g.Cells[x][y].Size, rl.Color{R: 128, G: 177, B: 136, A: 255})
+				rl.DrawRectangleV(g.Cells[x][y].Position, g.Cells[x][y].Size, colorex.RGBA{R: 128, G: 177, B: 136, A: 255})
 			}
 		}
 	}
@@ -182,16 +184,16 @@ func (g *Game) Draw() {
 	// Draw grid lines
 	for i := int32(0); i < g.Cols+1; i++ {
 		rl.DrawLineV(
-			rl.NewVector2(float32(squareSize*i), 0),
-			rl.NewVector2(float32(squareSize*i), float32(g.ScreenHeight)),
+			vector2.NewFloat32(float32(squareSize*i), 0),
+			vector2.NewFloat32(float32(squareSize*i), float32(g.ScreenHeight)),
 			rl.LightGray,
 		)
 	}
 
 	for i := int32(0); i < g.Rows+1; i++ {
 		rl.DrawLineV(
-			rl.NewVector2(0, float32(squareSize*i)),
-			rl.NewVector2(float32(g.ScreenWidth), float32(squareSize*i)),
+			vector2.NewFloat32(0, float32(squareSize*i)),
+			vector2.NewFloat32(float32(g.ScreenWidth), float32(squareSize*i)),
 			rl.LightGray,
 		)
 	}

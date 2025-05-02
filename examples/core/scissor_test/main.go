@@ -1,7 +1,7 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var (
@@ -24,15 +24,15 @@ func main() {
 			scissorMode = !scissorMode
 		}
 
-		scissorArea.XY.X = float32(rl.GetMouseX())
-		scissorArea.XY.Y = float32(rl.GetMouseY())
+		scissorArea.Position.X = float32(rl.GetMouseX())
+		scissorArea.Position.Y = float32(rl.GetMouseY())
 
 		rl.BeginDrawing()
 
 		rl.ClearBackground(rl.RayWhite)
 
 		if scissorMode {
-			rl.BeginScissorMode(scissorArea.ToInt32().XY.X, scissorArea.ToInt32().XY.Y, scissorArea.ToInt32().WH.X, scissorArea.ToInt32().WH.Y)
+			rl.BeginScissorMode(scissorArea.ToInt32().Position.X, scissorArea.ToInt32().Position.Y, scissorArea.ToInt32().Size.X, scissorArea.ToInt32().Size.Y)
 		}
 
 		rl.DrawRectangle(0, 0, screenW, screenH, rl.Red)

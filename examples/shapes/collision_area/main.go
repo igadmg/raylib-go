@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var (
@@ -32,25 +32,25 @@ func main() {
 		mousePos := rl.GetMousePosition()
 
 		if !pause {
-			boxA.XY.X += boxAspeedX
+			boxA.Position.X += boxAspeedX
 		}
-		if boxA.XY.X+boxA.WH.X >= float32(rl.GetScreenWidth()) || boxA.XY.X <= 0 {
+		if boxA.Position.X+boxA.Size.X >= float32(rl.GetScreenWidth()) || boxA.Position.X <= 0 {
 			boxAspeedX *= -1
 		}
 
-		boxB.XY.X = mousePos.X - boxB.WH.X/2
-		boxB.XY.Y = mousePos.Y - boxB.WH.Y/2
+		boxB.Position.X = mousePos.X - boxB.Size.X/2
+		boxB.Position.Y = mousePos.Y - boxB.Size.Y/2
 
-		if boxB.XY.X+boxB.WH.X >= float32(rl.GetScreenWidth()) {
-			boxB.XY.X = float32(rl.GetScreenWidth()) - boxB.WH.X
-		} else if boxB.XY.X <= 0 {
-			boxB.XY.X = 0
+		if boxB.Position.X+boxB.Size.X >= float32(rl.GetScreenWidth()) {
+			boxB.Position.X = float32(rl.GetScreenWidth()) - boxB.Size.X
+		} else if boxB.Position.X <= 0 {
+			boxB.Position.X = 0
 		}
 
-		if boxB.XY.Y+boxB.WH.Y >= float32(rl.GetScreenHeight()) {
-			boxB.XY.Y = float32(rl.GetScreenHeight()) - boxB.WH.Y
-		} else if boxB.XY.X <= screenUpperLimit {
-			boxB.XY.Y = screenUpperLimit
+		if boxB.Position.Y+boxB.Size.Y >= float32(rl.GetScreenHeight()) {
+			boxB.Position.Y = float32(rl.GetScreenHeight()) - boxB.Size.Y
+		} else if boxB.Position.X <= screenUpperLimit {
+			boxB.Position.Y = screenUpperLimit
 		}
 
 		collision := rl.CheckCollisionRecs(boxA, boxB)
@@ -70,7 +70,7 @@ func main() {
 			rl.DrawRectangle(0, 0, screenWidth, int32(screenUpperLimit), rl.Red)
 			rl.DrawRectangleRec(boxCollision, rl.Lime)
 			rl.DrawText("COLLISION", int32(rl.GetScreenWidth()/2)-(rl.MeasureText("COLLISION", 20)/2), int32(screenUpperLimit/2)-10, 20, rl.Black)
-			rl.DrawText("Collision Area: "+fmt.Sprint(boxCollision.WH.X*boxCollision.WH.Y), int32(rl.GetScreenWidth()/2)-100, int32(screenUpperLimit+10), 20, rl.Black)
+			rl.DrawText("Collision Area: "+fmt.Sprint(boxCollision.Size.X*boxCollision.Size.Y), int32(rl.GetScreenWidth()/2)-100, int32(screenUpperLimit+10), 20, rl.Black)
 		} else {
 			rl.DrawRectangle(0, 0, screenWidth, int32(screenUpperLimit), rl.Black)
 		}

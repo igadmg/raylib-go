@@ -3,10 +3,10 @@ package raygui
 import (
 	"iter"
 
+	rm "github.com/igadmg/gamemath"
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
 	rl "github.com/igadmg/raylib-go/raylib"
-	rm "github.com/igadmg/raylib-go/raymath"
-	"github.com/igadmg/raylib-go/raymath/rect2"
-	"github.com/igadmg/raylib-go/raymath/vector2"
 )
 
 type Justyfy int

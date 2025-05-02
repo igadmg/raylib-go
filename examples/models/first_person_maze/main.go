@@ -2,8 +2,8 @@
 *
 *   raylib [models] example - first person maze
 *
-*   This example has been created using raylib-go v0.0.0-20220104071325-2f072dc2d259 (https://github.com/gen2brain/raylib-go)
-*   raylib-go is licensed under an unmodified zlib/libpng license (https://github.com/gen2brain/raylib-go/blob/master/LICENSE)
+*   This example has been created using raylib-go v0.0.0-20220104071325-2f072dc2d259 (https://github.com/igadmg/raylib-go)
+*   raylib-go is licensed under an unmodified zlib/libpng license (https://github.com/igadmg/raylib-go/blob/master/LICENSE)
 *
 *   Original C version for Raylib 2.5 Copyright (c) 2019 Ramon Santamaria (@raysan5)
 *   Converted to Go by Michael Redman January 4, 2022
@@ -13,7 +13,9 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -26,15 +28,15 @@ func main() {
 
 	// Define the camera to look into our 3d world
 	camera := rl.Camera{}
-	camera.Position = rl.NewVector3(0.2, 0.4, 0.2)
-	camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	camera.Position = vector3.NewFloat32(0.2, 0.4, 0.2)
+	camera.Target = vector3.NewFloat32(0.0, 0.0, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
 	camera.Fovy = 45.0
 	camera.Projection = rl.CameraPerspective
 
 	imMap := rl.LoadImage("cubicmap.png")      // Load cubicmap image (RAM)
 	cubicmap := rl.LoadTextureFromImage(imMap) // Convert image to texture to display (VRAM)
-	mesh := rl.GenMeshCubicmap(*imMap, rl.NewVector3(1.0, 1.0, 1.0))
+	mesh := rl.GenMeshCubicmap(imMap, vector3.NewFloat32(1.0, 1.0, 1.0))
 	model := rl.LoadModelFromMesh(mesh)
 
 	// NOTE: By default each cube is mapped to one part of texture atlas
@@ -42,9 +44,9 @@ func main() {
 	model.Materials.GetMap(rl.MapDiffuse).Texture = texture // Set map diffuse texture
 	// Get map image data to be used for collision detectio
 	mapPixels := rl.LoadImageColors(imMap)
-	rl.UnloadImage(imMap) // Unload image from RAM
+	rl.UnloadImage(&imMap) // Unload image from RAM
 
-	mapPosition := rl.NewVector3(-16.0, 0.0, -8.0) // Set model position
+	mapPosition := vector3.NewFloat32(-16.0, 0.0, -8.0) // Set model position
 
 	rl.SetTargetFPS(60) // Set our game to run at 60 frames-per-second
 	//--------------------------------------------------------------------------------------
@@ -58,7 +60,7 @@ func main() {
 		rl.UpdateCamera(&camera, rl.CameraFirstPerson) // Update camera with first person mode
 
 		// Check player collision (we simplify to 2D collision detection)
-		playerPos := rl.NewVector2(camera.Position.X, camera.Position.Z)
+		playerPos := vector2.NewFloat32(camera.Position.X, camera.Position.Z)
 		playerRadius := 0.1 // Collision radius (player is modelled as a cylinder for collision)
 
 		playerCellX := (int)(playerPos.X - mapPosition.X + 0.5)
@@ -96,7 +98,7 @@ func main() {
 		rl.BeginMode3D(camera)
 		rl.DrawModel(model, mapPosition, 1.0, rl.White) // Draw maze map
 		rl.EndMode3D()
-		rl.DrawTextureEx(&cubicmap, rl.NewVector2(float32(rl.GetScreenWidth())-float32(cubicmap.Width)*4.0-20, 20.0), 0.0, 4.0, rl.White)
+		rl.DrawTextureEx(cubicmap, vector2.NewFloat32(float32(rl.GetScreenWidth())-float32(cubicmap.Width)*4.0-20, 20.0), 0.0, 4.0, rl.White)
 		rl.DrawRectangleLines(int32(rl.GetScreenWidth())-cubicmap.Width*4-20, 20, cubicmap.Width*4, cubicmap.Height*4, rl.Green)
 		// Draw player position radar
 		rl.DrawRectangle(int32(rl.GetScreenWidth()-int(cubicmap.Width*4)-20+(playerCellX*4)), int32(20+playerCellY*4), 4, 4, rl.Red)

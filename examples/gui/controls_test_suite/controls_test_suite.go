@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 
-	gui "github.com/gen2brain/raylib-go/raygui"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	gui "github.com/igadmg/raylib-go/raygui"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 /*******************************************************************************************
@@ -99,7 +100,7 @@ func main() {
 
 		toggleGroupActive int32 = 0
 
-		viewScroll = rl.NewVector2(0, 0)
+		viewScroll = vector2.NewFloat32(0, 0)
 
 		//----------------------------------------------------------------------------------
 
@@ -229,7 +230,7 @@ func main() {
 		var view rl.Rectangle
 		gui.ScrollPanel(rl.NewRectangle(560, 25, 102, 354), "", rl.NewRectangle(560, 25, 300, 1200), &viewScroll, &view)
 
-		var mouseCell rl.Vector2
+		var mouseCell vector2.Float32
 		gui.Grid(rl.NewRectangle(560, 25+180+195, 100, 120), "", 20, 3, &mouseCell)
 
 		alphaValue = gui.ColorBarAlpha(rl.NewRectangle(320, 490, 200, 30), "", alphaValue)

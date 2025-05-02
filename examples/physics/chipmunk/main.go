@@ -5,7 +5,8 @@ import (
 	"math"
 	"math/rand"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 	"github.com/jakecoffman/cp"
 )
 
@@ -68,9 +69,9 @@ func main() {
 	rl.SetConfigFlags(rl.FlagVsyncHint)
 	rl.InitWindow(width, height, "raylib [physics] example - chipmunk")
 
-	offset := rl.Vector2{X: width / 2, Y: height / 2}
+	offset := vector2.Float32{X: width / 2, Y: height / 2}
 	// since the example ported from elsewhere, flip the camera 180 and offset to center it
-	camera := rl.NewCamera2D(offset, rl.Vector2{}, 180, 1)
+	camera := rl.NewCamera2D(offset, vector2.Float32{}, 180, 1)
 
 	space := simpleTerrain()
 	for i := 0; i < 1000; i++ {
@@ -158,6 +159,6 @@ func main() {
 	rl.CloseWindow()
 }
 
-func v(v cp.Vector) rl.Vector2 {
-	return rl.Vector2{X: float32(v.X), Y: float32(v.Y)}
+func v(v cp.Vector) vector2.Float32 {
+	return vector2.Float32{X: float32(v.X), Y: float32(v.Y)}
 }

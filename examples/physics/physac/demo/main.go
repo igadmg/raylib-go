@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/physics"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/raylib-go/physics"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -20,11 +21,11 @@ func main() {
 	physics.Init()
 
 	// Create floor rectangle physics body
-	floor := physics.NewBodyRectangle(rl.NewVector2(float32(screenWidth)/2, float32(screenHeight)), 500, 100, 10)
+	floor := physics.NewBodyRectangle(vector2.NewFloat32(float32(screenWidth)/2, float32(screenHeight)), 500, 100, 10)
 	floor.Enabled = false // Disable body state to convert it to static (no dynamics, but collisions)
 
 	// Create obstacle circle physics body
-	circle := physics.NewBodyCircle(rl.NewVector2(float32(screenWidth)/2, float32(screenHeight)/2), 45, 10)
+	circle := physics.NewBodyCircle(vector2.NewFloat32(float32(screenWidth)/2, float32(screenHeight)/2), 45, 10)
 	circle.Enabled = false // Disable body state to convert it to static (no dynamics, but collisions)
 
 	rl.SetTargetFPS(60)
@@ -37,10 +38,10 @@ func main() {
 		if rl.IsKeyPressed(rl.KeyR) { // Reset physics input
 			physics.Reset()
 
-			floor = physics.NewBodyRectangle(rl.NewVector2(float32(screenWidth)/2, float32(screenHeight)), 500, 100, 10)
+			floor = physics.NewBodyRectangle(vector2.NewFloat32(float32(screenWidth)/2, float32(screenHeight)), 500, 100, 10)
 			floor.Enabled = false
 
-			circle = physics.NewBodyCircle(rl.NewVector2(float32(screenWidth)/2, float32(screenHeight)/2), 45, 10)
+			circle = physics.NewBodyCircle(vector2.NewFloat32(float32(screenWidth)/2, float32(screenHeight)/2), 45, 10)
 			circle.Enabled = false
 		}
 

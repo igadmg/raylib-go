@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const (
@@ -32,7 +33,7 @@ func main() {
 			rl.DrawText(fmt.Sprintf("GP1: %s", rl.GetGamepadName(gamepad)), 10, 10, 10, rl.Black)
 
 			if rl.GetGamepadName(gamepad) == xbox360NameID {
-				rl.DrawTexture(&texXboxPad, 0, 0, rl.DarkGray)
+				rl.DrawTexture(texXboxPad, 0, 0, rl.DarkGray)
 
 				// Draw buttons: xbox home
 				if rl.IsGamepadButtonDown(gamepad, rl.GamepadButtonMiddle) {
@@ -102,7 +103,7 @@ func main() {
 				rl.DrawRectangle(604, 30, 15, int32(((1.0+rl.GetGamepadAxisMovement(gamepad, rl.GamepadAxisRightTrigger))/2.0)*70), rl.Red)
 
 			} else if rl.GetGamepadName(gamepad) == ps3NameID {
-				rl.DrawTexture(&texPs3Pad, 0, 0, rl.DarkGray)
+				rl.DrawTexture(texPs3Pad, 0, 0, rl.DarkGray)
 
 				// Draw buttons: ps
 				if rl.IsGamepadButtonDown(gamepad, rl.GamepadButtonMiddle) {
@@ -114,7 +115,7 @@ func main() {
 					rl.DrawRectangle(328, 170, 32, 13, rl.Red)
 				}
 				if rl.IsGamepadButtonDown(gamepad, rl.GamepadButtonMiddleRight) {
-					rl.DrawTriangle(rl.NewVector2(436, 168), rl.NewVector2(436, 185), rl.NewVector2(464, 177), rl.Red)
+					rl.DrawTriangle(vector2.NewFloat32(436, 168), vector2.NewFloat32(436, 185), vector2.NewFloat32(464, 177), rl.Red)
 				}
 				if rl.IsGamepadButtonDown(gamepad, rl.GamepadButtonRightFaceUp) {
 					rl.DrawCircle(557, 144, 13, rl.Lime)
@@ -179,7 +180,7 @@ func main() {
 			rl.DrawText(fmt.Sprintf("DETECTED AXIS [%d]:", rl.GetGamepadAxisCount(gamepad)), 10, 50, 10, rl.Maroon)
 
 			for i := int32(0); i < rl.GetGamepadAxisCount(gamepad); i++ {
-				rl.DrawText(fmt.Sprintf("AXIS %d: %.02f", i, rl.GetGamepadAxisMovement(gamepad, i)), 20, 70+20*i, 10, rl.DarkGray)
+				rl.DrawText(fmt.Sprintf("AXIS %d: %.02f", i, rl.GetGamepadAxisMovement(gamepad, rl.GamepadAxisType(i))), 20, 70+20*i, 10, rl.DarkGray)
 			}
 
 			if rl.GetGamepadButtonPressed() != -1 {
@@ -190,7 +191,7 @@ func main() {
 		} else {
 			rl.DrawText("GP1: NOT DETECTED", 10, 10, 10, rl.Gray)
 
-			rl.DrawTexture(&texXboxPad, 0, 0, rl.LightGray)
+			rl.DrawTexture(texXboxPad, 0, 0, rl.LightGray)
 		}
 
 		rl.EndDrawing()

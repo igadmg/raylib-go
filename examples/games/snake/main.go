@@ -1,7 +1,9 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const (
@@ -11,18 +13,18 @@ const (
 
 // Snake type
 type Snake struct {
-	Position rl.Vector2
-	Size     rl.Vector2
-	Speed    rl.Vector2
-	Color    rl.Color
+	Position vector2.Float32
+	Size     vector2.Float32
+	Speed    vector2.Float32
+	Color    colorex.RGBA
 }
 
 // Food type
 type Food struct {
-	Position rl.Vector2
-	Size     rl.Vector2
+	Position vector2.Float32
+	Size     vector2.Float32
 	Active   bool
-	Color    rl.Color
+	Color    colorex.RGBA
 }
 
 // Game type
@@ -36,9 +38,9 @@ type Game struct {
 
 	Fruit         Food
 	Snake         []Snake
-	SnakePosition []rl.Vector2
+	SnakePosition []vector2.Float32
 	AllowMove     bool
-	Offset        rl.Vector2
+	Offset        vector2.Float32
 	CounterTail   int
 }
 
@@ -71,16 +73,16 @@ func (g *Game) Init() {
 	g.CounterTail = 1
 	g.AllowMove = false
 
-	g.Offset = rl.Vector2{}
+	g.Offset = vector2.Float32{}
 	g.Offset.X = float32(g.ScreenWidth % squareSize)
 	g.Offset.Y = float32(g.ScreenHeight % squareSize)
 
 	g.Snake = make([]Snake, snakeLength)
 
 	for i := 0; i < snakeLength; i++ {
-		g.Snake[i].Position = rl.NewVector2(g.Offset.X/2, g.Offset.Y/2)
-		g.Snake[i].Size = rl.NewVector2(squareSize, squareSize)
-		g.Snake[i].Speed = rl.NewVector2(squareSize, 0)
+		g.Snake[i].Position = vector2.NewFloat32(g.Offset.X/2, g.Offset.Y/2)
+		g.Snake[i].Size = vector2.NewFloat32(squareSize, squareSize)
+		g.Snake[i].Speed = vector2.NewFloat32(squareSize, 0)
 
 		if i == 0 {
 			g.Snake[i].Color = rl.DarkBlue
@@ -89,13 +91,13 @@ func (g *Game) Init() {
 		}
 	}
 
-	g.SnakePosition = make([]rl.Vector2, snakeLength)
+	g.SnakePosition = make([]vector2.Float32, snakeLength)
 
 	for i := 0; i < snakeLength; i++ {
-		g.SnakePosition[i] = rl.NewVector2(0.0, 0.0)
+		g.SnakePosition[i] = vector2.NewFloat32(0.0, 0.0)
 	}
 
-	g.Fruit.Size = rl.NewVector2(squareSize, squareSize)
+	g.Fruit.Size = vector2.NewFloat32(squareSize, squareSize)
 	g.Fruit.Color = rl.SkyBlue
 	g.Fruit.Active = false
 }
@@ -110,19 +112,19 @@ func (g *Game) Update() {
 		if !g.Pause {
 			// control
 			if rl.IsKeyPressed(rl.KeyRight) && g.Snake[0].Speed.X == 0 && g.AllowMove {
-				g.Snake[0].Speed = rl.NewVector2(squareSize, 0)
+				g.Snake[0].Speed = vector2.NewFloat32(squareSize, 0)
 				g.AllowMove = false
 			}
 			if rl.IsKeyPressed(rl.KeyLeft) && g.Snake[0].Speed.X == 0 && g.AllowMove {
-				g.Snake[0].Speed = rl.NewVector2(-squareSize, 0)
+				g.Snake[0].Speed = vector2.NewFloat32(-squareSize, 0)
 				g.AllowMove = false
 			}
 			if rl.IsKeyPressed(rl.KeyUp) && g.Snake[0].Speed.Y == 0 && g.AllowMove {
-				g.Snake[0].Speed = rl.NewVector2(0, -squareSize)
+				g.Snake[0].Speed = vector2.NewFloat32(0, -squareSize)
 				g.AllowMove = false
 			}
 			if rl.IsKeyPressed(rl.KeyDown) && g.Snake[0].Speed.Y == 0 && g.AllowMove {
-				g.Snake[0].Speed = rl.NewVector2(0, squareSize)
+				g.Snake[0].Speed = vector2.NewFloat32(0, squareSize)
 				g.AllowMove = false
 			}
 
@@ -159,14 +161,14 @@ func (g *Game) Update() {
 
 			if !g.Fruit.Active {
 				g.Fruit.Active = true
-				g.Fruit.Position = rl.NewVector2(
+				g.Fruit.Position = vector2.NewFloat32(
 					float32(rl.GetRandomValue(0, (g.ScreenWidth/squareSize)-1)*squareSize)+(g.Offset.X)/2,
 					float32(rl.GetRandomValue(0, (g.ScreenHeight/squareSize)-1)*squareSize)+(g.Offset.Y)/2,
 				)
 
 				for i := 0; i < g.CounterTail; i++ {
 					for (g.Fruit.Position.X == g.Snake[i].Position.X) && (g.Fruit.Position.Y == g.Snake[i].Position.Y) {
-						g.Fruit.Position = rl.NewVector2(
+						g.Fruit.Position = vector2.NewFloat32(
 							float32(rl.GetRandomValue(0, (g.ScreenWidth/squareSize)-1)*squareSize)+g.Offset.X/2,
 							float32(rl.GetRandomValue(0, (g.ScreenHeight/squareSize)-1)*squareSize)+g.Offset.Y/2,
 						)
@@ -205,16 +207,16 @@ func (g *Game) Draw() {
 		// Draw grid lines
 		for i := int32(0); i < g.ScreenWidth/squareSize+1; i++ {
 			rl.DrawLineV(
-				rl.NewVector2(float32(squareSize*i)+g.Offset.X/2, g.Offset.Y/2),
-				rl.NewVector2(float32(squareSize*i)+g.Offset.X/2, float32(g.ScreenHeight)-g.Offset.Y/2),
+				vector2.NewFloat32(float32(squareSize*i)+g.Offset.X/2, g.Offset.Y/2),
+				vector2.NewFloat32(float32(squareSize*i)+g.Offset.X/2, float32(g.ScreenHeight)-g.Offset.Y/2),
 				rl.LightGray,
 			)
 		}
 
 		for i := int32(0); i < g.ScreenHeight/squareSize+1; i++ {
 			rl.DrawLineV(
-				rl.NewVector2(g.Offset.X/2, float32(squareSize*i)+g.Offset.Y/2),
-				rl.NewVector2(float32(g.ScreenWidth)-g.Offset.X/2, float32(squareSize*i)+g.Offset.Y/2),
+				vector2.NewFloat32(g.Offset.X/2, float32(squareSize*i)+g.Offset.Y/2),
+				vector2.NewFloat32(float32(g.ScreenWidth)-g.Offset.X/2, float32(squareSize*i)+g.Offset.Y/2),
 				rl.LightGray,
 			)
 		}

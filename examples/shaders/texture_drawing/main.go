@@ -1,7 +1,7 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -12,7 +12,7 @@ func main() {
 
 	imBlank := rl.GenImageColor(1024, 1024, rl.Blank)
 	texture := rl.LoadTextureFromImage(imBlank)
-	rl.UnloadImage(imBlank)
+	rl.UnloadImage(&imBlank)
 
 	shader := rl.LoadShader("", "cubes_panning.fs")
 
@@ -35,7 +35,7 @@ func main() {
 		rl.ClearBackground(rl.RayWhite)
 
 		rl.BeginShaderMode(shader)
-		rl.DrawTexture(&texture, 0, 0, rl.White)
+		rl.DrawTexture(texture, 0, 0, rl.White)
 		rl.EndShaderMode()
 
 		rl.DrawText("BACKGROUND is PAINTED and ANIMATED on SHADER!", 10, 10, 20, rl.Maroon)

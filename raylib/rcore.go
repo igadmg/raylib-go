@@ -10,9 +10,10 @@ import "C"
 import (
 	"unsafe"
 
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
+	"github.com/igadmg/gamemath/vector4"
 	"github.com/igadmg/goex/image/colorex"
-	"github.com/igadmg/raylib-go/raymath/vector2"
-	"github.com/igadmg/raylib-go/raymath/vector4"
 )
 
 // AutomationEvent - Automation event
@@ -204,7 +205,7 @@ func GetScreenHeight() int {
 	return v
 }
 
-func GetScreenSize() Vector2Int {
+func GetScreenSize() vector2.Int {
 	return vector2.NewInt(
 		GetScreenWidth(),
 		GetScreenHeight(),
@@ -225,7 +226,7 @@ func GetRenderHeight() int {
 	return v
 }
 
-func GetRenderSize() Vector2Int {
+func GetRenderSize() vector2.Int {
 	return vector2.NewInt(
 		GetRenderWidth(),
 		GetRenderHeight(),
@@ -247,7 +248,7 @@ func GetCurrentMonitor() int {
 }
 
 // GetMonitorPosition - Get specified monitor position
-func GetMonitorPosition(monitor int) Vector2 {
+func GetMonitorPosition(monitor int) vector2.Float32 {
 	cmonitor := (C.int)(monitor)
 	ret := C.GetMonitorPosition(cmonitor)
 	return *govec2ptr(&ret)
@@ -294,13 +295,13 @@ func GetMonitorRefreshRate(monitor int) int {
 }
 
 // GetWindowPosition - Get window position XY on monitor
-func GetWindowPosition() Vector2 {
+func GetWindowPosition() vector2.Float32 {
 	ret := C.GetWindowPosition()
 	return *govec2ptr(&ret)
 }
 
 // GetWindowScaleDPI - Get window scale DPI factor
-func GetWindowScaleDPI() Vector2 {
+func GetWindowScaleDPI() vector2.Float32 {
 	ret := C.GetWindowScaleDPI()
 	return *govec2ptr(&ret)
 }
@@ -331,7 +332,7 @@ func GetClipboardText() string {
 // Only works with SDL3 backend or Windows with GLFW/RGFW
 func GetClipboardImage() Image {
 	ret := C.GetClipboardImage()
-	v := newImageFromPointer(unsafe.Pointer(&ret))
+	v := newImageFromPointer(&ret)
 	return *v
 }
 
@@ -526,28 +527,26 @@ func UnloadShader(shader *Shader) {
 // GetMouseRay - Get a ray trace from mouse position
 //
 // Deprecated: Use [GetScreenToWorldRay] instead.
-func GetMouseRay(mousePosition Vector2, camera Camera) Ray {
+func GetMouseRay(mousePosition vector2.Float32, camera Camera) Ray {
 	return GetScreenToWorldRay(mousePosition, camera)
 }
 
 // GetScreenToWorldRay - Get a ray trace from screen position (i.e mouse)
-func GetScreenToWorldRay(position Vector2, camera Camera) Ray {
-	cposition := position.cptr()
+func GetScreenToWorldRay(position vector2.Float32, camera Camera) Ray {
+	cposition := cvec2ptr(&position)
 	ccamera := camera.cptr()
 	ret := C.GetScreenToWorldRay(*cposition, *ccamera)
-	v := newRayFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newRayFromPointer(&ret)
 }
 
 // GetScreenToWorldRayEx - Get a ray trace from screen position (i.e mouse) in a viewport
-func GetScreenToWorldRayEx(position Vector2, camera Camera, width, height int32) Ray {
-	cposition := position.cptr()
+func GetScreenToWorldRayEx(position vector2.Float32, camera Camera, width, height int32) Ray {
+	cposition := cvec2ptr(&position)
 	ccamera := camera.cptr()
 	cwidth := (C.int)(width)
 	cheight := (C.int)(height)
 	ret := C.GetScreenToWorldRayEx(*cposition, *ccamera, cwidth, cheight)
-	v := newRayFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *newRayFromPointer(&ret)
 }
 
 // GetCameraMatrix - Returns camera transform matrix (view matrix)
@@ -565,7 +564,7 @@ func GetCameraMatrix2D(camera Camera2D) Matrix {
 }
 
 // GetWorldToScreen - Returns the screen space position from a 3d world space position
-func GetWorldToScreen(position Vector3, camera Camera) Vector2 {
+func GetWorldToScreen(position vector3.Float32, camera Camera) vector2.Float32 {
 	cposition := cvec3ptr(&position)
 	ccamera := camera.cptr()
 	ret := C.GetWorldToScreen(*cposition, *ccamera)
@@ -573,7 +572,7 @@ func GetWorldToScreen(position Vector3, camera Camera) Vector2 {
 }
 
 // GetScreenToWorld2D - Returns the world space position for a 2d camera screen space position
-func GetScreenToWorld2D(position Vector2, camera Camera2D) Vector2 {
+func GetScreenToWorld2D(position vector2.Float32, camera Camera2D) vector2.Float32 {
 	cposition := cvec2ptr(&position)
 	ccamera := camera.cptr()
 	ret := C.GetScreenToWorld2D(*cposition, *ccamera)
@@ -581,7 +580,7 @@ func GetScreenToWorld2D(position Vector2, camera Camera2D) Vector2 {
 }
 
 // GetWorldToScreenEx - Get size position for a 3d world space position
-func GetWorldToScreenEx(position Vector3, camera Camera, width int32, height int32) Vector2 {
+func GetWorldToScreenEx(position vector3.Float32, camera Camera, width int32, height int32) vector2.Float32 {
 	cposition := cvec3ptr(&position)
 	ccamera := camera.cptr()
 	cwidth := (C.int)(width)
@@ -591,7 +590,7 @@ func GetWorldToScreenEx(position Vector3, camera Camera, width int32, height int
 }
 
 // GetWorldToScreen2D - Returns the screen space position for a 2d camera world space position
-func GetWorldToScreen2D(position Vector2, camera Camera2D) Vector2 {
+func GetWorldToScreen2D(position vector2.Float32, camera Camera2D) vector2.Float32 {
 	cposition := cvec2ptr(&position)
 	ccamera := camera.cptr()
 	ret := C.GetWorldToScreen2D(*cposition, *ccamera)
@@ -664,7 +663,7 @@ func ColorToInt(col colorex.RGBA) int32 {
 }
 
 // ColorNormalize - Returns color normalized as float [0..1]
-func ColorNormalize(col colorex.RGBA) Vector4 {
+func ColorNormalize(col colorex.RGBA) vector4.Float32 {
 	return vector4.NewFloat32(
 		float32(col.R)/255,
 		float32(col.G)/255,
@@ -673,14 +672,14 @@ func ColorNormalize(col colorex.RGBA) Vector4 {
 }
 
 // ColorFromNormalized - Returns Color from normalized values [0..1]
-func ColorFromNormalized(normalized Vector4) colorex.RGBA {
+func ColorFromNormalized(normalized vector4.Float32) colorex.RGBA {
 	cnormalized := cvec4ptr(&normalized)
 	ret := C.ColorFromNormalized(*cnormalized)
 	return *gocolorptr(&ret)
 }
 
 // ColorToHSV - Returns HSV values for a Color, hue [0..360], saturation/value [0..1]
-func ColorToHSV(col colorex.RGBA) Vector3 {
+func ColorToHSV(col colorex.RGBA) vector3.Float32 {
 	ccolor := ccolorptr(&col)
 	ret := C.ColorToHSV(*ccolor)
 	return *govec3ptr(&ret)
@@ -734,12 +733,11 @@ func ColorAlphaBlend(src, dst, tint colorex.RGBA) colorex.RGBA {
 }
 
 // ColorLerp - Get color lerp interpolation between two colors, factor [0.0f..1.0f]
-func ColorLerp(col1, col2 color.RGBA, factor float32) color.RGBA {
-	ccol1 := colorCptr(col1)
-	ccol2 := colorCptr(col2)
+func ColorLerp(col1, col2 colorex.RGBA, factor float32) colorex.RGBA {
+	ccol1 := ccolorptr(&col1)
+	ccol2 := ccolorptr(&col2)
 	ret := C.ColorLerp(*ccol1, *ccol2, C.float(factor))
-	v := newColorFromPointer(unsafe.Pointer(&ret))
-	return v
+	return *gocolorptr(&ret)
 }
 
 // GetColor - Returns a Color struct from hexadecimal value
@@ -760,7 +758,7 @@ func GetPixelDataSize(width, height, format int32) int32 {
 }
 
 // Vector3ToFloat - Converts Vector3 to float32 slice
-func Vector3ToFloat(vec Vector3) []float32 {
+func Vector3ToFloat(vec vector3.Float32) []float32 {
 	data := make([]float32, 0)
 	data[0] = vec.X
 	data[1] = vec.Y
@@ -1048,13 +1046,13 @@ func GetMouseY() int32 {
 }
 
 // GetMousePosition - Returns mouse position XY
-func GetMousePosition() Vector2 {
+func GetMousePosition() vector2.Float32 {
 	ret := C.GetMousePosition()
 	return *govec2ptr(&ret)
 }
 
 // GetMouseDelta - Get mouse delta between frames
-func GetMouseDelta() Vector2 {
+func GetMouseDelta() vector2.Float32 {
 	ret := C.GetMouseDelta()
 	return *govec2ptr(&ret)
 }
@@ -1088,7 +1086,7 @@ func GetMouseWheelMove() float32 {
 }
 
 // GetMouseWheelMoveV - Get mouse wheel movement for both X and Y
-func GetMouseWheelMoveV() Vector2 {
+func GetMouseWheelMoveV() vector2.Float32 {
 	ret := C.GetMouseWheelMoveV()
 	return *govec2ptr(&ret)
 }
@@ -1114,7 +1112,7 @@ func GetTouchY() int32 {
 }
 
 // GetTouchPosition - Returns touch position XY for a touch point index (relative to screen size)
-func GetTouchPosition[IT IntegerT](index IT) Vector2 {
+func GetTouchPosition[IT IntegerT](index IT) vector2.Float32 {
 	cindex := (C.int)(index)
 	ret := C.GetTouchPosition(cindex)
 	return *govec2ptr(&ret)

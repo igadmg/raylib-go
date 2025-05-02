@@ -1,7 +1,9 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -11,13 +13,13 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [core] example - 3d camera free")
 
 	camera := rl.Camera{}
-	camera.Position = rl.NewVector3(10.0, 10.0, 10.0) // Camera position
-	camera.Target = rl.NewVector3(0.0, 0.0, 0.0)      // Camera looking at point
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)          // Camera up vector (rotation towards target)
-	camera.Fovy = 45.0                                // Camera field-of-view Y
+	camera.Position = vector3.NewFloat32(10.0, 10.0, 10.0) // Camera position
+	camera.Target = vector3.NewFloat32(0.0, 0.0, 0.0)      // Camera looking at point
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)          // Camera up vector (rotation towards target)
+	camera.Fovy = 45.0                                     // Camera field-of-view Y
 
-	cubePosition := rl.NewVector3(0.0, 0.0, 0.0)
-	cubeScreenPosition := rl.Vector2{}
+	cubePosition := vector3.NewFloat32(0.0, 0.0, 0.0)
+	cubeScreenPosition := vector2.Float32{}
 
 	rl.SetTargetFPS(60)
 
@@ -25,7 +27,7 @@ func main() {
 		rl.UpdateCamera(&camera, rl.CameraFree) // Update camera with free camera mode
 
 		// Calculate cube screen space position (with a little offset to be in top)
-		cubeScreenPosition = rl.GetWorldToScreen(rl.NewVector3(cubePosition.X, cubePosition.Y+2.5, cubePosition.Z), camera)
+		cubeScreenPosition = rl.GetWorldToScreen(vector3.NewFloat32(cubePosition.X, cubePosition.Y+2.5, cubePosition.Z), camera)
 
 		rl.BeginDrawing()
 

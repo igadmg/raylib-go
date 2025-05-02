@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var (
@@ -24,7 +25,7 @@ func main() {
 
 		mousePos := rl.GetMousePosition()
 
-		if rl.CheckCollisionPointRec(mousePos, rl.NewRectangle(rec.XY.X+rec.WH.X-mouseScaleMarkSize, rec.XY.Y+rec.WH.Y-mouseScaleMarkSize, mouseScaleMarkSize, mouseScaleMarkSize)) {
+		if rl.CheckCollisionPointRec(mousePos, rl.NewRectangle(rec.Position.X+rec.Size.X-mouseScaleMarkSize, rec.Position.Y+rec.Size.Y-mouseScaleMarkSize, mouseScaleMarkSize, mouseScaleMarkSize)) {
 			mouseScaleReady = true
 			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 				MouseScaleMode = true
@@ -36,21 +37,21 @@ func main() {
 		if MouseScaleMode {
 
 			mouseScaleReady = true
-			rec.WH.X = mousePos.X - rec.XY.X
-			rec.WH.Y = mousePos.Y - rec.XY.Y
+			rec.Size.X = mousePos.X - rec.Position.X
+			rec.Size.Y = mousePos.Y - rec.Position.Y
 
 			// CHECK MIN MAX REC SIZES
-			if rec.WH.X < mouseScaleMarkSize {
-				rec.WH.X = rec.WH.Y
+			if rec.Size.X < mouseScaleMarkSize {
+				rec.Size.X = rec.Size.Y
 			}
-			if rec.WH.Y < mouseScaleMarkSize {
-				rec.WH.Y = rec.WH.X
+			if rec.Size.Y < mouseScaleMarkSize {
+				rec.Size.Y = rec.Size.X
 			}
-			if rec.WH.X > (float32(rl.GetScreenWidth()) - rec.XY.X) {
-				rec.WH.X = float32(rl.GetScreenWidth()) - rec.XY.X
+			if rec.Size.X > (float32(rl.GetScreenWidth()) - rec.Position.X) {
+				rec.Size.X = float32(rl.GetScreenWidth()) - rec.Position.X
 			}
-			if rec.WH.Y > (float32(rl.GetScreenHeight()) - rec.XY.Y) {
-				rec.WH.Y = float32(rl.GetScreenHeight()) - rec.XY.Y
+			if rec.Size.Y > (float32(rl.GetScreenHeight()) - rec.Position.Y) {
+				rec.Size.Y = float32(rl.GetScreenHeight()) - rec.Position.Y
 			}
 			if rl.IsMouseButtonReleased(rl.MouseLeftButton) {
 				MouseScaleMode = false
@@ -67,7 +68,7 @@ func main() {
 
 		if mouseScaleReady {
 			rl.DrawRectangleLinesEx(rec, 1, rl.Red)
-			rl.DrawTriangle(rl.NewVector2(rec.XY.X+rec.WH.X-mouseScaleMarkSize, rec.XY.Y+rec.WH.Y), rl.NewVector2(rec.XY.X+rec.WH.X, rec.XY.Y+rec.WH.Y), rl.NewVector2(rec.XY.X+rec.WH.X, rec.XY.Y+rec.WH.Y-mouseScaleMarkSize), rl.Red)
+			rl.DrawTriangle(vector2.NewFloat32(rec.Position.X+rec.Size.X-mouseScaleMarkSize, rec.Position.Y+rec.Size.Y), vector2.NewFloat32(rec.Position.X+rec.Size.X, rec.Position.Y+rec.Size.Y), vector2.NewFloat32(rec.Position.X+rec.Size.X, rec.Position.Y+rec.Size.Y-mouseScaleMarkSize), rl.Red)
 		}
 
 		rl.EndDrawing()

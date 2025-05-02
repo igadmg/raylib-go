@@ -13,12 +13,12 @@ import (
 	"runtime"
 	"unsafe"
 
+	rm "github.com/igadmg/gamemath"
+	"github.com/igadmg/gamemath/rect2"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
+	"github.com/igadmg/gamemath/vector4"
 	"github.com/igadmg/goex/image/colorex"
-	rm "github.com/igadmg/raylib-go/raymath"
-	"github.com/igadmg/raylib-go/raymath/rect2"
-	"github.com/igadmg/raylib-go/raymath/vector2"
-	"github.com/igadmg/raylib-go/raymath/vector3"
-	"github.com/igadmg/raylib-go/raymath/vector4"
 )
 
 func init() {
@@ -43,7 +43,7 @@ type CoordinateT interface {
 }
 
 type Vector2T interface {
-	Vector2 | Vector2Int
+	vector2.Float32 | vector2.Int
 }
 
 // Wave type, defines audio wave data
@@ -67,6 +67,15 @@ func NewWave(sampleCount, sampleRate, sampleSize, channels uint32, data []byte) 
 	return Wave{sampleCount, sampleRate, sampleSize, channels, d}
 }
 
+// Checks if wave data is valid (data loaded and parameters)
+func (w Wave) IsValid() bool {
+	return w.Data != nil && // Validate wave data available
+		w.FrameCount > 0 && // Validate frame count
+		w.SampleRate > 0 && // Validate sample rate is supported
+		w.SampleSize > 0 && // Validate sample size is supported
+		w.Channels > 0 // Validate number of channels supported
+}
+
 // AudioCallback function.
 type AudioCallback func(data []float32, frames int)
 
@@ -77,6 +86,12 @@ type Sound struct {
 	_          [4]byte
 }
 
+// Checks if a sound is valid (data loaded and buffers initialized)
+func (s Sound) IsValid() bool {
+	return s.FrameCount > 0 && // Validate frame count
+		s.Stream.IsValid() // Validate stream buffer
+}
+
 // Music type (file streaming from memory)
 // NOTE: Anything longer than ~10 seconds should be streamed
 type Music struct {
@@ -85,6 +100,13 @@ type Music struct {
 	Looping    bool
 	CtxType    int32
 	CtxData    unsafe.Pointer
+}
+
+// Checks if a music stream is valid (context and buffers initialized)
+func (m Music) IsValid() bool {
+	return m.CtxData != nil && // Validate context loaded
+		m.FrameCount > 0 && // Validate audio frame count
+		m.Stream.IsValid() // Validate audio stream
 }
 
 // AudioStream type
@@ -101,6 +123,14 @@ type AudioStream struct {
 	// Number of channels (1-mono, 2-stereo)
 	Channels uint32
 	_        [4]byte
+}
+
+// Checks if an audio stream is valid (buffers initialized)
+func (s AudioStream) IsValid() bool {
+	return s.Buffer != nil && // Validate stream buffer
+		s.SampleRate > 0 && // Validate sample rate is supported
+		s.SampleSize > 0 && // Validate sample size is supported
+		s.Channels > 0 // Validate number of channels supported
 }
 
 type maDataConverter struct {
@@ -192,25 +222,25 @@ type AudioProcessor struct {
 }
 
 // AutomationEvent - Automation event
-type AutomationEvent struct {
-	Frame  uint32
-	Type   uint32
-	Params [4]int32
-}
+//type AutomationEvent struct {
+//	Frame  uint32
+//	Type   uint32
+//	Params [4]int32
+//}
 
 // AutomationEventList - Automation event list
-type AutomationEventList struct {
-	Capacity uint32
-	Count    uint32
-	// Events array (c array)
-	//
-	// Use AutomationEventList.GetEvents instead (go slice)
-	Events *AutomationEvent
-}
+//type AutomationEventList struct {
+//	Capacity uint32
+//	Count    uint32
+//	// Events array (c array)
+//	//
+//	// Use AutomationEventList.GetEvents instead (go slice)
+//	Events *AutomationEvent
+//}
 
-func (a *AutomationEventList) GetEvents() []AutomationEvent {
-	return unsafe.Slice(a.Events, a.Count)
-}
+//func (a *AutomationEventList) GetEvents() []AutomationEvent {
+//	return unsafe.Slice(a.Events, a.Count)
+//}
 
 // CameraMode type
 type CameraMode int32
@@ -385,10 +415,6 @@ const (
 	KeyMenu       KeyType = 5
 	KeyVolumeUp   KeyType = 24
 	KeyVolumeDown KeyType = 25
-
-	MouseLeftButton   = MouseButtonLeft
-	MouseRightButton  = MouseButtonRight
-	MouseMiddleButton = MouseButtonMiddle
 )
 
 // Mouse Buttons
@@ -519,11 +545,6 @@ var (
 	RayWhite = NewColor(245, 245, 245, 255)
 )
 
-// Vector2 type
-type Vector2 = vector2.Float32
-type Vector2Int = vector2.Int
-type Vector3 = vector3.Float32
-type Vector3Int = vector3.Int
 type Vector4 = vector4.Float32
 
 var (
@@ -563,7 +584,7 @@ func NewMat2(m0, m1, m10, m11 float32) Mat2 {
 }
 
 // Quaternion, 4 components (Vector4 alias)
-type Quaternion = Vector4
+type Quaternion = vector4.Float32
 
 // NewQuaternion - Returns new Quaternion
 func NewQuaternion(x, y, z, w float32) Quaternion {
@@ -580,22 +601,22 @@ type Rectangle = rect2.Float32
 type RectangleInt32 = rect2.Int32
 
 // NewRectangle - Returns new Rectangle
-func NewRectangle[XT, YT, WT, HT CoordinateT](x XT, y YT, width WT, height HT) Rectangle {
+func NewRectangle[XT, YT, WT, HT CoordinateT](x XT, y YT, width WT, height HT) rect2.Float32 {
 	return rect2.New(vector2.NewFloat32(x, y), vector2.NewFloat32(width, height))
 }
 
-func NewRectangleWHV[WHT rm.SignedNumber](wh vector2.Vector[WHT]) Rectangle {
+func NewRectangleWHV[WHT rm.SignedNumber](wh vector2.Vector[WHT]) rect2.Float32 {
 	return rect2.New(vector2.Zero[float32](), wh.ToFloat32())
 }
 
 // Camera3D type, defines a camera position/orientation in 3d space
 type Camera3D struct {
 	// Camera position
-	Position Vector3
+	Position vector3.Float32
 	// Camera target it looks-at
-	Target Vector3
+	Target vector3.Float32
 	// Camera up vector (rotation over its axis)
-	Up Vector3
+	Up vector3.Float32
 	// Camera field-of-view apperture in Y (degrees) in perspective, used as near plane width in orthographic
 	Fovy float32
 	// Camera type, controlling projection type, either CameraPerspective or CameraOrthographic.
@@ -606,16 +627,16 @@ type Camera3D struct {
 type Camera = Camera3D
 
 // NewCamera3D - Returns new Camera3D
-func NewCamera3D(pos, target, up Vector3, fovy float32, ct CameraProjection) Camera3D {
+func NewCamera3D(pos, target, up vector3.Float32, fovy float32, ct CameraProjection) Camera3D {
 	return Camera3D{pos, target, up, fovy, ct}
 }
 
 // Camera2D type, defines a 2d camera
 type Camera2D struct {
 	// Camera offset (displacement from target)
-	Offset Vector2
+	Offset vector2.Float32
 	// Camera target (rotation and zoom origin)
-	Target Vector2
+	Target vector2.Float32
 	// Camera rotation in degrees
 	Rotation float32
 	// Camera zoom (scaling), should be 1.0f by default
@@ -623,20 +644,20 @@ type Camera2D struct {
 }
 
 // NewCamera2D - Returns new Camera2D
-func NewCamera2D(offset, target Vector2, rotation, zoom float32) Camera2D {
+func NewCamera2D(offset, target vector2.Float32, rotation, zoom float32) Camera2D {
 	return Camera2D{offset, target, rotation, zoom}
 }
 
 // BoundingBox type
 type BoundingBox struct {
 	// Minimum vertex box-corner
-	Min Vector3
+	Min vector3.Float32
 	// Maximum vertex box-corner
-	Max Vector3
+	Max vector3.Float32
 }
 
 // NewBoundingBox - Returns new BoundingBox
-func NewBoundingBox(min, max Vector3) BoundingBox {
+func NewBoundingBox(min, max vector3.Float32) BoundingBox {
 	return BoundingBox{min, max}
 }
 
@@ -807,6 +828,41 @@ type Mesh struct {
 	VboID *uint32
 }
 
+func (m Mesh) IsValid() bool {
+	if m.Vertices != nil && unsafe.Slice(m.VboID, 1)[0] == 0 {
+		return false
+	} // Vertex position buffer not uploaded to GPU
+	if m.Texcoords != nil && unsafe.Slice(m.VboID, 2)[1] == 0 {
+		return false
+	} // Vertex textcoords buffer not uploaded to GPU
+	if m.Normals != nil && unsafe.Slice(m.VboID, 3)[2] == 0 {
+		return false
+	} // Vertex normals buffer not uploaded to GPU
+	if m.Colors != nil && unsafe.Slice(m.VboID, 4)[3] == 0 {
+		return false
+	} // Vertex colors buffer not uploaded to GPU
+	if m.Tangents != nil && unsafe.Slice(m.VboID, 5)[4] == 0 {
+		return false
+	} // Vertex tangents buffer not uploaded to GPU
+	if m.Texcoords2 != nil && unsafe.Slice(m.VboID, 6)[5] == 0 {
+		return false
+	} // Vertex texcoords2 buffer not uploaded to GPU
+	if m.Indices != nil && unsafe.Slice(m.VboID, 7)[6] == 0 {
+		return false
+	} // Vertex indices buffer not uploaded to GPU
+	if m.BoneIds != nil && unsafe.Slice(m.VboID, 8)[7] == 0 {
+		return false
+	} // Vertex boneIds buffer not uploaded to GPU
+	if m.BoneWeights != nil && unsafe.Slice(m.VboID, 9)[8] == 0 {
+		return false
+	} // Vertex boneWeights buffer not uploaded to GPU
+
+	// NOTE: Some OpenGL versions do not support VAO, so we don't check it
+	//if m.VaoId == 0 { return false; break }
+
+	return true
+}
+
 // Material type
 type Material struct {
 	// Shader
@@ -815,6 +871,20 @@ type Material struct {
 	Maps *MaterialMap
 	// Generic parameters (if required)
 	Params [4]float32
+}
+
+// IsMaterialValid - Check if a material is valid (shader assigned, map textures loaded in GPU)
+func (material Material) IsValid() bool {
+	result := false
+
+	if material.Maps != nil && // Validate material contain some map
+		material.Shader.IsValid() { // Validate material shader is valid
+		result = true
+	}
+
+	// TODO: Check if available maps contain loaded textures
+
+	return result
 }
 
 // GetMap - Get pointer to MaterialMap by map type
@@ -862,6 +932,28 @@ type Model struct {
 	BindPose *Transform
 }
 
+func (model Model) IsValid() bool {
+	result := false
+
+	if (model.Meshes != nil) && // Validate model contains some mesh
+		(model.Materials != nil) && // Validate model contains some material (at least default one)
+		(model.MeshMaterial != nil) && // Validate mesh-material linkage
+		(model.MeshCount > 0) && // Validate mesh count
+		(model.MaterialCount > 0) { // Validate material count
+		result = true
+	}
+
+	// NOTE: Many elements could be validated from a model, including every model mesh VAO/VBOs
+	// but some VBOs could not be used, it depends on Mesh vertex data
+	for _, mesh := range model.GetMeshes() {
+		if !mesh.IsValid() {
+			return false
+		}
+	}
+
+	return result
+}
+
 // GetMeshes returns the meshes of a model as go slice
 func (m Model) GetMeshes() []Mesh {
 	return unsafe.Slice(m.Meshes, m.MeshCount)
@@ -890,21 +982,21 @@ type BoneInfo struct {
 
 // Transform type
 type Transform struct {
-	Translation Vector3
-	Rotation    Vector4
-	Scale       Vector3
+	Translation vector3.Float32
+	Rotation    Quaternion
+	Scale       vector3.Float32
 }
 
 // Ray type (useful for raycast)
 type Ray struct {
 	// Ray position (origin)
-	Position Vector3
+	Position vector3.Float32
 	// Ray direction
-	Direction Vector3
+	Direction vector3.Float32
 }
 
 // NewRay - Returns new Ray
-func NewRay(position, direction Vector3) Ray {
+func NewRay(position, direction vector3.Float32) Ray {
 	return Ray{position, direction}
 }
 
@@ -943,12 +1035,12 @@ func (m ModelAnimation) GetName() string {
 type RayCollision struct {
 	Hit      bool
 	Distance float32
-	Point    Vector3
-	Normal   Vector3
+	Point    vector3.Float32
+	Normal   vector3.Float32
 }
 
 // NewRayCollision - Returns new RayCollision
-func NewRayCollision(hit bool, distance float32, point, normal Vector3) RayCollision {
+func NewRayCollision(hit bool, distance float32, point, normal vector3.Float32) RayCollision {
 	return RayCollision{hit, distance, point, normal}
 }
 
@@ -980,14 +1072,19 @@ func NewShader(id uint32, locs *int32) Shader {
 	return Shader{id, locs}
 }
 
+func (s Shader) IsValid() bool {
+	return s.ID > 0 && // Validate shader id (GPU loaded successfully)
+		s.Locs != nil
+}
+
 // GetLocation - Get shader value's location
-func (sh *Shader) GetLocation(index int32) int32 {
-	return *(*int32)(unsafe.Pointer(uintptr(unsafe.Pointer(sh.Locs)) + uintptr(index*4)))
+func (s Shader) GetLocation(index int32) int32 {
+	return *(*int32)(unsafe.Pointer(uintptr(unsafe.Pointer(s.Locs)) + uintptr(index*4)))
 }
 
 // UpdateLocation - Update shader value's location
-func (sh *Shader) UpdateLocation(index int32, loc int32) {
-	*(*int32)(unsafe.Pointer(uintptr(unsafe.Pointer(sh.Locs)) + uintptr(index*4))) = loc
+func (s *Shader) UpdateLocation(index int32, loc int32) {
+	*(*int32)(unsafe.Pointer(uintptr(unsafe.Pointer(s.Locs)) + uintptr(index*4))) = loc
 }
 
 // GlyphInfo - Font character info
@@ -1027,13 +1124,13 @@ type Font struct {
 	// Characters texture atlas
 	Texture Texture2D
 	// Characters rectangles in texture
-	Recs *Rectangle
+	Recs *rect2.Float32
 	// Characters info data
 	Glyphs *GlyphInfo
 }
 
-func (f Font) IsReady() bool {
-	return f.Texture.IsReady() && // Validate OpenGL id fot font texture atlas
+func (f Font) IsValid() bool {
+	return f.Texture.IsValid() && // Validate OpenGL id fot font texture atlas
 		f.BaseSize != 0 && // Validate font size
 		f.GlyphCount != 0 && // Validate font contains some glyph
 		f.Recs != nil && // Validate font recs defining glyphs on texture atlas
@@ -1041,16 +1138,16 @@ func (f Font) IsReady() bool {
 }
 
 // DrawTextEx - Draw text using Font and additional parameters
-func (f Font) DrawEx(text string, position Vector2, fontSize float32, spacing float32, tint colorex.RGBA) {
+func (f Font) DrawEx(text string, position vector2.Float32, fontSize float32, spacing float32, tint colorex.RGBA) {
 	DrawTextEx(f, text, position, fontSize, spacing, tint)
 }
 
-func (f Font) DrawLayout(text string, fontSize float32, spacing float32, tint colorex.RGBA, layoutFn func(wh Vector2) Rectangle) {
+func (f Font) DrawLayout(text string, fontSize float32, spacing float32, tint colorex.RGBA, layoutFn func(wh vector2.Float32) rect2.Float32) {
 	DrawTextLayout(f, text, fontSize, spacing, tint, layoutFn)
 }
 
 // MeasureTextEx - Measure string size for Font
-func (f Font) MeasureEx(text string, fontSize float32, spacing float32) Vector2 {
+func (f Font) MeasureEx(text string, fontSize float32, spacing float32) vector2.Float32 {
 	return MeasureTextEx(f, text, fontSize, spacing)
 }
 
@@ -1062,16 +1159,16 @@ type FontPreset struct {
 	Spacing  float32
 }
 
-func (f FontPreset) DrawEx(text string, position Vector2, tint colorex.RGBA) {
+func (f FontPreset) DrawEx(text string, position vector2.Float32, tint colorex.RGBA) {
 	DrawTextEx(f.Font, text, position, f.FontSize, f.Spacing, tint)
 }
 
-func (f FontPreset) DrawLayout(text string, tint colorex.RGBA, layoutFn func(wh Vector2) Rectangle) {
+func (f FontPreset) DrawLayout(text string, tint colorex.RGBA, layoutFn func(wh vector2.Float32) rect2.Float32) {
 	DrawTextLayout(f.Font, text, f.FontSize, f.Spacing, tint, layoutFn)
 }
 
 // MeasureTextEx - Measure string size for Font
-func (f FontPreset) MeasureEx(text string) Vector2 {
+func (f FontPreset) MeasureEx(text string) vector2.Float32 {
 	return MeasureTextEx(f.Font, text, f.FontSize, f.Spacing)
 }
 
@@ -1188,6 +1285,15 @@ func NewImage(data []byte, width, height, mipmaps int32, format PixelFormat) *Im
 	return &Image{d, width, height, mipmaps, format}
 }
 
+// IsImageValid - Check if an image is valid (data and parameters)
+func (image Image) IsValid() bool {
+	return (image.Data != nil) && // Validate pixel data available
+		(image.Width > 0) && // Validate image width
+		(image.Height > 0) && // Validate image height
+		(image.Format > 0) && // Validate image format
+		(image.Mipmaps > 0) // Validate image mipmaps (at least 1 for basic mipmap level)
+}
+
 func (i *Image) Unload() {
 	UnloadImage(i)
 }
@@ -1200,16 +1306,16 @@ func (t Image) IsReady() bool {
 	return !t.IsNull()
 }
 
-func (i Image) GetSize() Vector2 {
+func (i Image) GetSize() vector2.Float32 {
 	return vector2.NewFloat32(i.Width, i.Height)
 }
 
-func (i Image) GetRect() Rectangle {
+func (i Image) GetRect() rect2.Float32 {
 	return NewRectangle(0, 0, i.Width, i.Height)
 }
 
-func (i *Image) DrawDef(dst *Image, dstRect Rectangle) {
-	ImageDraw(dst, i, i.GetRect(), dstRect, White)
+func (i *Image) DrawDef(dst *Image, dstRect rect2.Float32) {
+	ImageDraw(dst, *i, i.GetRect(), dstRect, White)
 }
 
 // Texture2D type, bpp always RGBA (32bit)
@@ -1236,15 +1342,7 @@ func (t *Texture2D) Unload() {
 	UnloadTexture(t)
 }
 
-func (t Texture2D) IsNull() bool {
-	return t.ID == 0 || // Validate OpenGL id
-		t.Width == 0 ||
-		t.Height == 0 || // Validate texture size
-		t.Format == 0 || // Validate texture pixel format
-		t.Mipmaps == 0
-}
-
-func (t Texture2D) IsReady() bool {
+func (t Texture2D) IsValid() bool {
 	return t.ID > 0 && // Validate OpenGL id
 		t.Width > 0 &&
 		t.Height > 0 && // Validate texture size
@@ -1252,65 +1350,65 @@ func (t Texture2D) IsReady() bool {
 		t.Mipmaps > 0
 }
 
-func (t Texture2D) GetSize() Vector2 {
+func (t Texture2D) GetSize() vector2.Float32 {
 	return vector2.NewFloat32(t.Width, t.Height)
 }
 
-func (t Texture2D) GetRect() Rectangle {
+func (t Texture2D) GetRect() rect2.Float32 {
 	return NewRectangle(0, 0, t.Width, t.Height)
 }
 
-func (t *Texture2D) Draw(posX int, posY int, tint colorex.RGBA) {
+func (t Texture2D) Draw(posX int, posY int, tint colorex.RGBA) {
 	DrawTexture(t, posX, posY, tint)
 }
 
-func (t *Texture2D) DrawDef(posX int, posY int) {
+func (t Texture2D) DrawDef(posX int, posY int) {
 	DrawTexture(t, posX, posY, White)
 }
 
-func (t *Texture2D) DrawV(position Vector2, tint colorex.RGBA) {
+func (t Texture2D) DrawV(position vector2.Float32, tint colorex.RGBA) {
 	DrawTextureV(t, position, tint)
 }
 
-func (t *Texture2D) DrawVDef(position Vector2) {
+func (t Texture2D) DrawVDef(position vector2.Float32) {
 	DrawTextureV(t, position, White)
 }
 
-func (t *Texture2D) DrawEx(position Vector2, rotation, scale float32, tint colorex.RGBA) {
+func (t Texture2D) DrawEx(position vector2.Float32, rotation, scale float32, tint colorex.RGBA) {
 	DrawTextureEx(t, position, rotation, scale, tint)
 }
 
-func (t *Texture2D) DrawExDef(position Vector2) {
+func (t Texture2D) DrawExDef(position vector2.Float32) {
 	DrawTextureEx(t, position, 0, 1, White)
 }
 
-func (t *Texture2D) DrawRec(sourceRec Rectangle, position Vector2, tint colorex.RGBA) {
+func (t Texture2D) DrawRec(sourceRec rect2.Float32, position vector2.Float32, tint colorex.RGBA) {
 	DrawTextureRec(t, sourceRec, position, tint)
 }
 
-func (t *Texture2D) DrawPro(sourceRec, destRec Rectangle, origin Vector2, rotation float32, tint colorex.RGBA) {
+func (t Texture2D) DrawPro(sourceRec, destRec rect2.Float32, origin vector2.Float32, rotation float32, tint colorex.RGBA) {
 	DrawTexturePro(t, sourceRec, destRec, origin, rotation, tint)
 }
 
-func (t *Texture2D) DrawFlippedPro(sourceRec, destRec Rectangle, origin Vector2, rotation float32, tint colorex.RGBA) {
+func (t Texture2D) DrawFlippedPro(sourceRec, destRec rect2.Float32, origin vector2.Float32, rotation float32, tint colorex.RGBA) {
 	sourceRec = sourceRec.ScaleByVectorF(vector2.NewFloat32(1, -1))
 	sourceRec = sourceRec.SetY(float32(t.Height) + sourceRec.Height())
 	DrawTexturePro(t, sourceRec, destRec, origin, rotation, tint)
 }
 
-func (t *Texture2D) DrawProDef(destRec Rectangle) {
+func (t Texture2D) DrawProDef(destRec rect2.Float32) {
 	DrawTexturePro(t, t.GetRect(), destRec, vector2.Zero[float32](), 0, White)
 }
 
-func (t *Texture2D) DrawProFlippedDef(destRec Rectangle) {
+func (t Texture2D) DrawProFlippedDef(destRec rect2.Float32) {
 	DrawTexturePro(t, t.GetRect().ScaleByVectorF(vector2.NewFloat32(1, -1)), destRec, vector2.Zero[float32](), 0, White)
 }
 
-func (t *Texture2D) DrawTiled(source, dest Rectangle, origin Vector2, rotation, scale float32, tint colorex.RGBA) {
+func (t Texture2D) DrawTiled(source, dest rect2.Float32, origin vector2.Float32, rotation, scale float32, tint colorex.RGBA) {
 	DrawTextureTiled(t, source, dest, origin, rotation, scale, tint)
 }
 
-func (t *Texture2D) DrawTiledDef(dest Rectangle) {
+func (t Texture2D) DrawTiledDef(dest rect2.Float32) {
 	DrawTextureTiled(t, t.GetRect(), dest, vector2.Zero[float32](), 0, 1, White)
 }
 
@@ -1329,10 +1427,10 @@ func NewRenderTexture2D(id uint32, texture, depth Texture2D) *RenderTexture2D {
 	return &RenderTexture2D{id, texture, depth}
 }
 
-func (r RenderTexture2D) IsNull() bool {
-	return r.ID == 0 ||
-		r.Texture.IsNull() ||
-		r.Depth.IsNull()
+func (r RenderTexture2D) IsValid() bool {
+	return r.ID > 0 &&
+		r.Texture.IsValid() &&
+		r.Depth.IsValid()
 }
 
 func (r *RenderTexture2D) Unload() {
@@ -1377,12 +1475,12 @@ const (
 
 // NPatchInfo type, n-patch layout info
 type NPatchInfo struct {
-	Source Rectangle    // Texture source rectangle
-	Left   int32        // Left border offset
-	Top    int32        // Top border offset
-	Right  int32        // Right border offset
-	Bottom int32        // Bottom border offset
-	Layout NPatchLayout // Layout of the n-patch: 3x3, 1x3 or 3x1
+	Source rect2.Float32 // Texture source rectangle
+	Left   int32         // Left border offset
+	Top    int32         // Top border offset
+	Right  int32         // Right border offset
+	Bottom int32         // Bottom border offset
+	Layout NPatchLayout  // Layout of the n-patch: 3x3, 1x3 or 3x1
 }
 
 // VrStereoConfig, VR stereo rendering configuration for simulator

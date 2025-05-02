@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -11,9 +12,9 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [shaders] example - texture tiling")
 
 	cam := rl.Camera3D{}
-	cam.Position = rl.NewVector3(4, 4, 4)
-	cam.Target = rl.NewVector3(0, 0.5, 0)
-	cam.Up = rl.NewVector3(0, 1, 0)
+	cam.Position = vector3.NewFloat32(4, 4, 4)
+	cam.Target = vector3.NewFloat32(0, 0.5, 0)
+	cam.Up = vector3.NewFloat32(0, 1, 0)
 	cam.Fovy = 45
 	cam.Projection = rl.CameraPerspective
 
@@ -37,7 +38,7 @@ func main() {
 		rl.UpdateCamera(&cam, rl.CameraOrbital)
 
 		if rl.IsKeyPressed(rl.KeyZ) {
-			cam.Target = rl.NewVector3(0, 0.5, 0)
+			cam.Target = vector3.NewFloat32(0, 0.5, 0)
 		}
 
 		rl.BeginDrawing()
@@ -47,7 +48,7 @@ func main() {
 		rl.BeginMode3D(cam)
 
 		rl.BeginShaderMode(shader)
-		rl.DrawModel(model, rl.Vector3Zero(), 2, rl.White)
+		rl.DrawModel(model, vector3.Zero[float32](), 2, rl.White)
 		rl.EndShaderMode()
 
 		rl.DrawGrid(10, 1)

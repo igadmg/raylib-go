@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"unsafe"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector3"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 type LightType int32
@@ -17,9 +19,9 @@ const (
 type Light struct {
 	shader    rl.Shader
 	lightType LightType
-	position  rl.Vector3
-	target    rl.Vector3
-	color     rl.Color
+	position  vector3.Float32
+	target    vector3.Float32
+	color     colorex.RGBA
 	enabled   int32
 	// shader locations
 	enabledLoc int32
@@ -35,8 +37,8 @@ var lightCount = 0
 
 func NewLight(
 	lightType LightType,
-	position, target rl.Vector3,
-	color rl.Color,
+	position, target vector3.Float32,
+	color colorex.RGBA,
 	shader rl.Shader) Light {
 	light := Light{
 		shader: shader,

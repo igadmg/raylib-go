@@ -3,10 +3,10 @@ package raygui_test
 import (
 	"testing"
 
+	. "github.com/igadmg/gamemath/test"
+	"github.com/igadmg/gamemath/vector2"
 	rg "github.com/igadmg/raylib-go/raygui"
 	rl "github.com/igadmg/raylib-go/raylib"
-	. "github.com/igadmg/raylib-go/raymath/test"
-	"github.com/igadmg/raylib-go/raymath/vector2"
 )
 
 func TestSpread(t *testing.T) {

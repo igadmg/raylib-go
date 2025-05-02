@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/physics"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/raylib-go/physics"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const (
@@ -25,7 +26,7 @@ func main() {
 	physics.SetGravity(0, 0)
 
 	// Create random polygon physics body to shatter
-	physics.NewBodyPolygon(rl.NewVector2(screenWidth/2, screenHeight/2), float32(rl.GetRandomValue(80, 200)), int(rl.GetRandomValue(3, 8)), 10)
+	physics.NewBodyPolygon(vector2.NewFloat32(screenWidth/2, screenHeight/2), float32(rl.GetRandomValue(80, 200)), int(rl.GetRandomValue(3, 8)), 10)
 
 	rl.SetTargetFPS(60)
 
@@ -37,7 +38,7 @@ func main() {
 			physics.Reset()
 
 			// Create random polygon physics body to shatter
-			physics.NewBodyPolygon(rl.NewVector2(screenWidth/2, screenHeight/2), float32(rl.GetRandomValue(80, 200)), int(rl.GetRandomValue(3, 8)), 10)
+			physics.NewBodyPolygon(vector2.NewFloat32(screenWidth/2, screenHeight/2), float32(rl.GetRandomValue(80, 200)), int(rl.GetRandomValue(3, 8)), 10)
 		}
 
 		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {

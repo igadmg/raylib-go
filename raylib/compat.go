@@ -87,12 +87,12 @@ func UnloadMesh(mesh *Mesh) {
 			VboID: mesh.VboID,
 		}
 		cmesh := tempMesh.cptr()
-		C.UnloadMesh(*cmesh)
+		C.UnloadMesh(cmesh)
 
 		// remove mesh VaoID from list
 		goManagedMeshIDs = slices.DeleteFunc(goManagedMeshIDs, func(id uint32) bool { return id == mesh.VaoID })
 	} else {
 		cmesh := mesh.cptr()
-		C.UnloadMesh(*cmesh)
+		C.UnloadMesh(cmesh)
 	}
 }

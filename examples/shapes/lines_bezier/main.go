@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -10,8 +11,8 @@ func main() {
 
 	rl.InitWindow(screenWidth, screenHeight, "raylib [shapes] example - cubic-bezier lines")
 
-	start := rl.NewVector2(0, 0)
-	end := rl.NewVector2(float32(screenWidth), float32(screenHeight))
+	start := vector2.NewFloat32(0, 0)
+	end := vector2.NewFloat32(float32(screenWidth), float32(screenHeight))
 
 	rl.SetTargetFPS(60)
 

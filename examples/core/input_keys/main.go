@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -10,7 +11,7 @@ func main() {
 
 	rl.InitWindow(screenWidth, screenHeight, "raylib [core] example - keyboard input")
 
-	ballPosition := rl.NewVector2(float32(screenWidth)/2, float32(screenHeight)/2)
+	ballPosition := vector2.NewFloat32(float32(screenWidth)/2, float32(screenHeight)/2)
 
 	rl.SetTargetFPS(60)
 

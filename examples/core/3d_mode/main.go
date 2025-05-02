@@ -1,20 +1,21 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
 	rl.InitWindow(800, 450, "raylib [core] example - 3d mode")
 
 	camera := rl.Camera3D{}
-	camera.Position = rl.NewVector3(0.0, 10.0, 10.0)
-	camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	camera.Position = vector3.NewFloat32(0.0, 10.0, 10.0)
+	camera.Target = vector3.NewFloat32(0.0, 0.0, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
 	camera.Fovy = 45.0
 	camera.Projection = rl.CameraPerspective
 
-	cubePosition := rl.NewVector3(0.0, 0.0, 0.0)
+	cubePosition := vector3.NewFloat32(0.0, 0.0, 0.0)
 
 	rl.SetTargetFPS(60)
 

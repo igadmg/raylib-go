@@ -1,7 +1,9 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/goex/image/colorex"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var (
@@ -17,18 +19,18 @@ func main() {
 	player := rl.NewRectangle(400, 280, 40, 40)
 
 	buildings := make([]rl.Rectangle, maxBuildings)
-	buildColors := make([]rl.Color, maxBuildings)
+	buildColors := make([]colorex.RGBA, maxBuildings)
 
 	spacing := float32(0)
 
 	for i := 0; i < maxBuildings; i++ {
 		r := rl.Rectangle{}
-		r.WH.X = float32(rl.GetRandomValue(50, 200))
-		r.WH.Y = float32(rl.GetRandomValue(100, 800))
-		r.XY.Y = float32(screenHeight) - 130 - r.WH.Y
-		r.XY.X = -6000 + spacing
+		r.Size.X = float32(rl.GetRandomValue(50, 200))
+		r.Size.Y = float32(rl.GetRandomValue(100, 800))
+		r.Position.Y = float32(screenHeight) - 130 - r.Size.Y
+		r.Position.X = -6000 + spacing
 
-		spacing += r.WH.X
+		spacing += r.Size.X
 
 		c := rl.NewColor(byte(rl.GetRandomValue(200, 240)), byte(rl.GetRandomValue(200, 240)), byte(rl.GetRandomValue(200, 250)), byte(255))
 
@@ -37,8 +39,8 @@ func main() {
 	}
 
 	camera := rl.Camera2D{}
-	camera.Target = rl.NewVector2(float32(player.XY.X+20), float32(player.XY.Y+20))
-	camera.Offset = rl.NewVector2(float32(screenWidth/2), float32(screenHeight/2))
+	camera.Target = vector2.NewFloat32(float32(player.Position.X+20), float32(player.Position.Y+20))
+	camera.Offset = vector2.NewFloat32(float32(screenWidth/2), float32(screenHeight/2))
 	camera.Rotation = 0.0
 	camera.Zoom = 1.0
 
@@ -46,13 +48,13 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 		if rl.IsKeyDown(rl.KeyRight) {
-			player.XY.X += 2 // Player movement
+			player.Position.X += 2 // Player movement
 		} else if rl.IsKeyDown(rl.KeyLeft) {
-			player.XY.X -= 2 // Player movement
+			player.Position.X -= 2 // Player movement
 		}
 
 		// Camera target follows player
-		camera.Target = rl.NewVector2(float32(player.XY.X+20), float32(player.XY.Y+20))
+		camera.Target = vector2.NewFloat32(float32(player.Position.X+20), float32(player.Position.Y+20))
 
 		// Camera rotation controls
 		if rl.IsKeyDown(rl.KeyA) {

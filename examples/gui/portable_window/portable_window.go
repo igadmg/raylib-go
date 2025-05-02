@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 
-	gui "github.com/gen2brain/raylib-go/raygui"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	gui "github.com/igadmg/raylib-go/raygui"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 /*******************************************************************************************
@@ -40,8 +41,8 @@ func main() {
 
 	// General variables
 	var (
-		mousePosition  = rl.Vector2{0, 0}
-		windowPosition = rl.Vector2{500, 200}
+		mousePosition  = vector2.Float32{0, 0}
+		windowPosition = vector2.Float32{500, 200}
 		panOffset      = mousePosition
 		dragWindow     = false
 	)

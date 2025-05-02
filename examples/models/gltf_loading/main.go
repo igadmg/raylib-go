@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -13,9 +14,9 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [models] example - gltf loading")
 
 	camera := rl.Camera{}
-	camera.Position = rl.NewVector3(5.0, 5.0, 5.0)
-	camera.Target = rl.NewVector3(0.0, 2.0, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	camera.Position = vector3.NewFloat32(5.0, 5.0, 5.0)
+	camera.Target = vector3.NewFloat32(0.0, 2.0, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
 	camera.Fovy = 45.0
 	camera.Projection = rl.CameraPerspective
 
@@ -26,7 +27,7 @@ func main() {
 
 	modelAnims := rl.LoadModelAnimations("robot.glb")
 
-	position := rl.NewVector3(0, 0, 0)
+	position := vector3.NewFloat32(0, 0, 0)
 	rl.DisableCursor()
 
 	rl.SetTargetFPS(60)
@@ -62,7 +63,7 @@ func main() {
 
 		rl.EndMode3D()
 
-		rl.DrawText(fmt.Sprintf("current animation: %s [%d]", animPlaying.GetName(), animIndex), 10, 10, 10, rl.Black)
+		rl.DrawText("current animation number: "+fmt.Sprint(animIndex), 10, 10, 10, rl.Black)
 		rl.DrawText("UP/DOWN ARROW KEYS CHANGE ANIMATION", 10, 30, 10, rl.Black)
 
 		rl.EndDrawing()

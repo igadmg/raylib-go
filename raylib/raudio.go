@@ -92,40 +92,6 @@ func internalAudioMixedProcessorGo(data unsafe.Pointer, frames C.int) {
 	}
 }
 
-// newWaveFromPointer - Returns new Wave from pointer
-func newWaveFromPointer(ptr unsafe.Pointer) Wave {
-	return *(*Wave)(ptr)
-}
-
-// cptr returns C pointer
-func (w *Wave) cptr() *C.Wave {
-	return (*C.Wave)(unsafe.Pointer(w))
-}
-
-// newSoundFromPointer - Returns new Sound from pointer
-func newSoundFromPointer(ptr unsafe.Pointer) Sound {
-	return *(*Sound)(ptr)
-}
-
-func (s *Sound) cptr() *C.Sound {
-	return (*C.Sound)(unsafe.Pointer(s))
-}
-
-// newAudioStreamFromPointer - Returns new AudioStream from pointer
-func newAudioStreamFromPointer(ptr unsafe.Pointer) AudioStream {
-	return *(*AudioStream)(ptr)
-}
-
-// cptr returns C pointer
-func (a *AudioStream) cptr() *C.AudioStream {
-	return (*C.AudioStream)(unsafe.Pointer(a))
-}
-
-// newMusicFromPointer - Returns new Music from pointer
-func newMusicFromPointer(ptr unsafe.Pointer) Music {
-	return *(*Music)(ptr)
-}
-
 // InitAudioDevice - Initialize audio device and context
 func InitAudioDevice() {
 	C.InitAudioDevice()

@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var (
@@ -20,13 +21,13 @@ func main() {
 	player1 := rl.NewRectangle(200, 200, playerSize, playerSize)
 	player2 := rl.NewRectangle(250, 200, playerSize, playerSize)
 
-	cam1.Target = rl.NewVector2(player1.XY.X, player1.XY.Y)
-	cam1.Offset = rl.NewVector2(200, 200)
+	cam1.Target = vector2.NewFloat32(player1.Position.X, player1.Position.Y)
+	cam1.Offset = vector2.NewFloat32(200, 200)
 	cam1.Rotation = 0
 	cam1.Zoom = 1
 
 	cam2 = cam1
-	cam2.Target = rl.NewVector2(player2.XY.X, player2.XY.Y)
+	cam2.Target = vector2.NewFloat32(player2.Position.X, player2.Position.Y)
 
 	screenCam1 := rl.LoadRenderTexture(screenW/2, screenH)
 	screenCam2 := rl.LoadRenderTexture(screenW/2, screenH)
@@ -38,39 +39,39 @@ func main() {
 	for !rl.WindowShouldClose() {
 
 		if rl.IsKeyDown(rl.KeyS) {
-			player1.XY.Y += 3
+			player1.Position.Y += 3
 		} else if rl.IsKeyDown(rl.KeyW) {
-			player1.XY.Y -= 3
+			player1.Position.Y -= 3
 		}
 		if rl.IsKeyDown(rl.KeyD) {
-			player1.XY.X += 3
+			player1.Position.X += 3
 		} else if rl.IsKeyDown(rl.KeyA) {
-			player1.XY.X -= 3
+			player1.Position.X -= 3
 		}
 
 		if rl.IsKeyDown(rl.KeyUp) {
-			player2.XY.Y -= 3
+			player2.Position.Y -= 3
 		} else if rl.IsKeyDown(rl.KeyDown) {
-			player2.XY.Y += 3
+			player2.Position.Y += 3
 		}
 		if rl.IsKeyDown(rl.KeyRight) {
-			player2.XY.X += 3
+			player2.Position.X += 3
 		} else if rl.IsKeyDown(rl.KeyLeft) {
-			player2.XY.X -= 3
+			player2.Position.X -= 3
 		}
 
-		cam1.Target = rl.NewVector2(player1.XY.X, player1.XY.Y)
-		cam2.Target = rl.NewVector2(player2.XY.X, player2.XY.Y)
+		cam1.Target = vector2.NewFloat32(player1.Position.X, player1.Position.Y)
+		cam2.Target = vector2.NewFloat32(player2.Position.X, player2.Position.Y)
 
-		rl.BeginTextureMode(&screenCam1)
+		rl.BeginTextureMode(screenCam1)
 		rl.ClearBackground(rl.RayWhite)
 		rl.BeginMode2D(cam1)
 
 		for i := 0; i < int(screenW/int32(playerSize))+1; i++ {
-			rl.DrawLineV(rl.NewVector2(playerSize*float32(i), 0), rl.NewVector2(playerSize*float32(i), float32(screenH)), rl.LightGray)
+			rl.DrawLineV(vector2.NewFloat32(playerSize*float32(i), 0), vector2.NewFloat32(playerSize*float32(i), float32(screenH)), rl.LightGray)
 		}
 		for i := 0; i < int(screenH/int32(playerSize))+1; i++ {
-			rl.DrawLineV(rl.NewVector2(0, playerSize*float32(i)), rl.NewVector2(float32(screenW), playerSize*float32(i)), rl.LightGray)
+			rl.DrawLineV(vector2.NewFloat32(0, playerSize*float32(i)), vector2.NewFloat32(float32(screenW), playerSize*float32(i)), rl.LightGray)
 		}
 		for i := 0; i < int(screenW/int32(playerSize)); i++ {
 			for j := 0; j < int(screenH/int32(playerSize)); j++ {
@@ -86,15 +87,15 @@ func main() {
 		rl.DrawText("PLAYER 1 WASD KEYS", 10, 10, 10, rl.Maroon)
 		rl.EndTextureMode()
 
-		rl.BeginTextureMode(&screenCam2)
+		rl.BeginTextureMode(screenCam2)
 		rl.ClearBackground(rl.RayWhite)
 		rl.BeginMode2D(cam2)
 
 		for i := 0; i < int(screenW/int32(playerSize))+1; i++ {
-			rl.DrawLineV(rl.NewVector2(playerSize*float32(i), 0), rl.NewVector2(playerSize*float32(i), float32(screenH)), rl.LightGray)
+			rl.DrawLineV(vector2.NewFloat32(playerSize*float32(i), 0), vector2.NewFloat32(playerSize*float32(i), float32(screenH)), rl.LightGray)
 		}
 		for i := 0; i < int(screenH/int32(playerSize))+1; i++ {
-			rl.DrawLineV(rl.NewVector2(0, playerSize*float32(i)), rl.NewVector2(float32(screenW), playerSize*float32(i)), rl.LightGray)
+			rl.DrawLineV(vector2.NewFloat32(0, playerSize*float32(i)), vector2.NewFloat32(float32(screenW), playerSize*float32(i)), rl.LightGray)
 		}
 		for i := 0; i < int(screenW/int32(playerSize)); i++ {
 			for j := 0; j < int(screenH/int32(playerSize)); j++ {
@@ -113,8 +114,8 @@ func main() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
 
-		rl.DrawTextureRec(&screenCam1.Texture, splitScreenRec, rl.NewVector2(0, 0), rl.White)
-		rl.DrawTextureRec(&screenCam2.Texture, splitScreenRec, rl.NewVector2(float32(screenW/2), 0), rl.White)
+		rl.DrawTextureRec(screenCam1.Texture, splitScreenRec, vector2.NewFloat32(0, 0), rl.White)
+		rl.DrawTextureRec(screenCam2.Texture, splitScreenRec, vector2.NewFloat32(float32(screenW/2), 0), rl.White)
 		rl.DrawRectangle((screenW/2)-2, 0, 4, screenH, rl.LightGray)
 
 		rl.EndDrawing()

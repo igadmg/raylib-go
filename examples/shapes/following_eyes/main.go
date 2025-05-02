@@ -3,7 +3,8 @@ package main
 import (
 	"math"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -14,12 +15,12 @@ func main() {
 
 	rl.InitWindow(screenWidth, screenHeight, "raylib [shapes] example - following eyes")
 
-	scleraLpos := rl.NewVector2(float32(screenWidth/2)-100, float32(screenHeight/2))
-	scleraRpos := rl.NewVector2(float32(screenWidth/2)+100, float32(screenHeight/2))
+	scleraLpos := vector2.NewFloat32(float32(screenWidth/2)-100, float32(screenHeight/2))
+	scleraRpos := vector2.NewFloat32(float32(screenWidth/2)+100, float32(screenHeight/2))
 	scleraRad := 80
 
-	irisLpos := rl.NewVector2(float32(screenWidth/2)-100, float32(screenHeight/2))
-	irisRpos := rl.NewVector2(float32(screenWidth/2)+100, float32(screenHeight/2))
+	irisLpos := vector2.NewFloat32(float32(screenWidth/2)-100, float32(screenHeight/2))
+	irisRpos := vector2.NewFloat32(float32(screenWidth/2)+100, float32(screenHeight/2))
 	irisRad := 24
 
 	angle := float32(0)

@@ -1,7 +1,9 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 /*******************************************************************************************
@@ -28,12 +30,12 @@ func DrawScene() {
 	spacing := float32(4.0)
 
 	// Grid of cube trees on a plane to make a "world"
-	rl.DrawPlane(rl.NewVector3(0, 0, 0), rl.NewVector2(50, 50), rl.Beige) // Simple world plane
+	rl.DrawPlane(vector3.NewFloat32(0, 0, 0), vector2.NewFloat32(50, 50), rl.Beige) // Simple world plane
 
 	for x := -float32(count * spacing); x <= count*spacing; x += spacing {
 		for z := -float32(count * spacing); z <= count*spacing; z += spacing {
-			rl.DrawCube(rl.NewVector3(x, 1.5, z), 1, 1, 1, rl.Lime)
-			rl.DrawCube(rl.NewVector3(x, 0.5, z), 0.25, 1, 0.25, rl.Brown)
+			rl.DrawCube(vector3.NewFloat32(x, 1.5, z), 1, 1, 1, rl.Lime)
+			rl.DrawCube(vector3.NewFloat32(x, 0.5, z), 0.25, 1, 0.25, rl.Brown)
 		}
 	}
 
@@ -109,7 +111,7 @@ func main() {
 		// Draw
 		//----------------------------------------------------------------------------------
 		// Draw Player1 view to the render texture
-		rl.BeginTextureMode(&screenPlayer1)
+		rl.BeginTextureMode(screenPlayer1)
 		rl.ClearBackground(rl.SkyBlue)
 		rl.BeginMode3D(cameraPlayer1)
 		DrawScene()
@@ -118,7 +120,7 @@ func main() {
 		rl.EndTextureMode()
 
 		// Draw Player2 view to the render texture
-		rl.BeginTextureMode(&screenPlayer2)
+		rl.BeginTextureMode(screenPlayer2)
 		rl.ClearBackground(rl.SkyBlue)
 		rl.BeginMode3D(cameraPlayer2)
 		DrawScene()
@@ -129,8 +131,8 @@ func main() {
 		// Draw both views render textures to the screen side by side
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
-		rl.DrawTextureRec(&screenPlayer1.Texture, splitScreenRect, rl.NewVector2(0, 0), rl.White)
-		rl.DrawTextureRec(&screenPlayer2.Texture, splitScreenRect, rl.NewVector2(screenWidth/2.0, 0), rl.White)
+		rl.DrawTextureRec(screenPlayer1.Texture, splitScreenRect, vector2.NewFloat32(0, 0), rl.White)
+		rl.DrawTextureRec(screenPlayer2.Texture, splitScreenRect, vector2.NewFloat32(screenWidth/2.0, 0), rl.White)
 		rl.EndDrawing()
 	}
 

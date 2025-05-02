@@ -1,7 +1,9 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -11,24 +13,24 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [models] example - cubesmap loading and drawing")
 
 	camera := rl.Camera{}
-	camera.Position = rl.NewVector3(16.0, 14.0, 16.0)
-	camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	camera.Position = vector3.NewFloat32(16.0, 14.0, 16.0)
+	camera.Target = vector3.NewFloat32(0.0, 0.0, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
 	camera.Fovy = 45.0
 
 	image := rl.LoadImage("cubicmap.png")      // Load cubicmap image (RAM)
 	cubicmap := rl.LoadTextureFromImage(image) // Convert image to texture to display (VRAM)
 
-	mesh := rl.GenMeshCubicmap(*image, rl.NewVector3(1.0, 1.0, 1.0))
+	mesh := rl.GenMeshCubicmap(image, vector3.NewFloat32(1.0, 1.0, 1.0))
 	model := rl.LoadModelFromMesh(mesh)
 
 	// NOTE: By default each cube is mapped to one part of texture atlas
 	texture := rl.LoadTexture("cubicmap_atlas.png")                 // Load map texture
 	rl.SetMaterialTexture(model.Materials, rl.MapDiffuse, &texture) // Set map diffuse texture
 
-	mapPosition := rl.NewVector3(-16.0, 0.0, -8.0) // Set model position
+	mapPosition := vector3.NewFloat32(-16.0, 0.0, -8.0) // Set model position
 
-	rl.UnloadImage(image) // Unload cubicmap image from RAM, already uploaded to VRAM
+	rl.UnloadImage(&image) // Unload cubicmap image from RAM, already uploaded to VRAM
 
 	rl.SetTargetFPS(60)
 
@@ -49,7 +51,7 @@ func main() {
 
 		rl.EndMode3D()
 
-		rl.DrawTextureEx(&cubicmap, rl.NewVector2(float32(screenWidth-cubicmap.Width*4-20), 20), 0.0, 4.0, rl.White)
+		rl.DrawTextureEx(cubicmap, vector2.NewFloat32(float32(screenWidth-cubicmap.Width*4-20), 20), 0.0, 4.0, rl.White)
 		rl.DrawRectangleLines(screenWidth-cubicmap.Width*4-20, 20, cubicmap.Width*4, cubicmap.Height*4, rl.Green)
 
 		rl.DrawText("cubicmap image used to", 658, 90, 10, rl.Gray)

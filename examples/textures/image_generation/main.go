@@ -1,7 +1,7 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const numTextures = 7
@@ -28,12 +28,12 @@ func main() {
 	textures[5] = rl.LoadTextureFromImage(cellular)
 
 	// Unload image data (CPU RAM)
-	rl.UnloadImage(verticalGradient)
-	rl.UnloadImage(horizontalGradient)
-	rl.UnloadImage(radialGradient)
-	rl.UnloadImage(checked)
-	rl.UnloadImage(whiteNoise)
-	rl.UnloadImage(cellular)
+	rl.UnloadImage(&verticalGradient)
+	rl.UnloadImage(&horizontalGradient)
+	rl.UnloadImage(&radialGradient)
+	rl.UnloadImage(&checked)
+	rl.UnloadImage(&whiteNoise)
+	rl.UnloadImage(&cellular)
 
 	currentTexture := 0
 
@@ -48,7 +48,7 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTexture(&textures[currentTexture], 0, 0, rl.White)
+		rl.DrawTexture(textures[currentTexture], 0, 0, rl.White)
 
 		rl.DrawRectangle(30, 400, 325, 30, rl.Fade(rl.SkyBlue, 0.5))
 		rl.DrawRectangleLines(30, 400, 325, 30, rl.Fade(rl.White, 0.5))

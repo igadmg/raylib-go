@@ -3,9 +3,10 @@ package main
 import (
 	"strings"
 
-	"github.com/gen2brain/raylib-go/easings"
-	"github.com/gen2brain/raylib-go/raygui"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	"github.com/igadmg/raylib-go/easings"
+	"github.com/igadmg/raylib-go/raygui"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 	finalPositionX := startPositionX * 3
 	currentPositionX := startPositionX
 
-	ballPosition := rl.NewVector2(startPositionX, float32(screenHeight)/2)
+	ballPosition := vector2.NewFloat32(startPositionX, float32(screenHeight)/2)
 
 	comboActive := int32(0)
 	comboLastActive := int32(0)

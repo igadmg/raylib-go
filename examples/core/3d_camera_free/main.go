@@ -1,20 +1,21 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
 	rl.InitWindow(800, 450, "raylib [core] example - 3d camera free")
 
 	camera := rl.Camera3D{}
-	camera.Position = rl.NewVector3(10.0, 10.0, 10.0)
-	camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	camera.Position = vector3.NewFloat32(10.0, 10.0, 10.0)
+	camera.Target = vector3.NewFloat32(0.0, 0.0, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
 	camera.Fovy = 45.0
 	camera.Projection = rl.CameraPerspective
 
-	cubePosition := rl.NewVector3(0.0, 0.0, 0.0)
+	cubePosition := vector3.NewFloat32(0.0, 0.0, 0.0)
 
 	rl.SetTargetFPS(60)
 
@@ -22,7 +23,7 @@ func main() {
 		rl.UpdateCamera(&camera, rl.CameraFree) // Update camera with free camera mode
 
 		if rl.IsKeyDown(rl.KeyZ) {
-			camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
+			camera.Target = vector3.NewFloat32(0.0, 0.0, 0.0)
 		}
 
 		rl.BeginDrawing()
@@ -44,6 +45,8 @@ func main() {
 		rl.DrawText("Free camera default controls:", 20, 20, 10, rl.Black)
 		rl.DrawText("- Mouse Wheel to Zoom in-out", 40, 40, 10, rl.DarkGray)
 		rl.DrawText("- Mouse Wheel Pressed to Pan", 40, 60, 10, rl.DarkGray)
+		rl.DrawText("- Alt + Mouse Wheel Pressed to Rotate", 40, 80, 10, rl.DarkGray)
+		rl.DrawText("- Alt + Ctrl + Mouse Wheel Pressed for Smooth Zoom", 40, 100, 10, rl.DarkGray)
 		rl.DrawText("- Z to zoom to (0, 0, 0)", 40, 120, 10, rl.DarkGray)
 
 		rl.EndDrawing()

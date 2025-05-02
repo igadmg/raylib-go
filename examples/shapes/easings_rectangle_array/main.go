@@ -1,8 +1,9 @@
 package main
 
 import (
-	ez "github.com/gen2brain/raylib-go/easings"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	ez "github.com/igadmg/raylib-go/easings"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 var (
@@ -27,10 +28,10 @@ func main() {
 	for y := 0; y < maxRecsY; y++ {
 
 		for x := 0; x < maxRecsX; x++ {
-			recs[y*maxRecsX+x].XY.X = float32(recsW/2 + recsW*float32(x))
-			recs[y*maxRecsX+x].XY.Y = float32(recsH/2 + recsH*float32(y))
-			recs[y*maxRecsX+x].WH.X = float32(recsW)
-			recs[y*maxRecsX+x].WH.Y = float32(recsH)
+			recs[y*maxRecsX+x].Position.X = float32(recsW/2 + recsW*float32(x))
+			recs[y*maxRecsX+x].Position.Y = float32(recsH/2 + recsH*float32(y))
+			recs[y*maxRecsX+x].Size.X = float32(recsW)
+			recs[y*maxRecsX+x].Size.Y = float32(recsH)
 		}
 
 	}
@@ -47,18 +48,18 @@ func main() {
 			frameCount++
 
 			for i := 0; i < maxRecsX*maxRecsY; i++ {
-				recs[i].WH.Y = float32(ez.LinearIn(frameCount, recsH, -recsH, playTime))
-				recs[i].WH.X = float32(ez.LinearIn(frameCount, recsW, -recsW, playTime))
+				recs[i].Size.Y = float32(ez.LinearIn(frameCount, recsH, -recsH, playTime))
+				recs[i].Size.X = float32(ez.LinearIn(frameCount, recsW, -recsW, playTime))
 
-				if recs[i].WH.Y < 0 {
-					recs[i].WH.Y = 0
+				if recs[i].Size.Y < 0 {
+					recs[i].Size.Y = 0
 				}
 
-				if recs[i].WH.X < 0 {
-					recs[i].WH.X = 0
+				if recs[i].Size.X < 0 {
+					recs[i].Size.X = 0
 				}
 
-				if recs[i].WH.Y == 0 && recs[i].WH.X == 0 {
+				if recs[i].Size.Y == 0 && recs[i].Size.X == 0 {
 					state = 1
 				}
 				rotation = float32(ez.LinearIn(frameCount, 0, 360, playTime))
@@ -66,8 +67,8 @@ func main() {
 		} else if state == 1 && rl.IsKeyPressed(rl.KeySpace) {
 			frameCount = 0
 			for i := 0; i < maxRecsX*maxRecsY; i++ {
-				recs[i].WH.Y = float32(recsH)
-				recs[i].WH.X = float32(recsW)
+				recs[i].Size.Y = float32(recsH)
+				recs[i].Size.X = float32(recsW)
 			}
 
 			state = 0
@@ -78,7 +79,7 @@ func main() {
 
 		if state == 0 {
 			for i := 0; i < maxRecsX*maxRecsY; i++ {
-				rl.DrawRectanglePro(recs[i], rl.NewVector2(recs[i].WH.X/2, recs[i].WH.Y/2), rotation, rl.Red)
+				rl.DrawRectanglePro(recs[i], vector2.NewFloat32(recs[i].Size.X/2, recs[i].Size.Y/2), rotation, rl.Red)
 			}
 		} else if state == 1 {
 			txtlen := rl.MeasureText("SPACE to replay", 20)

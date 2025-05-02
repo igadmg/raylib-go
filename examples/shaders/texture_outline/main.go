@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -14,7 +15,7 @@ func main() {
 
 	shader := rl.LoadShader("", "outline.fs")
 
-	cnt := rl.NewVector2(float32(screenWidth/2), float32(screenHeight/2))
+	cnt := vector2.NewFloat32(float32(screenWidth/2), float32(screenHeight/2))
 
 	outlineSize := []float32{2}
 	outlineColor := []float32{1, 0, 0, 1}
@@ -49,7 +50,7 @@ func main() {
 
 		rl.BeginShaderMode(shader)
 
-		rl.DrawTexture(&texture, int32(cnt.X)-texture.Width/2, int32(cnt.Y)-texture.Height/2, rl.White)
+		rl.DrawTexture(texture, int32(cnt.X)-texture.Width/2, int32(cnt.Y)-texture.Height/2, rl.White)
 
 		rl.EndShaderMode()
 

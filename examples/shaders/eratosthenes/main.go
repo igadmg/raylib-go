@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -17,7 +18,7 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 
-		rl.BeginTextureMode(&target)
+		rl.BeginTextureMode(target)
 		rl.ClearBackground(rl.Black)
 		rl.DrawRectangle(0, 0, int32(rl.GetScreenWidth()), int32(rl.GetScreenHeight()), rl.Black)
 		rl.EndTextureMode()
@@ -28,7 +29,7 @@ func main() {
 
 		rl.BeginShaderMode(shader)
 
-		rl.DrawTextureRec(&target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(target.Texture.Height)), rl.Vector2Zero(), rl.White)
+		rl.DrawTextureRec(target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(target.Texture.Height)), vector2.Zero[float32](), rl.White)
 
 		rl.EndShaderMode()
 

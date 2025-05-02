@@ -1,7 +1,8 @@
 package main
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector2"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -17,9 +18,9 @@ func main() {
 	fontBm := rl.LoadFont("fonts/bmfont.fnt")      // BMFont (AngelCode)
 	fontTtf := rl.LoadFont("fonts/pixantiqua.ttf") // TTF font
 
-	fontPosition := rl.Vector2{}
+	fontPosition := vector2.Float32{}
 
-	fontPosition.X = float32(screenWidth)/2 - rl.MeasureTextEx(&fontBm, msgBm, float32(fontBm.BaseSize), 0).X/2
+	fontPosition.X = float32(screenWidth)/2 - rl.MeasureTextEx(fontBm, msgBm, float32(fontBm.BaseSize), 0).X/2
 	fontPosition.Y = float32(screenHeight)/2 - float32(fontBm.BaseSize)/2 - 80
 
 	rl.SetTargetFPS(60)
@@ -29,8 +30,8 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		rl.DrawTextEx(&fontBm, msgBm, fontPosition, float32(fontBm.BaseSize), 0, rl.Maroon)
-		rl.DrawTextEx(&fontTtf, msgTtf, rl.NewVector2(75.0, 240.0), float32(fontTtf.BaseSize)*0.8, 2, rl.Lime)
+		rl.DrawTextEx(fontBm, msgBm, fontPosition, float32(fontBm.BaseSize), 0, rl.Maroon)
+		rl.DrawTextEx(fontTtf, msgTtf, vector2.NewFloat32(75.0, 240.0), float32(fontTtf.BaseSize)*0.8, 2, rl.Lime)
 
 		rl.EndDrawing()
 	}

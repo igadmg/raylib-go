@@ -3,7 +3,8 @@ package main
 import (
 	"math"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/igadmg/gamemath/vector3"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 func main() {
@@ -13,9 +14,9 @@ func main() {
 	rl.InitWindow(screenWidth, screenHeight, "raylib [models] example - waving cubes")
 
 	camera := rl.Camera{}
-	camera.Position = rl.NewVector3(30.0, 20.0, 30.0)
-	camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
-	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
+	camera.Position = vector3.NewFloat32(30.0, 20.0, 30.0)
+	camera.Target = vector3.NewFloat32(0.0, 0.0, 0.0)
+	camera.Up = vector3.NewFloat32(0.0, 1.0, 0.0)
 	camera.Fovy = 70.0
 	camera.Projection = rl.CameraPerspective
 
@@ -52,7 +53,7 @@ func main() {
 
 					scatter := math.Sin(float64(blockScale*20) + (time * 4))
 
-					cubePos := rl.NewVector3(float32((x-numBloks/2))*(scale*3)+float32(scatter), float32((y-numBloks/2))*(scale*2)+float32(scatter), float32((z-numBloks/2))*(scale*3)+float32(scatter))
+					cubePos := vector3.NewFloat32(float32((x-numBloks/2))*(scale*3)+float32(scatter), float32((y-numBloks/2))*(scale*2)+float32(scatter), float32((z-numBloks/2))*(scale*3)+float32(scatter))
 
 					cubeColor := rl.ColorFromHSV(float32(((x+y+z)*18)%360), 0.75, 0.9)
 
