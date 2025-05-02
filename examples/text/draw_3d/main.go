@@ -34,7 +34,7 @@ import (
 	"unicode/utf8"
 	"unsafe"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 // Globals
@@ -188,7 +188,7 @@ func main() {
 
 		// Handle clicking the cube
 		if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-			// TODO : Missing function, see issue https://github.com/gen2brain/raylib-go/issues/457
+			// TODO : Missing function, see issue https://github.com/igadmg/raylib-go/issues/457
 			//ray := rl.GetScreenToWorldRay(rl.GetMousePosition(), camera)
 			ray := rl.GetMouseRay(rl.GetMousePosition(), camera)
 

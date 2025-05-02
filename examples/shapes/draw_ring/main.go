@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"math"
 
-	gui "github.com/gen2brain/raylib-go/raygui"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	gui "github.com/igadmg/raylib-go/raygui"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const (

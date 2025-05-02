@@ -19,7 +19,7 @@ import (
 	"math"
 	"unsafe"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/igadmg/raylib-go/raylib"
 )
 
 const (
@@ -122,7 +122,7 @@ func main() {
 		cursorColor := rl.White
 
 		// Get ray and test against objects
-		// See issue : https://github.com/gen2brain/raylib-go/issues/457
+		// See issue : https://github.com/igadmg/raylib-go/issues/457
 		//ray = rl.GetScreenToWorldRay(rl.GetMousePosition(), camera)
 		ray = rl.GetMouseRay(rl.GetMousePosition(), camera)
 
