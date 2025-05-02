@@ -292,7 +292,7 @@ void MinimizeWindow(void)
     glfwIconifyWindow(platform.handle);
 }
 
-// Set window state: not minimized/maximized
+// Restore window from being minimized/maximized
 void RestoreWindow(void)
 {
     if (glfwGetWindowAttrib(platform.handle, GLFW_RESIZABLE) == GLFW_TRUE)
@@ -1092,19 +1092,9 @@ int SetGamepadMappings(const char *mappings)
 }
 
 // Set gamepad vibration
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
 void SetGamepadVibration(int gamepad, float leftMotor, float rightMotor, float duration)
 {
     TRACELOG(LOG_WARNING, "SetGamepadVibration() not available on target platform");
-=======
-<<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop.c
-void SetGamepadVibration(int gamepad, float leftMotor, float rightMotor)
-========
-void SetGamepadVibration(int gamepad, float leftMotor, float rightMotor, float duration)
->>>>>>>> master_original:external/raylib/src/platforms/rcore_desktop_glfw.c
-{
-    TRACELOG(LOG_WARNING, "GamepadSetVibration() not available on target platform");
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
 }
 
 // Set mouse position XY
@@ -1120,15 +1110,12 @@ void SetMousePosition(int x, int y)
 // Set mouse cursor
 void SetMouseCursor(int cursor)
 {
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
     if (CORE.Input.Mouse.customCursor)
     {
         glfwDestroyCursor(CORE.Input.Mouse.customCursor);
         CORE.Input.Mouse.customCursor = NULL;
     }
 
-=======
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
     CORE.Input.Mouse.cursor = cursor;
     if (cursor == MOUSE_CURSOR_DEFAULT) glfwSetCursor(platform.handle, NULL);
     else
@@ -1138,7 +1125,6 @@ void SetMouseCursor(int cursor)
     }
 }
 
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
 void SetMouseCursorImage(Image image, int xhot, int yhot)
 {
     if (CORE.Input.Mouse.customCursor)
@@ -1159,8 +1145,6 @@ void SetMouseCursorImage(Image image, int xhot, int yhot)
     glfwSetCursor(platform.handle, customCursor);
 }
 
-=======
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
 // Get physical key name.
 const char *GetKeyName(int key)
 {
@@ -1287,7 +1271,6 @@ void PollInputEvents(void)
             }
 
             // Register buttons for 2nd triggers (because GLFW doesn't count these as buttons but rather axis)
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
             if (CORE.Input.Gamepad.axisState[i][GAMEPAD_AXIS_LEFT_TRIGGER] > 0.1f)
             {
                 CORE.Input.Gamepad.currentButtonState[i][GAMEPAD_BUTTON_LEFT_TRIGGER_2] = 1;
@@ -1300,10 +1283,6 @@ void PollInputEvents(void)
                 CORE.Input.Gamepad.lastButtonPressed = GAMEPAD_BUTTON_RIGHT_TRIGGER_2;
             }
             else CORE.Input.Gamepad.currentButtonState[i][GAMEPAD_BUTTON_RIGHT_TRIGGER_2] = 0;
-=======
-            CORE.Input.Gamepad.currentButtonState[i][GAMEPAD_BUTTON_LEFT_TRIGGER_2] = (char)(CORE.Input.Gamepad.axisState[i][GAMEPAD_AXIS_LEFT_TRIGGER] > 0.1f);
-            CORE.Input.Gamepad.currentButtonState[i][GAMEPAD_BUTTON_RIGHT_TRIGGER_2] = (char)(CORE.Input.Gamepad.axisState[i][GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.1f);
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
 
             CORE.Input.Gamepad.axisCount[i] = GLFW_GAMEPAD_AXIS_LAST + 1;
         }
@@ -1311,7 +1290,6 @@ void PollInputEvents(void)
 
     CORE.Window.resizedLastFrame = false;
 
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
     if ((CORE.Window.eventWaiting) || (IsWindowState(FLAG_WINDOW_MINIMIZED) && !IsWindowState(FLAG_WINDOW_ALWAYS_RUN)))
     {
         glfwWaitEvents();     // Wait for in input events before continue (drawing is paused)
@@ -1319,14 +1297,6 @@ void PollInputEvents(void)
     }
     else glfwPollEvents();      // Poll input events: keyboard/mouse/window events (callbacks) -> Update keys state
 
-=======
-    if (CORE.Window.eventWaiting) glfwWaitEvents();     // Wait for in input events before continue (drawing is paused)
-    else glfwPollEvents();      // Poll input events: keyboard/mouse/window events (callbacks) -> Update keys state
-
-    // While window minimized, stop loop execution
-    while (IsWindowState(FLAG_WINDOW_MINIMIZED) && !IsWindowState(FLAG_WINDOW_ALWAYS_RUN)) glfwWaitEvents();
-
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
     CORE.Window.shouldClose = glfwWindowShouldClose(platform.handle);
 
     // Reset close status for next frame
@@ -1350,7 +1320,6 @@ static void SetDimensionsFromMonitor(GLFWmonitor *monitor)
   if (CORE.Window.screen.height == 0) CORE.Window.screen.height = CORE.Window.display.height;
 }
 
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
 // Function wrappers around RL_*alloc macros, used by glfwInitAllocator() inside of InitPlatform()
 // We need to provide these because GLFWallocator expects function pointers with specific signatures.
 // Similar wrappers exist in utils.c but we cannot reuse them here due to declaration mismatch.
@@ -1371,13 +1340,10 @@ static void DeallocateWrapper(void* block, void* user)
     RL_FREE(block);
 }
 
-=======
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
 // Initialize platform: graphics, inputs and more
 int InitPlatform(void)
 {
     glfwSetErrorCallback(ErrorCallback);
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
 
     const GLFWallocator allocator = {
         .allocate = AllocateWrapper,
@@ -1386,19 +1352,6 @@ int InitPlatform(void)
         .user = NULL, // RL_*ALLOC macros are not capable of handling user-provided data
     };
     glfwInitAllocator(&allocator);
-=======
-/*
-    // TODO: Setup GLFW custom allocators to match raylib ones
-    const GLFWallocator allocator = {
-        .allocate = MemAlloc,
-        .deallocate = MemFree,
-        .reallocate = MemRealloc,
-        .user = NULL
-    };
-
-    glfwInitAllocator(&allocator);
-*/
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
 
 #if defined(__APPLE__)
     glfwInitHint(GLFW_COCOA_CHDIR_RESOURCES, GLFW_FALSE);
@@ -1532,12 +1485,6 @@ int InitPlatform(void)
     GLFWmonitor *monitor = NULL;
     if (CORE.Window.fullscreen)
     {
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
-=======
-<<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop.c
-        // Remember center for switchinging from fullscreen to window
-========
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
         // According to glfwCreateWindow(), if the user does not have a choice, fullscreen applications
         // should default to the primary monitor.
 
@@ -1551,10 +1498,6 @@ int InitPlatform(void)
         SetDimensionsFromMonitor(monitor);
 
         // Remember center for switching from fullscreen to window
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
-=======
->>>>>>>> master_original:external/raylib/src/platforms/rcore_desktop_glfw.c
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
         if ((CORE.Window.screen.height == CORE.Window.display.height) && (CORE.Window.screen.width == CORE.Window.display.width))
         {
             // If screen width/height equal to the display, we can't calculate the window pos for toggling full-screened/windowed.
@@ -1604,15 +1547,12 @@ int InitPlatform(void)
         SetupFramebuffer(CORE.Window.display.width, CORE.Window.display.height);
 
         platform.handle = glfwCreateWindow(CORE.Window.display.width, CORE.Window.display.height, (CORE.Window.title != 0)? CORE.Window.title : " ", monitor, NULL);
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
         if (!platform.handle)
         {
             glfwTerminate();
             TRACELOG(LOG_WARNING, "GLFW: Failed to initialize Window");
             return -1;
         }
-=======
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
 
         // NOTE: Full-screen change, not working properly...
         //glfwSetWindowMonitor(platform.handle, glfwGetPrimaryMonitor(), 0, 0, CORE.Window.screen.width, CORE.Window.screen.height, GLFW_DONT_CARE);
@@ -1627,15 +1567,12 @@ int InitPlatform(void)
         int creationHeight = CORE.Window.screen.height != 0 ? CORE.Window.screen.height : 1;
 
         platform.handle = glfwCreateWindow(creationWidth, creationHeight, (CORE.Window.title != 0)? CORE.Window.title : " ", NULL, NULL);
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
         if (!platform.handle)
         {
             glfwTerminate();
             TRACELOG(LOG_WARNING, "GLFW: Failed to initialize Window");
             return -1;
         }
-=======
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
 
         // After the window was created, determine the monitor that the window manager assigned.
         // Derive display sizes, and, if possible, window size in case it was zero at beginning.
@@ -1659,23 +1596,8 @@ int InitPlatform(void)
             return -1;
         }
 
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
         CORE.Window.render.width = CORE.Window.screen.width;
         CORE.Window.render.height = CORE.Window.screen.height;
-=======
-        if (platform.handle)
-        {
-            CORE.Window.render.width = CORE.Window.screen.width;
-            CORE.Window.render.height = CORE.Window.screen.height;
-        }
-    }
-
-    if (!platform.handle)
-    {
-        glfwTerminate();
-        TRACELOG(LOG_WARNING, "GLFW: Failed to initialize Window");
-        return -1;
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
     }
 
     glfwMakeContextCurrent(platform.handle);
@@ -1746,16 +1668,6 @@ int InitPlatform(void)
         int monitorHeight = 0;
         glfwGetMonitorWorkarea(monitor, &monitorX, &monitorY, &monitorWidth, &monitorHeight);
 
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
-=======
-<<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop.c
-        int posX = monitorX + (monitorWidth - CORE.Window.screen.width)/2;
-        int posY = monitorY + (monitorHeight - CORE.Window.screen.height)/2;
-        if (posX < monitorX) posX = monitorX;
-        if (posY < monitorY) posY = monitorY;
-        SetWindowPosition(posX, posY);
-========
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
         // Here CORE.Window.render.width/height should be used instead of CORE.Window.screen.width/height to center the window correctly when the high dpi flag is enabled.
         int posX = monitorX + (monitorWidth - (int)CORE.Window.render.width)/2;
         int posY = monitorY + (monitorHeight - (int)CORE.Window.render.height)/2;
@@ -1766,10 +1678,6 @@ int InitPlatform(void)
         // Update CORE.Window.position here so it is correct from the start
         CORE.Window.position.x = posX;
         CORE.Window.position.y = posY;
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
-=======
->>>>>>>> master_original:external/raylib/src/platforms/rcore_desktop_glfw.c
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
     }
 
     // Load OpenGL extensions
@@ -1806,11 +1714,7 @@ int InitPlatform(void)
     // Retrieve gamepad names
     for (int i = 0; i < MAX_GAMEPADS; i++)
     {
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
         if (glfwJoystickPresent(i)) strncpy(CORE.Input.Gamepad.name[i], glfwGetJoystickName(i), MAX_GAMEPAD_NAME_LENGTH - 1);
-=======
-        if (glfwJoystickPresent(i)) strcpy(CORE.Input.Gamepad.name[i], glfwGetJoystickName(i));
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
     }
     //----------------------------------------------------------------------------
 
@@ -1824,23 +1728,6 @@ int InitPlatform(void)
     CORE.Storage.basePath = GetWorkingDirectory();
     //----------------------------------------------------------------------------
 
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
-=======
-<<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop.c
-    char* glfwPlatform = "";
-    switch (glfwGetPlatform())
-    {
-        case GLFW_PLATFORM_WIN32:   glfwPlatform = "Win32";   break;
-        case GLFW_PLATFORM_COCOA:   glfwPlatform = "Cocoa";   break;
-        case GLFW_PLATFORM_WAYLAND: glfwPlatform = "Wayland"; break;
-        case GLFW_PLATFORM_X11:     glfwPlatform = "X11";     break;
-        case GLFW_PLATFORM_NULL:    glfwPlatform = "Null";    break;
-    }
-
-    TRACELOG(LOG_INFO, "GLFW platform: %s", glfwPlatform);
-    TRACELOG(LOG_INFO, "PLATFORM: DESKTOP (GLFW): Initialized successfully");
-========
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
 #if defined(__NetBSD__)
     // Workaround for NetBSD
     char *glfwPlatform = "X11";
@@ -1858,10 +1745,6 @@ int InitPlatform(void)
 #endif
 
     TRACELOG(LOG_INFO, "PLATFORM: DESKTOP (GLFW - %s): Initialized successfully", glfwPlatform);
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
-=======
->>>>>>>> master_original:external/raylib/src/platforms/rcore_desktop_glfw.c
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
 
     return 0;
 }
@@ -1884,7 +1767,7 @@ static void ErrorCallback(int error, const char *description)
 }
 
 // GLFW3 WindowSize Callback, runs when window is resizedLastFrame
-// NOTE: Window resizing not allowed by default
+// NOTE: Window resizing not enabled by default, use SetConfigFlags()
 static void WindowSizeCallback(GLFWwindow *window, int width, int height)
 {
     // Reset viewport and projection matrix for new size
@@ -1896,23 +1779,22 @@ static void WindowSizeCallback(GLFWwindow *window, int width, int height)
 
     if (IsWindowFullscreen()) return;
 
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
     // if we are doing automatic DPI scaling, then the "screen" size is divided by the window scale
     if (IsWindowState(FLAG_WINDOW_HIGHDPI))
     {
-        width = (int)(width / GetWindowScaleDPI().x);
-        height = (int)(height / GetWindowScaleDPI().y);
+        width = (int)(width/GetWindowScaleDPI().x);
+        height = (int)(height/GetWindowScaleDPI().y);
     }
 
-    // Set current screen size
-=======
-    // Set current screen size
+    // Set render size
+    CORE.Window.render.width = width;
+    CORE.Window.render.height = height;
 
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
+    // Set current screen size
     CORE.Window.screen.width = width;
     CORE.Window.screen.height = height;
 
-    // NOTE: Postprocessing texture is not scaled to new size
+    // WARNING: If using a render texture, it is not scaled to new size
 }
 static void WindowPosCallback(GLFWwindow* window, int x, int y)
 {
@@ -1925,14 +1807,6 @@ static void WindowContentScaleCallback(GLFWwindow *window, float scalex, float s
     CORE.Window.screenScale = MatrixScale(scalex, scaley, 1.0f);
 }
 
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
-=======
-static void WindowContentScaleCallback(GLFWwindow *window, float scalex, float scaley)
-{
-    CORE.Window.screenScale = MatrixScale(scalex, scaley, 1.0f);
-}
-
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
 // GLFW3 WindowIconify Callback, runs when window is minimized/restored
 static void WindowIconifyCallback(GLFWwindow *window, int iconified)
 {
@@ -2113,19 +1987,11 @@ static void JoystickCallback(int jid, int event)
 {
     if (event == GLFW_CONNECTED)
     {
-<<<<<<< HEAD:external/raylib/src/platforms/rcore_desktop_glfw.c
         strncpy(CORE.Input.Gamepad.name[jid], glfwGetJoystickName(jid), MAX_GAMEPAD_NAME_LENGTH - 1);
     }
     else if (event == GLFW_DISCONNECTED)
     {
         memset(CORE.Input.Gamepad.name[jid], 0, MAX_GAMEPAD_NAME_LENGTH);
-=======
-        strcpy(CORE.Input.Gamepad.name[jid], glfwGetJoystickName(jid));
-    }
-    else if (event == GLFW_DISCONNECTED)
-    {
-        memset(CORE.Input.Gamepad.name[jid], 0, 64);
->>>>>>> master_original:raylib/platforms/rcore_desktop_glfw.c
     }
 }
 

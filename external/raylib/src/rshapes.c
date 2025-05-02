@@ -288,6 +288,7 @@ void DrawCircleSector(Vector2 center, float radius, float startAngle, float endA
     center.x += 0.5f;
     center.y += 0.5f;
 
+    if (startAngle == endAngle) return;
     if (radius <= 0.0f) radius = 0.1f;  // Avoid div by zero
 
     // Function expects (endAngle > startAngle)
@@ -379,6 +380,7 @@ void DrawCircleSector(Vector2 center, float radius, float startAngle, float endA
 // Draw a piece of a circle outlines
 void DrawCircleSectorLines(Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color)
 {
+    if (startAngle == endAngle) return;
     if (radius <= 0.0f) radius = 0.1f;  // Avoid div by zero issue
 
     // Function expects (endAngle > startAngle)
@@ -2252,7 +2254,7 @@ bool CheckCollisionPointTriangle(Vector2 point, Vector2 p1, Vector2 p2, Vector2 
 // NOTE: Based on http://jeffreythompson.org/collision-detection/poly-point.php
 bool CheckCollisionPointPoly(Vector2 point, const Vector2 *points, int pointCount)
 {
-    bool inside = false;
+    bool collision = false;
 
     if (pointCount > 2)
     {
@@ -2261,12 +2263,12 @@ bool CheckCollisionPointPoly(Vector2 point, const Vector2 *points, int pointCoun
             if ((points[i].y > point.y) != (points[j].y > point.y) &&
                 (point.x < (points[j].x - points[i].x)*(point.y - points[i].y)/(points[j].y - points[i].y) + points[i].x))
             {
-                inside = !inside;
+                collision = !collision;
             }
         }
     }
 
-    return inside;
+    return collision;
 }
 
 // Check collision between two rectangles
