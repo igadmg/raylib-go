@@ -2,7 +2,7 @@ module github.com/igadmg/raylib-go/easings
 
 go 1.24
 
-require github.com/igadmg/gamemath v0.0.0-20250410222204-28d83654fdf2
+require github.com/igadmg/gamemath v0.0.0-20250502152201-14a551f600ad
 
 require (
 	github.com/chewxy/math32 v1.11.1 // indirect
