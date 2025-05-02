@@ -8,8 +8,6 @@ github.com/igadmg/gamemath v0.0.0-20250410222204-28d83654fdf2 h1:SwNDZtDMiQiDXMr
 github.com/igadmg/gamemath v0.0.0-20250410222204-28d83654fdf2/go.mod h1:ht+Hnhqlek+UAzZiyf3zYNukFmfJHuAEOLKJrshPrQo=
 github.com/igadmg/goex v0.0.0-20250502115452-bd40b01ba4eb h1:Fu2lwvI20ZfrJN9uaR/zjQeN3VMU20hFuBLkRCgE0O8=
 github.com/igadmg/goex v0.0.0-20250502115452-bd40b01ba4eb/go.mod h1:oRtmQqRpH/fasU3HEeYAoWhDfM5oLz04zIvkqsQ75AU=
-github.com/igadmg/raylib-go/raylib v0.0.0-20250502133109-1dac2f68bf87 h1:ZCcahLtYPfaFI1zzEWu8oTxynq0Mp22nSCPZpm/wWTw=
-github.com/igadmg/raylib-go/raylib v0.0.0-20250502133109-1dac2f68bf87/go.mod h1:SQsSKrDb6hXm5CpjgZJDU/dcqnR2DqvZ6ST6WE6rREM=
 github.com/igadmg/raylib-go/raylib v0.0.0-20250502133510-0b068adc4c44 h1:iSxwo3cn9hW152tjpF6p5+1W7DfTaKLnwojr6JR2FAQ=
 github.com/igadmg/raylib-go/raylib v0.0.0-20250502133510-0b068adc4c44/go.mod h1:g6XCk2wFtZq0/2jBNyjqQl1PXR1jjM4bNIV6ZqRijzo=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
