@@ -4,8 +4,8 @@ go 1.24
 
 require (
 	github.com/igadmg/gamemath v0.0.0-20250410222204-28d83654fdf2
-	github.com/igadmg/goex v0.0.0-20250407220752-712c023573b8
-	github.com/igadmg/raylib-go/raylib v0.0.0-20250502131645-69dfc6d44b22
+	github.com/igadmg/goex v0.0.0-20250502115452-bd40b01ba4eb
+	github.com/igadmg/raylib-go/raylib v0.0.0-20250502133109-1dac2f68bf87
 )
 
 require (
@@ -18,4 +18,3 @@ require (
 	golang.org/x/sys v0.32.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
